@@ -6,13 +6,14 @@ import { Member } from '../types';
 import React from 'react';
 
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 export default function AddMember() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const mutation = useMutation(
     (newMember: Partial<Member>) =>
-      axios.post('http://localhost:3000/api/members', newMember),
+      axios.post(`${API_URL}/api/members`, newMember),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('members');

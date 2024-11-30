@@ -7,13 +7,15 @@ import { DashboardStatsData as DashboardStatsType, Member } from '../types';
 import React from 'react';
 
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export default function Dashboard() {
   const { data: stats } = useQuery<DashboardStatsType>('dashboardStats', () =>
-    axios.get('http://localhost:3000/api/dashboard/stats').then((res) => res.data)
+    axios.get(`${API_URL}/api/dashboard/stats`).then((res) => res.data)
   );
 
   const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get('http://localhost:3000/api/members').then((res) => res.data)
+    axios.get(`${API_URL}/api/members`).then((res) => res.data)
   );
 
   if (!stats || !members) return null;

@@ -12,6 +12,8 @@ interface Member {
   _id: string;
   name: string;
 }
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,7 +26,7 @@ export default function Header() {
     ['memberSearch', searchQuery],
     async () => {
       if (!searchQuery) return [];
-      const response = await axios.get(`http://localhost:3000/api/members/search?query=${searchQuery}`);
+      const response = await axios.get(`${API_URL}/api/members/search?query=${searchQuery}`);
       return response.data;
     },
     {

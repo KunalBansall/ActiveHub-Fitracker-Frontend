@@ -19,6 +19,8 @@ interface SignUpForm {
   gymType: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export default function SignUp() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ export default function SignUp() {
   const onSubmit = async (data: SignUpForm) => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/signup",
+        `${API_URL}/api/auth/signup`,
         data
       );
       localStorage.setItem("token", response.data.token);

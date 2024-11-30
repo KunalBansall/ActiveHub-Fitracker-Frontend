@@ -5,6 +5,8 @@ import MemberForm from '../components/MemberForm';
 import { Member } from '../types';
 import React from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 
 export default function MemberDetails() {
   const { id } = useParams();
@@ -12,7 +14,7 @@ export default function MemberDetails() {
   const navigate = useNavigate();
 
   const { data: member } = useQuery<Member>(['member', id], () =>
-    axios.get(`http://localhost:3000/api/members/${id}`).then((res) => res.data)
+    axios.get(`${API_URL}/api/members/${id}`).then((res) => res.data)
   );
 
   const mutation = useMutation(

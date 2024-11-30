@@ -5,21 +5,22 @@ import { toast } from 'react-hot-toast';
 import { Member } from '../types';
 import React from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Attendance() {
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const queryClient = useQueryClient();
 
   const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get('http://localhost:3000/api/members').then((res) => res.data)
+    axios.get(`${API_URL}/api/members`).then((res) => res.data)
   );
 
   const { data: todayAttendance } = useQuery('todayAttendance', () =>
-    axios.get('http://localhost:3000/api/attendance/today').then((res) => res.data)
+    axios.get(`${API_URL}/api/attendance/today`).then((res) => res.data)
   );
 
   const entryMutation = useMutation(
-    (memberId: string) => axios.post(`http://localhost:3000/api/attendance/entry/${memberId}`),
+    (memberId: string) => axios.post(`${API_URL}/api/attendance/entry/${memberId}`),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('todayAttendance');
@@ -30,7 +31,7 @@ export default function Attendance() {
   );
 
   const exitMutation = useMutation(
-    (memberId: string) => axios.post(`http://localhost:3000/api/attendance/exit/${memberId}`),
+    (memberId: string) => axios.post(`${API_URL}/api/attendance/exit/${memberId}`),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('todayAttendance');

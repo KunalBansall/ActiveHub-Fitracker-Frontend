@@ -9,6 +9,8 @@ interface SignInForm {
   password: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export default function SignIn() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default function SignIn() {
   const onSubmit = async (data: SignInForm) => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/signin",
+        `${API_URL}/api/auth/signin`,
         data
       );
       localStorage.setItem("token", response.data.token);

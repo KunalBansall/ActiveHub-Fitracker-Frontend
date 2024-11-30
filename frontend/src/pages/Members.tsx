@@ -6,10 +6,11 @@ import { Member } from '../types';
 import MemberList from '../components/MemberList';
 import React from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Members() {
   const { data: members, isLoading } = useQuery<Member[]>('members', () =>
-    axios.get('http://localhost:3000/api/members').then((res) => res.data)
+    axios.get(`${API_URL}/api/members`).then((res) => res.data) 
   );
 
   if (isLoading) return <div>Loading...</div>;
