@@ -23,7 +23,7 @@ export default function SignIn() {
   const onSubmit = async (data: SignInForm) => {
     try {
       const response = await axios.post(
-        `${API_URL}/api/auth/signin`,
+        `${API_URL}/auth/signin`,
         data
       );
       localStorage.setItem("token", response.data.token);

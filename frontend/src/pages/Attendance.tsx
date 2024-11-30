@@ -12,15 +12,15 @@ export default function Attendance() {
   const queryClient = useQueryClient();
 
   const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/api/members`).then((res) => res.data)
+    axios.get(`${API_URL}/members`).then((res) => res.data)
   );
 
   const { data: todayAttendance } = useQuery('todayAttendance', () =>
-    axios.get(`${API_URL}/api/attendance/today`).then((res) => res.data)
+    axios.get(`${API_URL}/attendance/today`).then((res) => res.data)
   );
 
   const entryMutation = useMutation(
-    (memberId: string) => axios.post(`${API_URL}/api/attendance/entry/${memberId}`),
+    (memberId: string) => axios.post(`${API_URL}/attendance/entry/${memberId}`),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('todayAttendance');
@@ -31,7 +31,7 @@ export default function Attendance() {
   );
 
   const exitMutation = useMutation(
-    (memberId: string) => axios.post(`${API_URL}/api/attendance/exit/${memberId}`),
+    (memberId: string) => axios.post(`${API_URL}/attendance/exit/${memberId}`),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('todayAttendance');

@@ -11,11 +11,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Dashboard() {
   const { data: stats } = useQuery<DashboardStatsType>('dashboardStats', () =>
-    axios.get(`${API_URL}/api/dashboard/stats`).then((res) => res.data)
+    axios.get(`${API_URL}/dashboard/stats`).then((res) => res.data)
   );
 
   const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/api/members`).then((res) => res.data)
+    axios.get(`${API_URL}/members`).then((res) => res.data)
   );
 
   if (!stats || !members) return null;

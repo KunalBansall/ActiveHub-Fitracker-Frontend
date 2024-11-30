@@ -14,12 +14,12 @@ export default function MemberDetails() {
   const navigate = useNavigate();
 
   const { data: member } = useQuery<Member>(['member', id], () =>
-    axios.get(`${API_URL}/api/members/${id}`).then((res) => res.data)
+    axios.get(`${API_URL}/members/${id}`).then((res) => res.data)
   );
 
   const mutation = useMutation(
     (updatedMember: Partial<Member>) =>
-      axios.patch(`${API_URL}/api/members/${id}`, updatedMember),
+      axios.patch(`${API_URL}/members/${id}`, updatedMember),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(['member', id]);

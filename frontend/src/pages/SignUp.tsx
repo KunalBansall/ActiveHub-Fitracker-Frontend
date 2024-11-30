@@ -33,7 +33,7 @@ export default function SignUp() {
   const onSubmit = async (data: SignUpForm) => {
     try {
       const response = await axios.post(
-        `${API_URL}/api/auth/signup`,
+        `${API_URL}/auth/signup`,
         data
       );
       localStorage.setItem("token", response.data.token);

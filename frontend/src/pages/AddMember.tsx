@@ -13,7 +13,7 @@ export default function AddMember() {
 
   const mutation = useMutation(
     (newMember: Partial<Member>) =>
-      axios.post(`${API_URL}/api/members`, newMember),
+      axios.post(`${API_URL}/members`, newMember),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('members');

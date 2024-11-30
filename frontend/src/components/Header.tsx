@@ -26,7 +26,7 @@ export default function Header() {
     ['memberSearch', searchQuery],
     async () => {
       if (!searchQuery) return [];
-      const response = await axios.get(`${API_URL}/api/members/search?query=${searchQuery}`);
+      const response = await axios.get(`${API_URL}/members/search?query=${searchQuery}`);
       return response.data;
     },
     {
