@@ -19,7 +19,7 @@ export default function MemberDetails() {
 
   const mutation = useMutation(
     (updatedMember: Partial<Member>) =>
-      axios.patch(`http://localhost:3000/api/members/${id}`, updatedMember),
+      axios.patch(`${API_URL}/api/members/${id}`, updatedMember),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(['member', id]);
