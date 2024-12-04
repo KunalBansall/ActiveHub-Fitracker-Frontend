@@ -119,7 +119,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               </label>
             </div>
             {isUploading && (
-              <div className="mt-2 text-sm text-green-600">
+              <div className="mt-2 text-sm text-green-600 flex flex-col items-center space-y-6">
                 Uploading... {uploadProgress}%
               </div>
             )}
