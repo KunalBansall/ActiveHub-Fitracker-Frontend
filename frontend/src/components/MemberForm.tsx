@@ -12,7 +12,9 @@ interface Props {
 }
 
 export default function MemberForm({ onSubmit, initialData }: Props) {
-  const [photoPreview, setPhotoPreview] = useState<string | null>(initialData?.photo || null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(
+    initialData?.photo || null
+  );
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -24,7 +26,9 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
     defaultValues: initialData,
   });
 
-  const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       setIsUploading(true);
@@ -127,7 +131,9 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
           {/* Name Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               {...register("name", { required: "Name is required" })}
@@ -140,33 +146,45 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
           {/* Email Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               {...register("email", { required: "Email is required" })}
               className="mt-1 block w-full font-serif rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
           {/* Phone Number Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
             <input
               type="tel"
-              {...register("phoneNumber", { required: "Phone number is required" })}
+              {...register("phoneNumber", {
+                required: "Phone number is required",
+              })}
               className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
             {errors.phoneNumber && (
-              <p className="mt-1 text-sm text-red-600">{errors.phoneNumber.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.phoneNumber.message}
+              </p>
             )}
           </div>
 
           {/* Weight Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Weight (kg)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Weight (kg)
+            </label>
             <input
               type="number"
               {...register("weight", {
@@ -177,13 +195,17 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
             {errors.weight && (
-              <p className="mt-1 text-sm text-red-600">{errors.weight.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.weight.message}
+              </p>
             )}
           </div>
 
           {/* Height Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Height (cm)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Height (cm)
+            </label>
             <input
               type="number"
               {...register("height", {
@@ -194,13 +216,17 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
             {errors.height && (
-              <p className="mt-1 text-sm text-red-600">{errors.height.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.height.message}
+              </p>
             )}
           </div>
 
           {/* Trainer Assigned Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Trainer Assigned</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Trainer Assigned
+            </label>
             <input
               type="text"
               {...register("trainerAssigned")}
@@ -210,9 +236,13 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
           {/* Membership Type Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Membership Type</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Membership Type
+            </label>
             <select
-              {...register("membershipType", { required: "Membership type is required" })}
+              {...register("membershipType", {
+                required: "Membership type is required",
+              })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-serif focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="basic">Basic</option>
@@ -221,13 +251,17 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               <option value="platinum">Platinum</option>
             </select>
             {errors.membershipType && (
-              <p className="mt-1 text-sm text-red-600">{errors.membershipType.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.membershipType.message}
+              </p>
             )}
           </div>
 
           {/* Duration Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Duration (months)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Duration (months)
+            </label>
             <input
               type="number"
               {...register("durationMonths", {
@@ -238,7 +272,42 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
             {errors.durationMonths && (
-              <p className="mt-1 text-sm text-red-600">{errors.durationMonths.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.durationMonths.message}
+              </p>
+            )}
+          </div>
+          {/* Fees Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Fees
+            </label>
+            <input
+              type="number"
+              {...register("fees", { required: "Fees is required", min: 0 })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            {errors.fees && (
+              <p className="mt-1 text-sm text-red-600">{errors.fees.message}</p>
+            )}
+          </div>
+
+          {/* Fee Status Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Fee Status
+            </label>
+            <select
+              {...register("feeStatus", { required: "Fee status is required" })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+            {errors.feeStatus && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.feeStatus.message}
+              </p>
             )}
           </div>
         </div>
