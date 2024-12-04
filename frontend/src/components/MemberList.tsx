@@ -4,12 +4,18 @@ import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 import React from 'react';
 
-
 interface Props {
   members: Member[];
 }
 
 export default function MemberList({ members }: Props) {
+  // Sort members by membershipEndDate (ascending)
+  const sortedMembers = [...members].sort((a, b) => {
+    const dateA = new Date(a.membershipEndDate);
+    const dateB = new Date(b.membershipEndDate);
+    return dateA.getTime() - dateB.getTime(); // Sort in ascending order
+  });
+
   return (
     <div className="mt-8 flow-root">
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -38,10 +44,10 @@ export default function MemberList({ members }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {members.map((member) => {
+              {sortedMembers.map((member) => {
                 const expiryDate = new Date(member.membershipEndDate);
                 const isExpiringSoon = expiryDate <= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
-                
+
                 return (
                   <tr key={member._id}>
                     <td className="whitespace-nowrap py-4 pl-4 pr-3">
@@ -62,9 +68,7 @@ export default function MemberList({ members }: Props) {
                           )}
                         </div>
                         <div className="ml-4">
-                          <div className="font-medium text-gray-900">
-                            {member.name}
-                          </div>
+                          <div className="font-medium text-gray-900">{member.name}</div>
                           <div className="text-gray-500">{member.phoneNumber}</div>
                         </div>
                       </div>
@@ -76,8 +80,7 @@ export default function MemberList({ members }: Props) {
                           {
                             'bg-green-100 text-green-800': member.status === 'active',
                             'bg-red-100 text-red-800': member.status === 'expired',
-                            'bg-yellow-100 text-yellow-800':
-                              member.status === 'pending',
+                            'bg-yellow-100 text-yellow-800': member.status === 'pending',
                           }
                         )}
                       >
@@ -87,10 +90,12 @@ export default function MemberList({ members }: Props) {
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {member.membershipType}
                     </td>
-                    <td className={clsx(
-                      "whitespace-nowrap px-3 py-4 text-sm",
-                      isExpiringSoon ? "text-red-600 font-medium" : "text-gray-500"
-                    )}>
+                    <td
+                      className={clsx(
+                        'whitespace-nowrap px-3 py-4 text-sm',
+                        isExpiringSoon ? 'text-red-600 font-medium' : 'text-gray-500'
+                      )}
+                    >
                       {format(expiryDate, 'MM/dd/yyyy')}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

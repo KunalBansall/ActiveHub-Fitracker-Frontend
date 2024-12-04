@@ -41,10 +41,10 @@ export default function MobileMenu({ isOpen, setIsOpen }: MobileMenuProps) {
           >
             <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
               <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4">
-                <div className="flex h-16 shrink-0 items-center">
+                <div className="flex  h-16  items-center">
                   <img
                     className="h-8 w-auto"
-                    src="/logo.svg"
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp3k7MVRHVPxRZfY8LXE7nWsKEfN2Fxsgv6g&s"
                     alt="ActiveHub"
                   />
                 </div>

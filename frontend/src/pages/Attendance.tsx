@@ -36,7 +36,6 @@ export default function Attendance() {
       onSuccess: () => {
         queryClient.invalidateQueries('todayAttendance');
         toast.success('Exit recorded successfully');
-        setSelectedMemberId('');
       },
     }
   );
@@ -46,9 +45,11 @@ export default function Attendance() {
       <h1 className="text-2xl font-semibold text-gray-900">Attendance</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Record Entry/Exit */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-medium mb-4">Record Entry/Exit</h2>
           <div className="space-y-4">
+            {/* Member selection dropdown */}
             <select
               value={selectedMemberId}
               onChange={(e) => setSelectedMemberId(e.target.value)}
@@ -57,11 +58,42 @@ export default function Attendance() {
               <option value="">Select Member</option>
               {members?.map((member) => (
                 <option key={member._id} value={member._id}>
+                  {/* Display photo and name in dropdown */}
+                  {member.photo && (
+                    <img
+                      src={member.photo}
+                      alt={member.name}
+                      className="inline-block h-8 w-8 rounded-full mr-2"
+                    />
+                  )}
                   {member.name}
                 </option>
               ))}
             </select>
-            <div className="flex space-x-4">
+
+            {/* Display selected member's photo and name */}
+            {selectedMemberId && members && (
+              <div className="flex items-center space-x-4 mt-4">
+                {/* Find the selected member */}
+                {members.map((member) =>
+                  member._id === selectedMemberId ? (
+                    <div key={member._id} className="flex items-center">
+                      {member.photo && (
+                        <img
+                          src={member.photo}
+                          alt={member.name}
+                          className="h-12 w-12 rounded-full mr-4"
+                        />
+                      )}
+                      <span className="text-lg font-medium text-gray-900">{member.name}</span>
+                    </div>
+                  ) : null
+                )}
+              </div>
+            )}
+
+            <div className="flex space-x-4 mt-4">
+              {/* Record Entry */}
               <button
                 onClick={() => selectedMemberId && entryMutation.mutate(selectedMemberId)}
                 disabled={!selectedMemberId}
@@ -69,6 +101,8 @@ export default function Attendance() {
               >
                 Record Entry
               </button>
+
+              {/* Record Exit */}
               <button
                 onClick={() => selectedMemberId && exitMutation.mutate(selectedMemberId)}
                 disabled={!selectedMemberId}
@@ -80,6 +114,7 @@ export default function Attendance() {
           </div>
         </div>
 
+        {/* Today's Attendance */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-medium mb-4">Today's Attendance</h2>
           <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
@@ -95,6 +130,9 @@ export default function Attendance() {
                   <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     Exit Time
                   </th>
+                  <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
@@ -102,6 +140,7 @@ export default function Attendance() {
                   <tr key={record._id}>
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
                       <div className="flex items-center">
+                        {/* Display member photo and name */}
                         {record.memberId.photo && (
                           <img
                             src={record.memberId.photo}
@@ -119,6 +158,17 @@ export default function Attendance() {
                       {record.exitTime
                         ? new Date(record.exitTime).toLocaleTimeString()
                         : '-'}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {/* Display Mark Exit button only if entry is done */}
+                      {record.entryTime && !record.exitTime && (
+                        <button
+                          onClick={() => exitMutation.mutate(record.memberId._id)}
+                          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                        >
+                          Mark Exit
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -46,21 +46,21 @@ export default function SignUp() {
 
   return (
     <div
-      className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:px-6 lg:px-8 "
+      className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:px-6 lg:px-8"
       style={{
         backgroundImage: "url(/Activehub04.jpeg)",
-        backgroundSize: "fit",
+        backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
       <div className="sm:mx-auto sm:w-full sm:max-w-4xl">
-        <h2 className="mt-2 text-center text-4xl font-extrabold text-outline text-white">
+        <h2 className="mt-2 text-center text-3xl sm:text-4xl font-extrabold text-outline text-white">
           Register Your Gym
         </h2>
       </div>
 
       <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-4xl">
-        <div className="bg-white bg-opacity-30 py-8 px-8 shadow sm:rounded-lg">
+        <div className="bg-white bg-opacity-30 py-8 px-6 sm:px-8 shadow sm:rounded-lg">
           {error && (
             <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
               {error}
@@ -174,7 +174,7 @@ export default function SignUp() {
                 <label className="block text-sm font-medium text-gray-700">
                   Gym Address
                 </label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input
                     {...register("gymAddress.street", { required: "Street is required" })}
                     placeholder="Street"
@@ -186,7 +186,7 @@ export default function SignUp() {
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                   <input
                     {...register("gymAddress.state", { required: "State is required" })}
                     placeholder="State"
@@ -197,14 +197,7 @@ export default function SignUp() {
                     placeholder="ZIP Code"
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
-                </div> 
-                {/* <div className="mt-4">
-                  <input
-                    {...register("gymAddress.country", { required: "Country is required" })}
-                    placeholder="Country"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div> */}
+                </div>
               </div>
             </div>
 

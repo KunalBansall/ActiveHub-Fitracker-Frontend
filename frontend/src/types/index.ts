@@ -11,7 +11,7 @@ export interface Member {
   durationMonths: number;
   fees: number;
   feeStatus: 'paid' | 'due';
-  photo?: string;
+  photo?: string | null;
   status: 'active' | 'expired' | 'pending';
   membershipType: 'basic' | 'premium' | 'platinum';
 }
