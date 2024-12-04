@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Member } from "../types"; // assuming Member type is defined elsewhere
-import cloudinary from "cloudinary";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload"; // Cloud Name: diy7wynvw
 const UPLOAD_PRESET = "ActiveHub"; // Replace with your upload preset
@@ -35,27 +34,39 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
       formData.append("file", file);
       formData.append("upload_preset", UPLOAD_PRESET);
 
-      try {
-        // Send a POST request to Cloudinary API
-        const response = await fetch(CLOUDINARY_URL, {
-          method: "POST",
-          body: formData,
-        });
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", CLOUDINARY_URL, true);
 
-        const result = await response.json();
+      // Track the upload progress
+      xhr.upload.onprogress = (e: ProgressEvent) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          setUploadProgress(percent);
+        }
+      };
 
-        if (response.ok) {
-          // Successfully uploaded, set the image URL
+      // Handle the upload completion
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const result = JSON.parse(xhr.responseText);
           setPhotoPreview(result.secure_url);
           setIsUploading(false);
         } else {
-          throw new Error(result.error?.message || "Upload failed");
+          console.error("Error uploading file:", xhr.responseText);
+          setIsUploading(false);
+          alert("Failed to upload the image. Please try again.");
         }
-      } catch (error) {
-        console.error("Error uploading file:", error);
+      };
+
+      // Handle errors during the upload
+      xhr.onerror = () => {
+        console.error("Error uploading file:", xhr.responseText);
         setIsUploading(false);
         alert("Failed to upload the image. Please try again.");
-      }
+      };
+
+      // Send the request
+      xhr.send(formData);
     }
   };
 
@@ -64,7 +75,6 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
       ...data,
       photo: photoPreview,
     });
-    // console.log("paylod",data);
   };
 
   return (
@@ -92,11 +102,11 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 accept="image/*"
                 onChange={handlePhotoChange}
                 className="block w-full text-sm text-gray-500
-                 file:mr-4 file:py-2 file:px-4
-                 file:rounded-md file:border-0
-                 file:text-sm file:font-semibold
-                 file:bg-blue-50 file:text-blue-700
-                 hover:file:bg-blue-100"
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100"
               />
             </label>
           </div>
@@ -226,39 +236,26 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
         {/* Fees Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Fees</label>
+          <label className="block text-sm font-medium text-gray-700">Fees (₹)</label>
           <input
             type="number"
-            {...register("fees", { required: "Fees is required" })}
+            {...register("fees", { required: "Fees are required" })}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           />
           {errors.fees && (
             <p className="mt-1 text-sm text-red-600">{errors.fees.message}</p>
           )}
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Fee Status</label>
-          <select
-            {...register("feeStatus", { required: "Fee status is required" })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="paid">Paid</option>
-            <option value="pending">Pending</option>
-            <option value="overdue">Overdue</option>
-          </select>
-          {errors.feeStatus && (
-            <p className="mt-1 text-sm text-red-600">{errors.feeStatus.message}</p>
-          )}
-        </div>
-      </div>
 
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          {initialData ? "Update Member" : "Add Member"}
-        </button>
+        {/* Submit Button */}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            {initialData ? "Update Member" : "Add Member"}
+          </button>
+        </div>
       </div>
     </form>
   );
