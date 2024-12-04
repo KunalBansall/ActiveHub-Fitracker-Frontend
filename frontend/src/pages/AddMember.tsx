@@ -7,6 +7,7 @@ import React from 'react';
 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+console.log(API_URL ,"sa");
 export default function AddMember() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();

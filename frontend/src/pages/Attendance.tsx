@@ -12,7 +12,7 @@ export default function Attendance() {
   const queryClient = useQueryClient();
 
   const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/members`).then((res) => res.data)
+    axios.get(`${API_URL}/members`).then((res) => res.data)  
   );
 
   const { data: todayAttendance } = useQuery('todayAttendance', () =>

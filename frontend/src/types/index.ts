@@ -14,6 +14,9 @@ export interface Member {
   photo?: string | null;
   status: 'active' | 'expired' | 'pending';
   membershipType: 'basic' | 'premium' | 'platinum';
+  lastCheckIn?: string | null; 
+  createdAt :string;
+  
 }
 
 export interface DashboardStatsData {

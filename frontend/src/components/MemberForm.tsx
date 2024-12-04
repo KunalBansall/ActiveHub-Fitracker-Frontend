@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Member } from "../types"; // assuming Member type is defined elsewhere
+import { format } from "date-fns"; // Importing date-fns for formatting
+import { Member } from "../types"; // Assuming Member type is defined elsewhere
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload"; // Cloud Name: diy7wynvw
 const UPLOAD_PRESET = "ActiveHub"; // Replace with your upload preset
@@ -29,7 +30,6 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
       setIsUploading(true);
       setUploadProgress(0);
 
-      // Create a FormData object to send the file in the request
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", UPLOAD_PRESET);
@@ -37,7 +37,6 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", CLOUDINARY_URL, true);
 
-      // Track the upload progress
       xhr.upload.onprogress = (e: ProgressEvent) => {
         if (e.lengthComputable) {
           const percent = Math.round((e.loaded / e.total) * 100);
@@ -45,7 +44,6 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
         }
       };
 
-      // Handle the upload completion
       xhr.onload = () => {
         if (xhr.status === 200) {
           const result = JSON.parse(xhr.responseText);
@@ -58,14 +56,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
         }
       };
 
-      // Handle errors during the upload
       xhr.onerror = () => {
         console.error("Error uploading file:", xhr.responseText);
         setIsUploading(false);
         alert("Failed to upload the image. Please try again.");
       };
 
-      // Send the request
       xhr.send(formData);
     }
   };
@@ -77,174 +73,174 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
     });
   };
 
+  // Calculate "Member Since" date
+  const memberSince = initialData?.createdAt
+    ? format(new Date(initialData.createdAt), "MM/yy")
+    : null;
+
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <div className="col-span-2">
-          <div className="flex items-center space-x-6">
-            <div className="h-24 w-24 overflow-hidden rounded-full bg-gray-100">
-              {photoPreview ? (
-                <img
-                  src={photoPreview}
-                  alt="Preview"
-                  className="h-full w-full object-cover"
+    <div className="relative">
+      {/* Member Since label */}
+      {memberSince && (
+        <div className="absolute top-0 right-0 text-sm font-serif font-medium text-green-500">
+          Member Since {memberSince}
+        </div>
+      )}
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="col-span-2">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="h-24 w-24 overflow-hidden rounded-full bg-gray-100">
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <span className="text-gray-400">No photo</span>
+                  </div>
+                )}
+              </div>
+              <label className="block">
+                <span className="sr-only">Choose photo</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100"
                 />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <span className="text-gray-400">No photo</span>
-                </div>
-              )}
+              </label>
             </div>
-            <label className="block">
-              <span className="sr-only">Choose photo</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-              />
-            </label>
+            {isUploading && (
+              <div className="mt-2 text-sm text-green-600">
+                Uploading... {uploadProgress}%
+              </div>
+            )}
           </div>
-          {isUploading && (
-            <div className="mt-2 text-sm text-gray-600">
-              Uploading... {uploadProgress}%
-            </div>
-          )}
-        </div>
 
-        {/* Name Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Name</label>
-          <input
-            type="text"
-            {...register("name", { required: "Name is required" })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-          )}
-        </div>
+          {/* Name Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input
+              type="text"
+              {...register("name", { required: "Name is required" })}
+              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            )}
+          </div>
 
-        {/* Email Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            {...register("email", { required: "Email is required" })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-          )}
-        </div>
+          {/* Email Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              {...register("email", { required: "Email is required" })}
+              className="mt-1 block w-full font-serif rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            )}
+          </div>
 
-        {/* Phone Number Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-          <input
-            type="tel"
-            {...register("phoneNumber", { required: "Phone number is required" })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-          {errors.phoneNumber && (
-            <p className="mt-1 text-sm text-red-600">{errors.phoneNumber.message}</p>
-          )}
-        </div>
+          {/* Phone Number Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input
+              type="tel"
+              {...register("phoneNumber", { required: "Phone number is required" })}
+              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            {errors.phoneNumber && (
+              <p className="mt-1 text-sm text-red-600">{errors.phoneNumber.message}</p>
+            )}
+          </div>
 
-        {/* Weight Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Weight (kg)</label>
-          <input
-            type="number"
-            {...register("weight", {
-              required: "Weight is required",
-              min: { value: 20, message: "Weight must be at least 20kg" },
-              max: { value: 300, message: "Weight must be less than 300kg" },
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-          {errors.weight && (
-            <p className="mt-1 text-sm text-red-600">{errors.weight.message}</p>
-          )}
-        </div>
+          {/* Weight Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Weight (kg)</label>
+            <input
+              type="number"
+              {...register("weight", {
+                required: "Weight is required",
+                min: { value: 20, message: "Weight must be at least 20kg" },
+                max: { value: 300, message: "Weight must be less than 300kg" },
+              })}
+              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            {errors.weight && (
+              <p className="mt-1 text-sm text-red-600">{errors.weight.message}</p>
+            )}
+          </div>
 
-        {/* Height Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Height (cm)</label>
-          <input
-            type="number"
-            {...register("height", {
-              required: "Height is required",
-              min: { value: 100, message: "Height must be at least 100cm" },
-              max: { value: 250, message: "Height must be less than 250cm" },
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-          {errors.height && (
-            <p className="mt-1 text-sm text-red-600">{errors.height.message}</p>
-          )}
-        </div>
+          {/* Height Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Height (cm)</label>
+            <input
+              type="number"
+              {...register("height", {
+                required: "Height is required",
+                min: { value: 100, message: "Height must be at least 100cm" },
+                max: { value: 250, message: "Height must be less than 250cm" },
+              })}
+              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            {errors.height && (
+              <p className="mt-1 text-sm text-red-600">{errors.height.message}</p>
+            )}
+          </div>
 
-        {/* Trainer Assigned Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Trainer Assigned</label>
-          <input
-            type="text"
-            {...register("trainerAssigned")}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
+          {/* Trainer Assigned Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Trainer Assigned</label>
+            <input
+              type="text"
+              {...register("trainerAssigned")}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-serif focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
 
-        {/* Membership Type Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Membership Type</label>
-          <select
-            {...register("membershipType", { required: "Membership type is required" })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="basic">Basic</option>
-            <option value="silver">Silver</option>
-            <option value="gold">Gold</option>
-            <option value="platinum">Platinum</option>
-          </select>
-          {errors.membershipType && (
-            <p className="mt-1 text-sm text-red-600">{errors.membershipType.message}</p>
-          )}
-        </div>
+          {/* Membership Type Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Membership Type</label>
+            <select
+              {...register("membershipType", { required: "Membership type is required" })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-serif focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="basic">Basic</option>
+              <option value="silver">Silver</option>
+              <option value="gold">Gold</option>
+              <option value="platinum">Platinum</option>
+            </select>
+            {errors.membershipType && (
+              <p className="mt-1 text-sm text-red-600">{errors.membershipType.message}</p>
+            )}
+          </div>
 
-        {/* Duration Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Duration (months)</label>
-          <input
-            type="number"
-            {...register("durationMonths", {
-              required: "Duration is required",
-              min: { value: 1, message: "Duration must be at least 1 month" },
-              max: { value: 60, message: "Duration must be less than 60 months" },
-            })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-          {errors.durationMonths && (
-            <p className="mt-1 text-sm text-red-600">{errors.durationMonths.message}</p>
-          )}
-        </div>
-
-        {/* Fees Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Fees (₹)</label>
-          <input
-            type="number"
-            {...register("fees", { required: "Fees are required" })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-          {errors.fees && (
-            <p className="mt-1 text-sm text-red-600">{errors.fees.message}</p>
-          )}
+          {/* Duration Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Duration (months)</label>
+            <input
+              type="number"
+              {...register("durationMonths", {
+                required: "Duration is required",
+                min: { value: 1, message: "Duration must be at least 1 month" },
+                max: { value: 36, message: "Duration cannot exceed 36 months" },
+              })}
+              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            {errors.durationMonths && (
+              <p className="mt-1 text-sm text-red-600">{errors.durationMonths.message}</p>
+            )}
+          </div>
         </div>
 
         {/* Submit Button */}
@@ -256,7 +252,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
             {initialData ? "Update Member" : "Add Member"}
           </button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
