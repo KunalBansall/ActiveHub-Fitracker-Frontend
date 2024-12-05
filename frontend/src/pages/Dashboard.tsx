@@ -10,12 +10,24 @@ import React from 'react';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Dashboard() {
+  const token = localStorage.getItem('token');
+
+  // Fetch dashboard stats
   const { data: stats } = useQuery<DashboardStatsType>('dashboardStats', () =>
-    axios.get(`${API_URL}/dashboard/stats`).then((res) => res.data)
+    axios.get(`${API_URL}/dashboard/stats`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => res.data)
   );
 
+  // Fetch members
   const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/members`).then((res) => res.data)
+    axios.get(`${API_URL}/members`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => res.data)
   );
 
   if (!stats || !members) return null;

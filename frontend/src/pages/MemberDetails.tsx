@@ -7,24 +7,38 @@ import React from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-
 export default function MemberDetails() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Get token from localStorage
+  const token = localStorage.getItem('token');
+
+  // Fetch member details
   const { data: member } = useQuery<Member>(['member', id], () =>
-    axios.get(`${API_URL}/members/${id}`).then((res) => res.data)
+    axios
+      .get(`${API_URL}/members/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data)
   );
 
+  // Update member details
   const mutation = useMutation(
     (updatedMember: Partial<Member>) =>
-      axios.patch(`${API_URL}/members/${id}`, updatedMember),
+      axios.patch(`${API_URL}/members/${id}`, updatedMember, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['member', id]);
-        queryClient.invalidateQueries('members');
-        navigate('/members');
+        queryClient.invalidateQueries(['member', id]); // Refetch updated member data
+        queryClient.invalidateQueries('members'); // Refetch members list
+        navigate('/members'); // Redirect to members list
       },
     }
   );

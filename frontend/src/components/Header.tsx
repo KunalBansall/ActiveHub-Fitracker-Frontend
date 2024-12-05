@@ -5,7 +5,6 @@ import {
   Bars3Icon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-
 import { useQuery } from "react-query";
 import axios from "axios";
 import MobileMenu from "./MobileMenu";
@@ -28,13 +27,20 @@ export default function Header() {
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = localStorage.getItem("token");
 
   const { data: searchResults } = useQuery(
     ["memberSearch", searchQuery],
     async () => {
       if (!searchQuery) return [];
+
       const response = await axios.get(
-        `${API_URL}/members/search?query=${searchQuery}`
+        `${API_URL}/members/search?query=${searchQuery}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in headers
+          },
+        }
       );
       return response.data;
     },

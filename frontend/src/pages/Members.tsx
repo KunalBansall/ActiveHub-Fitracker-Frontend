@@ -9,9 +9,14 @@ import React from 'react';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Members() {
-  const { data: members, isLoading } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/members`).then((res) => res.data) 
-  );
+  const { data: members, isLoading } = useQuery('members', () => {
+      const token = localStorage.getItem('token');
+      return axios.get(`${API_URL}/members`, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      }).then((res) => res.data);
+  });
 
   if (isLoading) return <div>Loading...</div>;
 

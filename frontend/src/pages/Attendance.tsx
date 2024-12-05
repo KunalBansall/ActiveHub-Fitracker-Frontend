@@ -11,16 +11,32 @@ export default function Attendance() {
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const queryClient = useQueryClient();
 
+  // Get token from localStorage
+  const token = localStorage.getItem('token');
+
   const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/members`).then((res) => res.data)  
+    axios.get(`${API_URL}/members`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => res.data)
   );
 
   const { data: todayAttendance } = useQuery('todayAttendance', () =>
-    axios.get(`${API_URL}/attendance/today`).then((res) => res.data)
+    axios.get(`${API_URL}/attendance/today`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => res.data)
   );
 
   const entryMutation = useMutation(
-    (memberId: string) => axios.post(`${API_URL}/attendance/entry/${memberId}`),
+    (memberId: string) =>
+      axios.post(`${API_URL}/attendance/entry/${memberId}`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('todayAttendance');
@@ -31,7 +47,12 @@ export default function Attendance() {
   );
 
   const exitMutation = useMutation(
-    (memberId: string) => axios.post(`${API_URL}/attendance/exit/${memberId}`),
+    (memberId: string) =>
+      axios.post(`${API_URL}/attendance/exit/${memberId}`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('todayAttendance');

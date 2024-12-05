@@ -5,20 +5,26 @@ import MemberForm from '../components/MemberForm';
 import { Member } from '../types';
 import React from 'react';
 
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-console.log(API_URL ,"sa");
+
 export default function AddMember() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  // Get token from localStorage
+  const token = localStorage.getItem('token');
+
   const mutation = useMutation(
     (newMember: Partial<Member>) =>
-      axios.post(`${API_URL}/members`, newMember),
+      axios.post(`${API_URL}/members`, newMember, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('members');
-        navigate('/members');
+        queryClient.invalidateQueries('members'); // Refetch the members list
+        navigate('/members'); // Redirect to the members list
       },
     }
   );
