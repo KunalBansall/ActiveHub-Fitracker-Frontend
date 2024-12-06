@@ -42,5 +42,5 @@ export interface Attendance {
   _id: string;
   memberId: string | Member;
   entryTime: string;
-  exitTime?: string;
+  exitTime?: string | null;
 }

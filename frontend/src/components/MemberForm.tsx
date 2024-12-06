@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { format } from "date-fns"; // Importing date-fns for formatting
-import { Member } from "../types"; // Assuming Member type is defined elsewhere
+import { format } from "date-fns";
+import { Member } from "../types";
+import { Typography } from "@material-tailwind/react";
+const defaultImage = "/Designer.jpeg";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload"; // Cloud Name: diy7wynvw
 const UPLOAD_PRESET = "ActiveHub"; // Replace with your upload preset
@@ -10,6 +12,9 @@ interface Props {
   onSubmit: (data: Partial<Member>) => void;
   initialData?: Member;
 }
+
+const user = JSON.parse(localStorage.getItem("user") || "{}"); // Get user from localStorage
+const gymName = user.gymName;
 
 export default function MemberForm({ onSubmit, initialData }: Props) {
   const [photoPreview, setPhotoPreview] = useState<string | null>(
@@ -77,51 +82,88 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
     });
   };
 
-  // Calculate "Member Since" date
   const memberSince = initialData?.createdAt
     ? format(new Date(initialData.createdAt), "MM/yy")
     : null;
 
+  const handleImageClick = () => {
+    document.getElementById("fileInput")?.click();
+  };
+
   return (
-    <div className="relative">
-      {/* Member Since label */}
+    <div className="relative font-serif">
       {memberSince && (
-        <div className="absolute top-0 right-0 text-sm font-serif font-medium text-green-500">
-          Member Since {memberSince}
+        <div className="absolute top-0 right-0 text-sm font-medium text-green-500">
+          {/* Member Since {memberSince} */}
         </div>
       )}
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div className="col-span-2">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="h-24 w-24 overflow-hidden rounded-full bg-gray-100">
-                {photoPreview ? (
-                  <img
-                    src={photoPreview}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <span className="text-gray-400">No photo</span>
-                  </div>
-                )}
-              </div>
-              <label className="block">
-                <span className="sr-only">Choose photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                  className="block w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
+          {/* Image Section (Left Side) */}
+          <div className="flex justify-center items-center">
+            <div
+              className="relative w-full h-96 overflow-hidden rounded-xl bg-gray-100 cursor-pointer"
+              onClick={handleImageClick}
+            >
+              {photoPreview ? (
+                <img
+                  className="h-full w-full object-cover object-center"
+                  src={photoPreview}
+                  alt="Preview"
                 />
-              </label>
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <img
+                    src={defaultImage} // Use the default image from public folder
+                    alt="Default"
+                    className="h-96 w-full object-top"
+                  />
+                  <span className="text-blue-800 font-serif font-bold">
+                    {/* {gymName} */}
+                  </span>{" "}
+                  {/* Dynamic gym name */}
+                </div>
+              )}
+
+              {/* Blurred Caption */}
+              <figcaption className="absolute bottom-8 left-2/4 flex w-[calc(100%-4rem)] -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-4 px-6 shadow-lg shadow-black/5 saturate-200 backdrop-blur-sm">
+                <div>
+                  <Typography
+                    variant="h5"
+                    color="blue-gray"
+                    className="text-lg font-semibold"
+                    type="text" // Add any additional props if required
+                  >
+                    {initialData?.name || "Member Name"}
+                  </Typography>
+                  <Typography
+                    color="blue-gray"
+                    className="mt-2 font-normal"
+                    type="text" // Optional, if needed
+                  >
+                    {memberSince || "MM/YY"}
+                  </Typography>
+                </div>
+                <Typography
+                  variant="h5"
+                  color="blue-gray"
+                  className="text-lg font-semibold"
+                >
+                  {gymName}
+                </Typography>
+              </figcaption>
             </div>
+
+            <label className="sr-only">
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="hidden"
+              />
+            </label>
+
             {isUploading && (
               <div className="mt-2 text-sm text-green-600 flex flex-col items-center space-y-6">
                 Uploading... {uploadProgress}%
@@ -129,186 +171,146 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
             )}
           </div>
 
-          {/* Name Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
-            <input
-              type="text"
-              {...register("name", { required: "Name is required" })}
-              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
+          {/* Form Fields Section (Right Side) */}
+          <div className="space-y-4">
+            {/* Name Field */}
+            <div className="flex justify-between">
+              <Typography className="font-semibold">Name</Typography>
+              <input
+                {...register("name")}
+                type="text"
+                defaultValue={initialData?.name || ""}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
 
-          {/* Email Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              {...register("email", { required: "Email is required" })}
-              className="mt-1 block w-full font-serif rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
+            {/* Phone Number Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Phone Number
+              </Typography>
+              <input
+                {...register("phoneNumber")}
+                type="text"
+                defaultValue={initialData?.phoneNumber || ""}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
 
-          {/* Phone Number Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              {...register("phoneNumber", {
-                required: "Phone number is required",
-              })}
-              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.phoneNumber && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.phoneNumber.message}
-              </p>
-            )}
-          </div>
+            {/* Email Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Email
+              </Typography>
+              <input
+                {...register("email")}
+                type="email"
+                defaultValue={initialData?.email || ""}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
 
-          {/* Weight Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Weight (kg)
-            </label>
-            <input
-              type="number"
-              {...register("weight", {
-                required: "Weight is required",
-                min: { value: 20, message: "Weight must be at least 20kg" },
-                max: { value: 300, message: "Weight must be less than 300kg" },
-              })}
-              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.weight && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.weight.message}
-              </p>
-            )}
-          </div>
+            {/* Weight Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Weight (kg)
+              </Typography>
+              <input
+                {...register("weight")}
+                type="number"
+                defaultValue={initialData?.weight || ""}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
 
-          {/* Height Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Height (cm)
-            </label>
-            <input
-              type="number"
-              {...register("height", {
-                required: "Height is required",
-                min: { value: 100, message: "Height must be at least 100cm" },
-                max: { value: 250, message: "Height must be less than 250cm" },
-              })}
-              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.height && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.height.message}
-              </p>
-            )}
-          </div>
+            {/* Height Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Height (cm)
+              </Typography>
+              <input
+                {...register("height")}
+                type="number"
+                defaultValue={initialData?.height || ""}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
 
-          {/* Trainer Assigned Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Trainer Assigned
-            </label>
-            <input
-              type="text"
-              {...register("trainerAssigned")}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-serif focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+            {/* Trainer Assigned Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Trainer Assigned
+              </Typography>
+              <input
+                {...register("trainerAssigned")}
+                type="text"
+                defaultValue={initialData?.trainerAssigned || ""}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
 
-          {/* Membership Type Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Membership Type
-            </label>
-            <select
-              {...register("membershipType", {
-                required: "Membership type is required",
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-serif focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="basic">Basic</option>
-              <option value="silver">Silver</option>
-              <option value="gold">Gold</option>
-              <option value="platinum">Platinum</option>
-            </select>
-            {errors.membershipType && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.membershipType.message}
-              </p>
-            )}
-          </div>
+            {/* Membership Type Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Membership Type
+              </Typography>
+              <select
+                {...register("membershipType")}
+                defaultValue={initialData?.membershipType || ""}
+                className=" p-1 w-1/2 shadow-md"
+              >
+                <option value="basic">basic</option>
+                <option value="premium">premium</option>
+                <option value="platinum">platinum</option>
+              </select>
+            </div>
 
-          {/* Duration Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Duration (months)
-            </label>
-            <input
-              type="number"
-              {...register("durationMonths", {
-                required: "Duration is required",
-                min: { value: 1, message: "Duration must be at least 1 month" },
-                max: { value: 36, message: "Duration cannot exceed 36 months" },
-              })}
-              className="mt-1 block w-full rounded-md font-serif border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.durationMonths && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.durationMonths.message}
-              </p>
-            )}
-          </div>
-          {/* Fees Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Fees
-            </label>
-            <input
-              type="number"
-              {...register("fees", { required: "Fees is required", min: 0 })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.fees && (
-              <p className="mt-1 text-sm text-red-600">{errors.fees.message}</p>
-            )}
-          </div>
+            {/* Duration Field */}
+            {/* Duration Months */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Duration (months)
+              </Typography>
+              <input
+                {...register("durationMonths", {
+                  valueAsNumber: true,
+                  required: true,
+                })}
+                type="number"
+                min="1" // Ensure it's a positive number
+                defaultValue={initialData?.durationMonths || 1}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
 
-          {/* Fee Status Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Fee Status
-            </label>
-            <select
-              {...register("feeStatus", { required: "Fee status is required" })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="paid">Paid</option>
-              <option value="unpaid">Unpaid</option>
-            </select>
-            {errors.feeStatus && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.feeStatus.message}
-              </p>
-            )}
+            {/* Fees Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Fees
+              </Typography>
+              <input
+                {...register("fees", { valueAsNumber: true, required: true })}
+                type="number"
+                min="0" // Fees should be a positive number
+                defaultValue={initialData?.fees || 0}
+                className=" p-1 w-1/2 shadow-md"
+              />
+            </div>
+
+            {/* Fees Status Field */}
+            <div className="flex justify-between">
+              <Typography color="blue-gray" className="font-semibold">
+                Fee Status
+              </Typography>
+              <select
+                {...register("feeStatus", { required: true })}
+                defaultValue={initialData?.feeStatus || "due"} // Default to "due"
+                className=" p-1 w-1/2 shadow-md"
+              >
+                <option value="paid">Paid</option>
+                <option value="due">Due</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -316,7 +318,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             {initialData ? "Update Member" : "Add Member"}
           </button>

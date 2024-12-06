@@ -49,8 +49,8 @@ export default function SignUp() {
       className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:px-6 lg:px-8"
       style={{
         backgroundImage: "url(/Activehub04.jpeg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundSize: "fit", 
+        backgroundPosition: "center", 
       }}
     >
       <div className="sm:mx-auto sm:w-full sm:max-w-4xl">
@@ -68,12 +68,10 @@ export default function SignUp() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              {/* Username */}
+            {/* Username, Email, Password */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Username
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Username</label>
                 <div className="mt-1">
                   <input
                     {...register("username", { required: "Username is required" })}
@@ -85,11 +83,8 @@ export default function SignUp() {
                 </div>
               </div>
 
-              {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Email address
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Email address</label>
                 <div className="mt-1">
                   <input
                     {...register("email", {
@@ -107,11 +102,8 @@ export default function SignUp() {
                 </div>
               </div>
 
-              {/* Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
                 <div className="mt-1">
                   <input
                     type="password"
@@ -129,12 +121,12 @@ export default function SignUp() {
                   )}
                 </div>
               </div>
+            </div>
 
-              {/* Gym Name */}
+            {/* Gym Name and Gym Type */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Gym Name
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Gym Name</label>
                 <div className="mt-1">
                   <input
                     {...register("gymName", { required: "Gym name is required" })}
@@ -146,11 +138,8 @@ export default function SignUp() {
                 </div>
               </div>
 
-              {/* Gym Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Gym Type
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Gym Type</label>
                 <div className="mt-1">
                   <select
                     {...register("gymType", { required: "Gym type is required" })}
@@ -168,36 +157,34 @@ export default function SignUp() {
                   )}
                 </div>
               </div>
+            </div>
 
-              {/* Address Fields */}
-              <div className="col-span-3">
-                <label className="block text-sm font-medium text-gray-700">
-                  Gym Address
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <input
-                    {...register("gymAddress.street", { required: "Street is required" })}
-                    placeholder="Street"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <input
-                    {...register("gymAddress.city", { required: "City is required" })}
-                    placeholder="City"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  <input
-                    {...register("gymAddress.state", { required: "State is required" })}
-                    placeholder="State"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <input
-                    {...register("gymAddress.zipCode", { required: "ZIP code is required" })}
-                    placeholder="ZIP Code"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+            {/* Gym Address */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Gym Address</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input
+                  {...register("gymAddress.street", { required: "Street is required" })}
+                  placeholder="Street"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+                <input
+                  {...register("gymAddress.city", { required: "City is required" })}
+                  placeholder="City"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <input
+                  {...register("gymAddress.state", { required: "State is required" })}
+                  placeholder="State"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+                <input
+                  {...register("gymAddress.zipCode", { required: "ZIP code is required" })}
+                  placeholder="ZIP Code"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
             </div>
 
