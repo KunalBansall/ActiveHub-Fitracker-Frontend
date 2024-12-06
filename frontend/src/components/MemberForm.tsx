@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { Member } from "../types";
 import { Typography } from "@material-tailwind/react";
+
 const defaultImage = "/Designer.jpeg";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload"; // Cloud Name: diy7wynvw
@@ -132,25 +133,26 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                     variant="h5"
                     color="blue-gray"
                     className="text-lg font-semibold"
-                    type="text" // Add any additional props if required
-                  >
-                    {initialData?.name || "Member Name"}
-                  </Typography>
+                    onPointerEnterCapture={() => {}}
+                    onPointerLeaveCapture={() => {}}
+                    {...({
+                      children: initialData?.name || "Member Name",
+                    } as any)}
+                  />
+
                   <Typography
                     color="blue-gray"
                     className="mt-2 font-normal"
                     type="text" // Optional, if needed
-                  >
-                    {memberSince || "MM/YY"}
-                  </Typography>
+                    {...({ children: memberSince || "MM/YY" } as any)}
+                  />
                 </div>
                 <Typography
                   variant="h5"
                   color="blue-gray"
                   className="text-lg font-semibold"
-                >
-                  {gymName}
-                </Typography>
+                  {...({ children: gymName } as any)}
+                />
               </figcaption>
             </div>
 
@@ -175,7 +177,11 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
           <div className="space-y-4">
             {/* Name Field */}
             <div className="flex justify-between">
-              <Typography className="font-semibold">Name</Typography>
+              <Typography
+                className="font-semibold"
+                {...({ children: "Name" } as any)}
+              />
+
               <input
                 {...register("name")}
                 type="text"
@@ -186,9 +192,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Phone Number Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Phone Number
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Phone Number" } as any)}
+              />
+
               <input
                 {...register("phoneNumber")}
                 type="text"
@@ -199,9 +208,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Email Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Email
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Email" } as any)}
+              />
+
               <input
                 {...register("email")}
                 type="email"
@@ -212,9 +224,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Weight Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Weight (kg)
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Weight (kg)" } as any)}
+              />
+
               <input
                 {...register("weight")}
                 type="number"
@@ -225,9 +240,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Height Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Height (cm)
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Height (cm)" } as any)}
+              />
+
               <input
                 {...register("height")}
                 type="number"
@@ -238,9 +256,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Trainer Assigned Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Trainer Assigned
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Trainer Assigned" } as any)}
+              />
+
               <input
                 {...register("trainerAssigned")}
                 type="text"
@@ -251,9 +272,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Membership Type Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Membership Type
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Membership Type" } as any)}
+              />
+
               <select
                 {...register("membershipType")}
                 defaultValue={initialData?.membershipType || ""}
@@ -268,9 +292,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
             {/* Duration Field */}
             {/* Duration Months */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Duration (months)
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Duration (months)" } as any)}
+              />
+
               <input
                 {...register("durationMonths", {
                   valueAsNumber: true,
@@ -285,9 +312,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Fees Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Fees
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Fees" } as any)}
+              />
+
               <input
                 {...register("fees", { valueAsNumber: true, required: true })}
                 type="number"
@@ -299,9 +329,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
 
             {/* Fees Status Field */}
             <div className="flex justify-between">
-              <Typography color="blue-gray" className="font-semibold">
-                Fee Status
-              </Typography>
+              <Typography
+                color="blue-gray"
+                className="font-semibold"
+                {...({ children: "Fee Status" } as any)}
+              />
+
               <select
                 {...register("feeStatus", { required: true })}
                 defaultValue={initialData?.feeStatus || "due"} // Default to "due"
