@@ -126,6 +126,20 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 </div>
               )}
 
+              {isUploading && (
+                <div
+                  className="absolute top-2 left-2/4 transform -translate-x-2/4 flex flex-col items-center space-y-2 text-green-800"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.7)", // Optional: Add a semi-transparent background for readability
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  Uploading... {uploadProgress}%
+                  
+                </div>
+              )}
+
               {/* Blurred Caption */}
               <figcaption className="absolute bottom-8 left-2/4 flex w-[calc(100%-4rem)] -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-4 px-6 shadow-lg shadow-black/5 saturate-200 backdrop-blur-sm">
                 <div>
@@ -150,7 +164,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 <Typography
                   variant="h5"
                   color="blue-gray"
-                  className="text-lg font-semibold"
+                  className="text-lg font-semibold mr-3"
                   {...({ children: gymName } as any)}
                 />
               </figcaption>
@@ -165,12 +179,6 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 className="hidden"
               />
             </label>
-
-            {isUploading && (
-              <div className="mt-2 text-sm text-green-600 flex flex-col items-center space-y-6">
-                Uploading... {uploadProgress}%
-              </div>
-            )}
           </div>
 
           {/* Form Fields Section (Right Side) */}

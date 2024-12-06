@@ -19,7 +19,11 @@ const ForgotPassword: React.FC = () => {
       toast.success(response.data.message || 'Reset link sent to your email');
       setEmail('');
     } catch (error: any) {
-      toast.error(error.response?.data.message || 'Error sending reset email');
+      if (error.response?.data?.message === 'user not exists') {
+        toast.error('User does not exist'); // Custom error message for non-existent user
+      } else {
+        toast.error(error.response?.data.message || 'Error sending reset email');
+      }
     } finally {
       setLoading(false);
     }
