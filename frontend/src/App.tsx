@@ -13,6 +13,8 @@ import SignUp from './pages/SignUp';
 import PrivateRoute from './components/PrivateRoute';
 import './index.css';
 import React from 'react';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 
 
@@ -24,6 +26,8 @@ export default function App() {
       <Router>
         <Toaster position="top-right" />
         <Routes>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route

@@ -3,16 +3,18 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import React from "react";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"; // Import icons
 
 interface SignInForm {
   email: string;
   password: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function SignIn() {
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const navigate = useNavigate();
   const {
     register,
@@ -22,10 +24,7 @@ export default function SignIn() {
 
   const onSubmit = async (data: SignInForm) => {
     try {
-      const response = await axios.post(
-        `${API_URL}/auth/signin`,
-        data
-      );
+      const response = await axios.post(`${API_URL}/auth/signin`, data);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data));
       navigate("/");
@@ -39,17 +38,11 @@ export default function SignIn() {
       className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
       style={{
         backgroundImage: "url(/Activehub04.jpeg)",
-        backgroundSize: "fit", // Ensures the entire image fits within the div
-        // backgroundRepeat: 'no-repeat', // Prevents the image from repeating
-        backgroundPosition: "center", // Centers the image
+        backgroundSize: "fit",
+        backgroundPosition: "center",
       }}
     >
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        {/* <div className="flex justify-center">
-          <svg className="h-12 w-12 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M13 6v8h-2V6h2zm4.5-4H6.5C5.12 2 4 3.12 4 4.5v15C4 20.88 5.12 22 6.5 22h11c1.38 0 2.5-1.12 2.5-2.5v-15C20 3.12 18.88 2 17.5 2zM18 19.5c0 .28-.22.5-.5.5h-11c-.28 0-.5-.22-.5-.5v-15c0-.28.22-.5.5-.5h11c.28 0 .5.22.5.5v15z" />
-          </svg>
-        </div> */}
         <h2 className="mt-4 text-center text-4xl font-extrabold text-white text-outline">
           Sign in to ActiveHub
         </h2>
@@ -97,14 +90,25 @@ export default function SignIn() {
               >
                 Password
               </label>
-              <div className="mt-1">
+              <div className="mt-1 relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Toggle input type
                   {...register("password", {
                     required: "Password is required",
                   })}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeIcon className="w-5 h-5" />
+                  )}
+                </button>
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.password.message}
@@ -131,6 +135,17 @@ export default function SignIn() {
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
                 Sign up here
+              </button>
+            </p>
+          </div>
+          <div className="mt-3 text-center">
+            <p className="text-sm text-gray-600">
+              Forgot your password?{" "}
+              <button
+                onClick={() => navigate("/forgot-password")}
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Reset Password
               </button>
             </p>
           </div>
