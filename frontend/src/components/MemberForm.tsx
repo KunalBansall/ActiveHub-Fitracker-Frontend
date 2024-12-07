@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Member } from "../types";
 import { Typography } from "@material-tailwind/react";
 
-const defaultImage = "/Designer.jpeg";
+const defaultImage = "/ah2.jpeg";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload"; // Cloud Name: diy7wynvw
 const UPLOAD_PRESET = "ActiveHub"; // Replace with your upload preset
