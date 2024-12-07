@@ -1,17 +1,17 @@
-import { useMutation, useQueryClient } from 'react-query';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import MemberForm from '../components/MemberForm';
-import { Member } from '../types';
+import { useMutation, useQueryClient } from "react-query";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import MemberForm from "../components/MemberForm";
+import { Member } from "../types";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function AddMember() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const mutation = useMutation(
     (newMember: Partial<Member>) =>
@@ -21,25 +21,29 @@ export default function AddMember() {
     {
       onSuccess: (response) => {
         const { emailSent, member } = response.data || {};
-        const memberName = member?.name || 'Member'; // Access the member's name properly
+        const memberName = member?.name || "Member"; // Access the member's name properly
         const message = emailSent
           ? `${memberName} joins our Family. Welcomed.`
           : `${memberName} joins our Family.`;
         toast.success(message);
-      
-        queryClient.invalidateQueries('members');
-        navigate('/members');
+
+        queryClient.invalidateQueries("members");
+        navigate("/members");
       },
       onError: (error) => {
         if (axios.isAxiosError(error)) {
-          const message = error.response?.data?.message || 'An error occurred';
+          const message = error.response?.data?.message || "An error occurred";
           const duplicateFields = error.response?.data?.duplicateFields;
-      
-          if (message === 'Duplicate entry detected' && duplicateFields) {
+
+          if (message === "Duplicate entry detected" && duplicateFields) {
             if (duplicateFields.email) {
-              toast.error(`The email ${duplicateFields.email} is already registered.`);
+              toast.error(
+                `The email ${duplicateFields.email} is already registered.`
+              );
             } else if (duplicateFields.phoneNumber) {
-              toast.error(`The phone number ${duplicateFields.phoneNumber} is already registered.`);
+              toast.error(
+                `The phone number ${duplicateFields.phoneNumber} is already registered.`
+              );
             } else {
               toast.error(message); // Fallback in case there is no specific field
             }
@@ -48,7 +52,6 @@ export default function AddMember() {
           }
         }
       },
-      
     }
   );
 

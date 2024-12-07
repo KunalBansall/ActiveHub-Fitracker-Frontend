@@ -1,24 +1,20 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { Toaster } from 'react-hot-toast';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
-import Dashboard from './pages/Dashboard';
-import Members from './pages/Members';
-import AddMember from './pages/AddMember';
-import MemberDetails from './pages/MemberDetails';
-import Attendance from './pages/Attendance';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
-import PrivateRoute from './components/PrivateRoute';
-import './index.css';
-import React from 'react';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-// import 'react-toastify/dist/ReactToastify.css';
-
-
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { Toaster } from "react-hot-toast";
+import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
+import Dashboard from "./pages/Dashboard";
+import Members from "./pages/Members";
+import AddMember from "./pages/AddMember";
+import MemberDetails from "./pages/MemberDetails";
+import Attendance from "./pages/Attendance";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import PrivateRoute from "./components/PrivateRoute";
+import "./index.css";
+import React from "react";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -28,8 +24,11 @@ export default function App() {
       <Router>
         <Toaster position="top-right" />
         <Routes>
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/reset-password/:id/:token"
+            element={<ResetPassword />}
+          />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route
@@ -45,7 +44,10 @@ export default function App() {
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/members" element={<Members />} />
                         <Route path="/members/add" element={<AddMember />} />
-                        <Route path="/members/:id" element={<MemberDetails />} />
+                        <Route
+                          path="/members/:id"
+                          element={<MemberDetails />}
+                        />
                         <Route path="/attendance" element={<Attendance />} />
                       </Routes>
                     </main>
