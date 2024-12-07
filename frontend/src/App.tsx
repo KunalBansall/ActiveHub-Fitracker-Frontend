@@ -15,6 +15,7 @@ import "./index.css";
 import React from "react";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,8 @@ export default function App() {
                           element={<MemberDetails />}
                         />
                         <Route path="/attendance" element={<Attendance />} />
+                        <Route path="/profile" element={<Profile />} />
+
                       </Routes>
                     </main>
                   </div>

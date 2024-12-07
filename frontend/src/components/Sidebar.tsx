@@ -15,7 +15,7 @@ export const navigation = [
   { name: 'Members', href: '/members', icon: UsersIcon },
   { name: 'Attendance', href: '/attendance', icon: ClockIcon },
   { name: 'Payments', href: '/payments', icon: CreditCardIcon },
-  { name: 'Reports', href: '/reports', icon: ChartBarIcon },
+  { name: 'Profile', href: '/profile', icon: ChartBarIcon },
   { name: 'Notifications', href: '/notifications', icon: BellIcon },
   { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
 ];
