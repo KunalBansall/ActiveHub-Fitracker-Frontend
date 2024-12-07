@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import React from 'react';
-
+import { Link } from 'react-router-dom'; // Import Link
 
 interface Props {
   stats: DashboardStatsData;
@@ -21,6 +21,7 @@ export default function DashboardStats({ stats }: Props) {
       change: stats.totalMembers.growth,
       icon: UsersIcon,
       iconBackground: 'bg-blue-500',
+      link: '/members', // Add link to Total Members card
     },
     {
       name: 'Active Today',
@@ -28,6 +29,7 @@ export default function DashboardStats({ stats }: Props) {
       change: stats.activeToday.growth,
       icon: ChartBarIcon,
       iconBackground: 'bg-green-500',
+      link: '/attendance', // Add link to Active Today card
     },
     {
       name: 'New Joins',
@@ -35,6 +37,7 @@ export default function DashboardStats({ stats }: Props) {
       change: stats.newJoins.growth,
       icon: UserPlusIcon,
       iconBackground: 'bg-purple-500',
+      link: '', // Add link to New Joins card
     },
     {
       name: 'Expiring Soon',
@@ -42,16 +45,14 @@ export default function DashboardStats({ stats }: Props) {
       change: stats.expiringSoon.growth,
       icon: ClockIcon,
       iconBackground: 'bg-orange-500',
+      link: '', // Add link to Expiring Soon card
     },
   ];
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
-        <div
-          key={card.name}
-          className="overflow-hidden rounded-lg bg-white shadow"
-        >
+        <Link to={card.link} key={card.name} className="overflow-hidden rounded-lg bg-white shadow">
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -85,7 +86,7 @@ export default function DashboardStats({ stats }: Props) {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

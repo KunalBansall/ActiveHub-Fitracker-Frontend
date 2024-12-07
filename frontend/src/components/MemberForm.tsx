@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { Member } from "../types";
 import { Typography } from "@material-tailwind/react";
+import { toast } from "react-hot-toast"; // Importing the toast function
 
 const defaultImage = "/ah2.jpeg";
-
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload"; // Cloud Name: diy7wynvw
 const UPLOAD_PRESET = "ActiveHub"; // Replace with your upload preset
 
@@ -81,6 +81,11 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
       ...data,
       photo: photoPreview,
     });
+
+    // Show success toast when member data is updated
+    if (initialData) {
+      toast.success(`${initialData.name}'s Profile updated successfully!`);
+    } 
   };
 
   const memberSince = initialData?.createdAt
@@ -121,8 +126,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                   />
                   <span className="text-blue-800 font-serif font-bold">
                     {/* {gymName} */}
-                  </span>{" "}
-                  {/* Dynamic gym name */}
+                  </span>
                 </div>
               )}
 
@@ -136,7 +140,6 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                   }}
                 >
                   Uploading... {uploadProgress}%
-                  
                 </div>
               )}
 
@@ -330,7 +333,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 {...register("fees", { valueAsNumber: true, required: true })}
                 type="number"
                 min="0" // Fees should be a positive number
-                defaultValue={initialData?.fees || 0}
+                defaultValue={initialData?.fees || 500}
                 className=" p-1 w-1/2 shadow-md"
               />
             </div>

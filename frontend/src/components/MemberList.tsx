@@ -2,24 +2,65 @@ import { Member } from "../types";
 import { format } from "date-fns";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useState } from "react";
 
 interface Props {
   members: Member[];
 }
 
 export default function MemberList({ members }: Props) {
-  // Sort members by membershipEndDate (ascending)
-  const sortedMembers = [...members].sort((a, b) => {
-    const dateA = new Date(a.membershipEndDate);
-    const dateB = new Date(b.membershipEndDate);
-    return dateA.getTime() - dateB.getTime(); // Sort in ascending order
-  });
+  // State for toggling between expiry date and created at
+  const [sortBy, setSortBy] = useState<'expiryDate' | 'createdAt'>('expiryDate'); // Default to 'expiryDate'
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Ascending order by default
+
+  // Sort members based on the selected filter and order
+ // Sort members based on the selected filter and order
+// Sort members based on the selected filter and order
+// Sort members based on the selected filter and order
+const sortedMembers = [...members].sort((a, b) => {
+  let valueA: number = 0;
+  let valueB: number = 0;
+
+  // Ensure we check the sort criteria (expiryDate or createdAt)
+  if (sortBy === 'expiryDate') {
+    valueA = a.membershipEndDate ? new Date(a.membershipEndDate).getTime() : 0;
+    valueB = b.membershipEndDate ? new Date(b.membershipEndDate).getTime() : 0;
+  } else if (sortBy === 'createdAt') {
+    // Ensure 'createdAt' is parsed correctly
+    valueA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    valueB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+  }
+
+  // Sorting based on order (desc for most recent join date at the top)
+  if (sortOrder === 'asc') {
+    return valueA - valueB; // Ascending order
+  } else {
+    return valueB - valueA; // Descending order (recent created at the top)
+  }
+});
+
+
+
+
+  // Toggle sorting method between Expiry Date and Created At
+  const toggleSortBy = () => {
+    setSortBy((prevSortBy) => (prevSortBy === 'expiryDate' ? 'createdAt' : 'expiryDate'));
+  };
+  
 
   return (
     <div className="mt-8 flow-root">
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div className="mb-4 flex justify-between">
+          <button
+  onClick={toggleSortBy}
+  className="bg-blue-500 text-white px-4 py-2 rounded-md"
+>
+  Sort by {sortBy === 'expiryDate' ? 'Join Date' : 'Expiry Date'}
+</button>
+
+          </div>
           <table className="min-w-full divide-y divide-gray-300">
             <thead>
               <tr>
