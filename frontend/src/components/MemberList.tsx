@@ -1,65 +1,84 @@
+import { toast } from "react-hot-toast"; // Importing the toast function
 import { Member } from "../types";
 import { format } from "date-fns";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 import React, { useState } from "react";
+import { BellIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 
 interface Props {
   members: Member[];
 }
 
 export default function MemberList({ members }: Props) {
-  // State for toggling between expiry date and created at
-  const [sortBy, setSortBy] = useState<'expiryDate' | 'createdAt'>('expiryDate'); // Default to 'expiryDate'
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Ascending order by default
+  const [sortBy, setSortBy] = useState<"expiryDate" | "createdAt">(
+    "expiryDate"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [isNotifying, setIsNotifying] = useState<string | null>(null); // Track the notifying state
 
-  // Sort members based on the selected filter and order
- // Sort members based on the selected filter and order
-// Sort members based on the selected filter and order
-// Sort members based on the selected filter and order
-const sortedMembers = [...members].sort((a, b) => {
-  let valueA: number = 0;
-  let valueB: number = 0;
+  const sortedMembers = [...members].sort((a, b) => {
+    let valueA = 0;
+    let valueB = 0;
 
-  // Ensure we check the sort criteria (expiryDate or createdAt)
-  if (sortBy === 'expiryDate') {
-    valueA = a.membershipEndDate ? new Date(a.membershipEndDate).getTime() : 0;
-    valueB = b.membershipEndDate ? new Date(b.membershipEndDate).getTime() : 0;
-  } else if (sortBy === 'createdAt') {
-    // Ensure 'createdAt' is parsed correctly
-    valueA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-    valueB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-  }
+    if (sortBy === "expiryDate") {
+      valueA = a.membershipEndDate
+        ? new Date(a.membershipEndDate).getTime()
+        : 0;
+      valueB = b.membershipEndDate
+        ? new Date(b.membershipEndDate).getTime()
+        : 0;
+    } else if (sortBy === "createdAt") {
+      valueA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      valueB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    }
 
-  // Sorting based on order (desc for most recent join date at the top)
-  if (sortOrder === 'asc') {
-    return valueA - valueB; // Ascending order
-  } else {
-    return valueB - valueA; // Descending order (recent created at the top)
-  }
-});
+    return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+  });
 
-
-
-
-  // Toggle sorting method between Expiry Date and Created At
   const toggleSortBy = () => {
-    setSortBy((prevSortBy) => (prevSortBy === 'expiryDate' ? 'createdAt' : 'expiryDate'));
+    setSortBy((prevSortBy) =>
+      prevSortBy === "expiryDate" ? "createdAt" : "expiryDate"
+    );
   };
-  
+
+  // Send notification
+  const sendNotification = async (member: Member) => {
+    setIsNotifying(member._id); // Disable button for this member
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const response = await axios.post(
+        `${API_URL}/members/renewal-reminder`,
+        { memberId: member._id },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      // Display success toast
+      toast.success(`Notification sent to ${member.name}`);
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      // Display error toast
+      toast.error(`Failed to send notification to ${member.name}`);
+    } finally {
+      setIsNotifying(null); // Re-enable button after sending the notification
+    }
+  };
 
   return (
     <div className="mt-8 flow-root">
       <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
           <div className="mb-4 flex justify-between">
-          <button
-  onClick={toggleSortBy}
-  className="bg-blue-500 text-white px-4 py-2 rounded-md"
->
-  Sort by {sortBy === 'expiryDate' ? 'Join Date' : 'Expiry Date'}
-</button>
-
+            <button
+              onClick={toggleSortBy}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md"
+            >
+              Sort by {sortBy === "expiryDate" ? "Join Date" : "Expiry Date"}
+            </button>
           </div>
           <table className="min-w-full divide-y divide-gray-300">
             <thead>
@@ -77,7 +96,7 @@ const sortedMembers = [...members].sort((a, b) => {
                   EXPIRY DATE
                 </th>
                 <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  LAST CHECK-IN
+                  ACTION
                 </th>
               </tr>
             </thead>
@@ -93,7 +112,10 @@ const sortedMembers = [...members].sort((a, b) => {
                     className="hover:bg-gray-100 cursor-pointer"
                   >
                     <td className="whitespace-nowrap py-4 pl-4 pr-3">
-                      <Link to={`/members/${member._id}`} className="flex items-center">
+                      <Link
+                        to={`/members/${member._id}`}
+                        className="flex items-center"
+                      >
                         <div className="h-10 w-10 flex-shrink-0">
                           {member.photo ? (
                             <img
@@ -124,9 +146,12 @@ const sortedMembers = [...members].sort((a, b) => {
                         className={clsx(
                           "inline-flex rounded-full px-2 text-xs font-semibold leading-5",
                           {
-                            "bg-green-100 text-green-800": member.status === "active",
-                            "bg-red-100 text-red-800": member.status === "expired",
-                            "bg-yellow-100 text-yellow-800": member.status === "pending",
+                            "bg-green-100 text-green-800":
+                              member.status === "active",
+                            "bg-red-100 text-red-800":
+                              member.status === "expired",
+                            "bg-yellow-100 text-yellow-800":
+                              member.status === "pending",
                           }
                         )}
                       >
@@ -145,11 +170,18 @@ const sortedMembers = [...members].sort((a, b) => {
                       )}
                     >
                       {format(expiryDate, "MM/dd/yyyy")}
+                      {isExpiringSoon && (
+                        <BellIcon className="h-5 w-5 text-red-500 inline ml-2" />
+                      )}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {member.lastCheckIn
-                        ? format(new Date(member.lastCheckIn), "MM/dd/yyyy hh:mm a")
-                        : "No Check-In"}
+                      <button
+                        onClick={() => sendNotification(member)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-md"
+                        disabled={isNotifying === member._id} // Disable button while notifying
+                      >
+                        {isNotifying === member._id ? "Notifying..." : "Notify"}
+                      </button>
                     </td>
                   </tr>
                 );
