@@ -38,9 +38,12 @@ export default function MemberList({ members }: Props) {
   });
 
   const toggleSortBy = () => {
-    setSortBy((prevSortBy) =>
-      prevSortBy === "expiryDate" ? "createdAt" : "expiryDate"
-    );
+    setSortBy((prevSortBy) => {
+      const newSortBy =
+        prevSortBy === "expiryDate" ? "createdAt" : "expiryDate";
+      setSortOrder(newSortBy === "createdAt" ? "desc" : "asc"); // Default order for "createdAt" is "desc"
+      return newSortBy;
+    });
   };
 
   // Send notification

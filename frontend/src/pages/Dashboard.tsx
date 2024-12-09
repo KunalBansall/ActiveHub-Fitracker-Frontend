@@ -1,36 +1,48 @@
-import { useQuery } from 'react-query';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import DashboardStats from '../components/DashboardStats';
-import MemberList from '../components/MemberList';
-import { DashboardStatsData as DashboardStatsType, Member } from '../types';
-import React from 'react';
+import { useQuery } from "react-query";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import DashboardStats from "../components/DashboardStats";
+import MemberList from "../components/MemberList";
+import { DashboardStatsData as DashboardStatsType, Member } from "../types";
+import React from "react";
 
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function Dashboard() {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   // Fetch dashboard stats
-  const { data: stats } = useQuery<DashboardStatsType>('dashboardStats', () =>
-    axios.get(`${API_URL}/dashboard/stats`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((res) => res.data)
+  const { data: stats } = useQuery<DashboardStatsType>("dashboardStats", () =>
+    axios
+      .get(`${API_URL}/dashboard/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data)
   );
 
   // Fetch members
-  const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/members`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((res) => res.data)
+  const { data: members } = useQuery<Member[]>("members", () =>
+    axios
+      .get(`${API_URL}/members`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data)
   );
 
   if (!stats || !members) return null;
+
+  // Sort members by membership end date (earliest first)
+  const sortedMembers = members
+    .filter((member) => member.membershipEndDate) // Ensure members have an end date
+    .sort(
+      (a, b) =>
+        new Date(a.membershipEndDate!).getTime() -
+        new Date(b.membershipEndDate!).getTime()
+    );
 
   return (
     <div className="flex-1 p-8">
@@ -48,9 +60,10 @@ export default function Dashboard() {
 
       <div className="mt-8">
         <h2 className="text-lg font-medium text-gray-900 mb-4">
-          Recent Members
+          Members Ending Soon
         </h2>
-        <MemberList members={members.slice(0, 5)} />
+        <MemberList members={sortedMembers.slice(0, 5)} />{" "}
+        {/* Show top 5 members */}
       </div>
     </div>
   );

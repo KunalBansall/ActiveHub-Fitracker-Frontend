@@ -1,10 +1,9 @@
-import { Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { Link, useLocation } from 'react-router-dom';
-import { navigation } from './Sidebar';
-import clsx from 'clsx';
-import React from 'react';
-
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Link, useLocation } from "react-router-dom";
+import { navigation } from "./Sidebar";
+import clsx from "clsx";
+import React from "react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -42,11 +41,11 @@ export default function MobileMenu({ isOpen, setIsOpen }: MobileMenuProps) {
             <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
               <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4">
                 <div className="flex  h-16  items-center">
-                  <img
-                    className="h-8 w-auto"
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp3k7MVRHVPxRZfY8LXE7nWsKEfN2Fxsgv6g&s"
-                    alt="ActiveHub"
-                  />
+                  <div className="flex-shrink-0 items-center">
+                    <div className="text-xl font-bold text-blue-400">
+                      ActiveHub
+                    </div>
+                  </div>
                 </div>
                 <nav className="flex flex-1 flex-col">
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -58,13 +57,16 @@ export default function MobileMenu({ isOpen, setIsOpen }: MobileMenuProps) {
                               to={item.href}
                               className={clsx(
                                 location.pathname === item.href
-                                  ? 'bg-gray-800 text-white'
-                                  : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                                'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                                  ? "bg-gray-800 text-white"
+                                  : "text-gray-400 hover:text-white hover:bg-gray-800",
+                                "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
                               )}
                               onClick={() => setIsOpen(false)}
                             >
-                              <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                              <item.icon
+                                className="h-6 w-6 shrink-0"
+                                aria-hidden="true"
+                              />
                               {item.name}
                             </Link>
                           </li>
