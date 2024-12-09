@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+// const navigate = useNavigate();
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -17,34 +18,49 @@ const SetPassword: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
 
-  const handleSetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/member-auth/set-password/${id}/${token}`,
-        {
-          password: newPassword,
-        }
-      );
-
-      if (response.data.Status === "Success") {
-        toast.success(response.data.message || "Password set successfully");
-        navigate(`/member/${id}`); // Redirect to member's profile page after success
+    const handleSetPassword = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+    
+      // Check if passwords match
+      if (newPassword !== confirmPassword) {
+        toast.error("Passwords do not match");
+        setLoading(false);
+        return;
       }
-    } catch (error: any) {
-      toast.error(error.response?.data.message || "Error setting password");
-    } finally {
-      setLoading(false);
-    }
-  };
+    
+      try {
+        console.log(`Attempting to set password for ID: ${id} and Token: ${token}`); // Debugging line
+    
+        // Make the API request
+        const response = await axios.post(
+          `${API_URL}/member-auth/set-password/${id}/${token}`,
+          {
+            password: newPassword, // Sending new password in the body
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in the Authorization header
+            },
+          }
+        );
+    
+        console.log("API Response:", response.data);
+    
+        // Check for success response and navigate
+        if (response.data.message === "Password set successfully!") {
+          toast.success(response.data.message);
+          console.log("Navigating to: ", `/member/${id}`);
+          navigate(`/member/${id}`); // Redirect to the member's profile page
+        }
+      } catch (error: any) {
+        console.error("Error:", error.response?.data);  // Detailed error logging
+        toast.error(error.response?.data.message || "Error setting password");
+      } finally {
+        setLoading(false); // Reset loading state
+      }
+    };
+    
 
   useEffect(() => {
     if (!token || !id) {

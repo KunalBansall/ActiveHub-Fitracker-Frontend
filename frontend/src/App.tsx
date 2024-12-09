@@ -16,6 +16,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import SetPassword from "./pages/MemberSetPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
+import MemberProfile from "./pages/MemberProfile";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,8 @@ export default function App() {
         <Routes>
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/set-password/:id/:token" element={<SetPassword />} />
+          <Route path="/member/:id" element={<MemberProfile />} />
+
 
           <Route
             path="/reset-password/:id/:token"
