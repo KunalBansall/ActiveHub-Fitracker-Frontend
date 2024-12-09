@@ -60,11 +60,16 @@ export default function MemberList({ members }: Props) {
           },
         }
       );
-      // Display success toast
-      toast.success(`Notification sent to ${member.name}`);
+
+      // Assuming backend response contains a message in 'response.data.message'
+      const message =
+        response.data.message || `Notification sent to ${member.name}`;
+
+      // Display success toast with backend message
+      toast.success(message);
     } catch (error) {
       console.error("Error sending notification:", error);
-      // Display error toast
+      // Display error toast if something goes wrong
       toast.error(`Failed to send notification to ${member.name}`);
     } finally {
       setIsNotifying(null); // Re-enable button after sending the notification
@@ -106,8 +111,10 @@ export default function MemberList({ members }: Props) {
             <tbody className="divide-y divide-gray-200">
               {sortedMembers.map((member) => {
                 const expiryDate = new Date(member.membershipEndDate);
+                const isExpired = expiryDate < new Date();
                 const isExpiringSoon =
                   expiryDate <= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+                const membershipStatus = isExpired ? "expired" : "active";
 
                 return (
                   <tr
@@ -150,15 +157,15 @@ export default function MemberList({ members }: Props) {
                           "inline-flex rounded-full px-2 text-xs font-semibold leading-5",
                           {
                             "bg-green-100 text-green-800":
-                              member.status === "active",
+                              membershipStatus === "active",
                             "bg-red-100 text-red-800":
-                              member.status === "expired",
+                              membershipStatus === "expired",
                             "bg-yellow-100 text-yellow-800":
                               member.status === "pending",
                           }
                         )}
                       >
-                        {member.status}
+                        {membershipStatus}
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

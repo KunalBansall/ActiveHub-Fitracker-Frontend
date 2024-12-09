@@ -12,8 +12,8 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import PrivateRoute from "./components/PrivateRoute";
 import "./index.css";
-import React from "react";
 import ForgotPassword from "./pages/ForgotPassword";
+import SetPassword from "./pages/MemberSetPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 
@@ -26,6 +26,8 @@ export default function App() {
         <Toaster position="top-right" />
         <Routes>
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/set-password/:id/:token" element={<SetPassword />} />
+
           <Route
             path="/reset-password/:id/:token"
             element={<ResetPassword />}
@@ -51,7 +53,6 @@ export default function App() {
                         />
                         <Route path="/attendance" element={<Attendance />} />
                         <Route path="/profile" element={<Profile />} />
-
                       </Routes>
                     </main>
                   </div>

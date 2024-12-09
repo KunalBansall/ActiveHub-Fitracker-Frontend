@@ -23,6 +23,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
   );
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -76,16 +77,26 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
     }
   };
 
-  const handleFormSubmit = (data: Partial<Member>) => {
-    onSubmit({
-      ...data,
-      photo: photoPreview,
-    });
+  const handleFormSubmit = async (data: Partial<Member>) => {
+    setIsSubmitting(true); // Disable the button when submission starts
 
-    // Show success toast when member data is updated
-    if (initialData) {
-      toast.success(`${initialData.name}'s Profile updated successfully!`);
-    } 
+    try {
+      await onSubmit({
+        ...data,
+        photo: photoPreview,
+      });
+
+      // Show success toast when member data is updated
+      if (initialData) {
+        toast.success(`${initialData.name}'s Profile updated successfully!`);
+      } else {
+        toast.success("Member added successfully!");
+      }
+    } catch (error) {
+      toast.error("There was an error while submitting the form.");
+    } finally {
+      setIsSubmitting(false); // Enable the button when submission is complete
+    }
   };
 
   const memberSince = initialData?.createdAt
@@ -150,8 +161,6 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                     variant="h5"
                     color="blue-gray"
                     className="text-lg font-semibold"
-                    onPointerEnterCapture={() => {}}
-                    onPointerLeaveCapture={() => {}}
                     {...({
                       children: initialData?.name || "Member Name",
                     } as any)}
@@ -362,9 +371,18 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            disabled={isSubmitting} // Disable when submitting
+            className={`px-6 py-2 rounded-md text-white ${
+              isSubmitting
+                ? "bg-gray-500 opacity-50"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
           >
-            {initialData ? "Update Member" : "Add Member"}
+            {isSubmitting
+              ? "Adding/Updating..."
+              : initialData
+              ? "Update Member"
+              : "Add Member"}
           </button>
         </div>
       </form>
