@@ -1,6 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "react-query";
+'use client'
+
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "react-query";
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
+import { PencilIcon, CheckIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,34 +23,35 @@ interface AdminProfile {
   gymAddress: GymAddress;
 }
 
-export default function Profile() {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}"); // Retrieve user from localStorage
+const queryClient = new QueryClient();
 
-  if (!token) {
-    return <p className="text-red-500">Authentication required</p>;
-  }
+export default function ProfilePage() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Profile />
+    </QueryClientProvider>
+  );
+}
 
-  const queryClient = useQueryClient();
-
-  // Fetch admin profile
-  const {
-    data: profile,
-    isLoading,
-    isError,
-    error,
-  } = useQuery<AdminProfile | undefined>("adminProfile", async () => {
-    const response = await axios.get(`${API_URL}/admin/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  });
-
-  // State for editable fields
+function Profile() {
+  const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+  const user = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem("user") || "{}") : {};
   const [formData, setFormData] = useState<AdminProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Mutation for updating the profile
+  const { data: profile, isLoading, isError, error } = useQuery<AdminProfile | undefined>(
+    "adminProfile",
+    async () => {
+      const response = await axios.get(`${API_URL}/admin/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    },
+    {
+      enabled: !!token,
+    }
+  );
+
   const mutation = useMutation(
     async (updatedProfile: Partial<AdminProfile>) => {
       const response = await axios.put(
@@ -61,35 +65,30 @@ export default function Profile() {
     },
     {
       onSuccess: (updatedProfile) => {
-        // Update localStorage user with the new gymName
         const updatedUser = { ...user, gymName: updatedProfile.gymName };
         localStorage.setItem("user", JSON.stringify(updatedUser));
-
-        queryClient.invalidateQueries("adminProfile"); // Refetch profile data
-        setIsEditing(false); // Exit editing mode
+        queryClient.invalidateQueries("adminProfile");
+        setIsEditing(false);
       },
     }
   );
 
-  // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
     if (name.startsWith("gymAddress.")) {
-      const field = name.split(".")[1]; // Extract "street", "city", etc.
-      setFormData((prev) =>
-        prev
-          ? { ...prev, gymAddress: { ...prev.gymAddress, [field]: value } }
-          : null
-      );
+      const field = name.split(".")[1] as keyof GymAddress;
+      setFormData((prev) => prev ? {
+        ...prev,
+        gymAddress: { ...prev.gymAddress, [field]: value },
+      } : null);
     } else {
-      setFormData((prev) => (prev ? { ...prev, [name]: value } : null));
+      setFormData((prev) => prev ? { ...prev, [name]: value } : null);
     }
   };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData) {
@@ -97,177 +96,197 @@ export default function Profile() {
     }
   };
 
+  if (!token) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto mt-8">
+        <p className="text-red-500">Authentication required</p>
+      </div>
+    );
+  }
+
   if (isLoading) {
-    return <p className="text-gray-700">Loading profile...</p>;
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto mt-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-8 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   if (isError) {
     return (
-      <div className="text-red-500">
-        Error fetching profile:{" "}
-        {error instanceof Error ? error.message : "Unknown error"}
+      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto mt-8">
+        <p className="text-red-500">
+          Error fetching profile: {error instanceof Error ? error.message : "Unknown error"}
+        </p>
       </div>
     );
   }
 
   if (!profile) {
-    return <p className="text-red-500">Profile not found</p>;
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto mt-8">
+        <p className="text-red-500">Profile not found</p>
+      </div>
+    );
   }
 
   return (
-    <div className="flex-1 p-8">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-8">
-        Admin Profile
-      </h1>
-
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-medium text-gray-900 mb-4">
-          Profile Information
-        </h2>
-        {isEditing ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block font-semibold text-gray-700">
-                Username:
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={formData?.username || ""}
-                onChange={handleChange}
-                className="mt-1 p-2 border rounded w-full"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold text-gray-700">
-                Email:
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData?.email || ""}
-                onChange={handleChange}
-                className="mt-1 p-2 border rounded w-full"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold text-gray-700">
-                Gym Name:
-              </label>
-              <input
-                type="text"
-                name="gymName"
-                value={formData?.gymName || ""}
-                onChange={handleChange}
-                className="mt-1 p-2 border rounded w-full"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold text-gray-700">
-                Gym Type:
-              </label>
-              <input
-                type="text"
-                name="gymType"
-                value={formData?.gymType || ""}
-                onChange={handleChange}
-                className="mt-1 p-2 border rounded w-full"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold text-gray-700">
-                Gym Address:
-              </label>
-              <div className="space-y-2">
+    <div className="container mx-auto py-10 px-4">
+      <div className="bg-white rounded-lg shadow-md max-w-2xl mx-auto">
+        <div className="border-b border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">Admin Profile</h1>
+            <UserCircleIcon className="w-8 h-8 text-gray-400" />
+          </div>
+        </div>
+        
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Username</label>
                 <input
                   type="text"
-                  name="gymAddress.street"
-                  placeholder="Street"
-                  value={formData?.gymAddress?.street || ""}
+                  name="username"
+                  value={formData?.username || profile.username}
                   onChange={handleChange}
-                  className="mt-1 p-2 border rounded w-full"
-                />
-                <input
-                  type="text"
-                  name="gymAddress.city"
-                  placeholder="City"
-                  value={formData?.gymAddress?.city || ""}
-                  onChange={handleChange}
-                  className="mt-1 p-2 border rounded w-full"
-                />
-                <input
-                  type="text"
-                  name="gymAddress.state"
-                  placeholder="State"
-                  value={formData?.gymAddress?.state || ""}
-                  onChange={handleChange}
-                  className="mt-1 p-2 border rounded w-full"
-                />
-                <input
-                  type="text"
-                  name="gymAddress.zipCode"
-                  placeholder="Zip Code"
-                  value={formData?.gymAddress?.zipCode || ""}
-                  onChange={handleChange}
-                  className="mt-1 p-2 border rounded w-full"
-                />
-                <input
-                  type="text"
-                  name="gymAddress.country"
-                  placeholder="Country"
-                  value={formData?.gymAddress?.country || ""}
-                  onChange={handleChange}
-                  className="mt-1 p-2 border rounded w-full"
+                  disabled={!isEditing}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData?.email || profile.email}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Gym Name</label>
+                <input
+                  type="text"
+                  name="gymName"
+                  value={formData?.gymName || profile.gymName}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Gym Type</label>
+                <select
+                  name="gymType"
+                  value={formData?.gymType || profile.gymType}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                >
+                  <option value="CrossFit">CrossFit</option>
+                  <option value="Yoga">Yoga</option>
+                  <option value="Weightlifting">Weightlifting</option>
+                  <option value="Cardio">Cardio</option>
+                  <option value="Mixed">Mixed</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Gym Address</label>
+                <div className="space-y-2 mt-1">
+                  <input
+                    type="text"
+                    name="gymAddress.street"
+                    placeholder="Street"
+                    value={formData?.gymAddress?.street || profile.gymAddress.street}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  />
+                  <input
+                    type="text"
+                    name="gymAddress.city"
+                    placeholder="City"
+                    value={formData?.gymAddress?.city || profile.gymAddress.city}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  />
+                  <input
+                    type="text"
+                    name="gymAddress.state"
+                    placeholder="State"
+                    value={formData?.gymAddress?.state || profile.gymAddress.state}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  />
+                  <input
+                    type="text"
+                    name="gymAddress.zipCode"
+                    placeholder="Zip Code"
+                    value={formData?.gymAddress?.zipCode || profile.gymAddress.zipCode}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  />
+                  <input
+                    type="text"
+                    name="gymAddress.country"
+                    placeholder="Country"
+                    value={formData?.gymAddress?.country || profile.gymAddress.country}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  />
+                </div>
+              </div>
             </div>
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 mt-4"
-            >
-              Save Changes
-            </button>
+
+            {isEditing ? (
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="submit"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <CheckIcon className="w-4 h-4 mr-2" />
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData(profile);
+                  setIsEditing(true);
+                }}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <PencilIcon className="w-4 h-4 mr-2" />
+                Edit Profile
+              </button>
+            )}
           </form>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <span className="font-semibold text-gray-700">Username:</span>{" "}
-              {profile.username}
-            </div>
-            <div>
-              <span className="font-semibold text-gray-700">Email:</span>{" "}
-              {profile.email}
-            </div>
-            <div>
-              <span className="font-semibold text-gray-700">Gym Name:</span>{" "}
-              {profile.gymName}
-            </div>
-            <div>
-              <span className="font-semibold text-gray-700">Gym Type:</span>{" "}
-              {profile.gymType}
-            </div>
-            <div>
-              <span className="font-semibold text-gray-700">Gym Address:</span>
-              <ul className="pl-4">
-                <li>Street: {profile.gymAddress?.street}</li>
-                <li>City: {profile.gymAddress?.city}</li>
-                <li>State: {profile.gymAddress?.state}</li>
-                <li>Zip Code: {profile.gymAddress?.zipCode}</li>
-                <li>Country: {profile.gymAddress?.country}</li>
-              </ul>
-            </div>
-          </div>
-        )}
-        <button
-          onClick={() => {
-            setFormData(profile); // Initialize formData
-            setIsEditing(!isEditing);
-          }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mt-4"
-        >
-          {isEditing ? "Cancel" : "Editz Profile"}
-        </button>
+        </div>
       </div>
     </div>
   );
 }
+

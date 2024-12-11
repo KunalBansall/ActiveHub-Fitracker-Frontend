@@ -1,46 +1,52 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useForm } from "react-hook-form"
 import axios from "axios"
+import toast from "react-hot-toast"
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline"
 import { motion } from "framer-motion"
 
-interface SignInForm {
-  email: string
-  password: string
-}
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-export default function SignIn() {
-  const [error, setError] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
+const MemberLoginPage: React.FC = () => {
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
+  const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const navigate = useNavigate()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SignInForm>()
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
 
-  const onSubmit = async (data: SignInForm) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError(null)
+    setIsLoading(true)
+
     try {
-      const response = await axios.post(`${API_URL}/auth/signin`, data)
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("user", JSON.stringify(response.data))
-      navigate("/")
-    } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred")
+      const response = await axios.post(`${API_URL}/member-auth/login`, { email, password })
+      const { token, userId } = response.data
+
+      localStorage.setItem("token", token)
+      localStorage.setItem("userId", userId)
+
+      toast.success("Login successful!")
+      navigate(`/member/${userId}`)
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Login failed.")
+        toast.error(err.response?.data?.message || "Login failed.")
+      } else {
+        setError("An unexpected error occurred.")
+        toast.error("An unexpected error occurred.")
+      }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col justify-center items-center p-4" 
-    style={{
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col justify-center items-center p-4 "  style={{
       backgroundImage: "url(/Activehub04.jpeg)",
       backgroundSize: "fit", 
       backgroundPosition: "center", 
-    }}
-    >
+    }}>
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -48,37 +54,26 @@ export default function SignIn() {
         className="w-full max-w-md"
       >
         <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white border-opacity-20">
-          <h2 className="text-4xl font-bold text-center text-white mb-8">Welcome Back</h2>
-          {error && (
-            <div className="mb-4 bg-red-500 bg-opacity-20 border border-red-500 text-red-100 px-4 py-3 rounded-lg relative" role="alert">
-              <span className="block sm:inline">{error}</span>
-            </div>
-          )}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <h2 className="text-4xl font-bold text-center text-white mb-8">Member Login</h2>
+          <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
-                Email address
+                Email
               </label>
               <div className="relative">
                 <EnvelopeIcon className="h-5 w-5 text-gray-300 absolute top-3 left-3" />
                 <input
                   id="email"
                   type="email"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                   className="pl-10 block w-full px-4 py-3 bg-white bg-opacity-10 border border-gray-300 border-opacity-20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="you@example.com"
+                  placeholder="Enter your email"
                 />
               </div>
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-300">{errors.email.message}</p>
-              )}
             </div>
+
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-white mb-1">
                 Password
@@ -88,9 +83,9 @@ export default function SignIn() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                   className="pl-10 block w-full px-4 py-3 bg-white bg-opacity-10 border border-gray-300 border-opacity-20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your password"
                 />
@@ -106,46 +101,29 @@ export default function SignIn() {
                   )}
                 </button>
               </div>
-              {errors.password && (
-                <p className="mt-2 text-sm text-red-300">{errors.password.message}</p>
-              )}
             </div>
+
+            {error && <p className="text-red-300 text-sm">{error}</p>}
+
             <div>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={!email || !password || isLoading}
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200"
               >
-                {isSubmitting ? "Signing in..." : "Sign in"}
+                {isLoading ? "Logging in..." : "Login"}
               </button>
             </div>
           </form>
-          <div className="mt-8 space-y-4">
-            <p className="text-sm text-gray-200 text-center">
-              Not a user?{" "}
-              <button
-                onClick={() => navigate("/signup")}
-                className="font-medium text-blue-300 hover:text-blue-200 transition-colors duration-200"
-              >
-                Sign up here
-              </button>
-            </p>
-            <p className="text-sm text-gray-200 text-center">
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-200">
               Forgot your password?{" "}
               <button
-                onClick={() => navigate("/forgot-password")}
+                onClick={() => navigate("/reset-password")}
                 className="font-medium text-blue-300 hover:text-blue-200 transition-colors duration-200"
               >
                 Reset Password
-              </button>
-            </p>
-            <p className="text-sm text-gray-200 text-center">
-              Want to log in as a member?{" "}
-              <button
-                onClick={() => navigate("/memberlogin")}
-                className="font-medium text-blue-300 hover:text-blue-200 transition-colors duration-200"
-              >
-                Member Login
               </button>
             </p>
           </div>
@@ -154,4 +132,6 @@ export default function SignIn() {
     </div>
   )
 }
+
+export default MemberLoginPage
 

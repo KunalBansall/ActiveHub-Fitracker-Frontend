@@ -14,8 +14,10 @@ interface Props {
   initialData?: Member;
 }
 
-const user = JSON.parse(localStorage.getItem("user") || "{}"); // Get user from localStorage
-const gymName = user.gymName;
+const userString = localStorage.getItem("user");
+const user = userString ? JSON.parse(userString) : {}; // Fallback to an empty object if "user" is null or undefined
+const gymName = user?.gymName; // Safe access with optional chaining
+
 
 export default function MemberForm({ onSubmit, initialData }: Props) {
   const [photoPreview, setPhotoPreview] = useState<string | null>(

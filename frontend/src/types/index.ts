@@ -16,6 +16,7 @@ export interface Member {
   membershipType: 'basic' | 'premium' | 'platinum';
   lastCheckIn?: string | null; 
   createdAt :string;
+  attendance:Attendance[];
   
 }
 

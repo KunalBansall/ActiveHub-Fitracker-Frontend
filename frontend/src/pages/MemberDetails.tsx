@@ -4,7 +4,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import MemberForm from "../components/MemberForm";
 import AttendanceHistoryModal from "../components/AttendenceHistoryModal";
-import { Member, Attendance } from "../types";
+import { Member } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -62,12 +62,12 @@ export default function MemberDetails() {
       </div>
 
       {/* Modal for Attendance History */}
-      {isHistoryModalOpen && (
-        <AttendanceHistoryModal
-          memberId={id!}
-          onClose={() => setIsHistoryModalOpen(false)}
-        />
-      )}
+      <AttendanceHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        memberId={id}
+      />
     </div>
   );
 }
+
