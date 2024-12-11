@@ -1,56 +1,40 @@
-import { toast } from "react-hot-toast"; // Importing the toast function
-import { Member } from "../types";
-import { format } from "date-fns";
-import clsx from "clsx";
-import { Link } from "react-router-dom";
-import React, { useState } from "react";
-import { BellIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
+import React, { useState } from "react"
+import { Link } from "react-router-dom"
+import { toast } from "react-hot-toast"
+import { format } from "date-fns"
+import { Member } from "../types"
+import { BellIcon, ArrowsUpDownIcon } from '@heroicons/react/24/outline'
+import axios from "axios"
 
 interface Props {
-  members: Member[];
+  members: Member[]
 }
 
-export default function MemberList({ members }: Props) {
-  const [sortBy, setSortBy] = useState<"expiryDate" | "createdAt">(
-    "expiryDate"
-  );
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [isNotifying, setIsNotifying] = useState<string | null>(null); // Track the notifying state
+export  default function MemberList({ members }: Props) {
+  const [sortBy, setSortBy] = useState<"expiryDate" | "createdAt">("expiryDate")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const [isNotifying, setIsNotifying] = useState<string | null>(null)
 
   const sortedMembers = [...members].sort((a, b) => {
-    let valueA = 0;
-    let valueB = 0;
+    let valueA = sortBy === "expiryDate" ? new Date(a.membershipEndDate).getTime() : new Date(a.createdAt).getTime()
+    let valueB = sortBy === "expiryDate" ? new Date(b.membershipEndDate).getTime() : new Date(b.createdAt).getTime()
+    return sortOrder === "asc" ? valueA - valueB : valueB - valueA
+  })
 
+  const toggleSort = () => {
     if (sortBy === "expiryDate") {
-      valueA = a.membershipEndDate
-        ? new Date(a.membershipEndDate).getTime()
-        : 0;
-      valueB = b.membershipEndDate
-        ? new Date(b.membershipEndDate).getTime()
-        : 0;
-    } else if (sortBy === "createdAt") {
-      valueA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      valueB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      setSortBy("createdAt")
+      setSortOrder("desc")
+    } else {
+      setSortBy("expiryDate")
+      setSortOrder("asc")
     }
+  }
 
-    return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
-  });
-
-  const toggleSortBy = () => {
-    setSortBy((prevSortBy) => {
-      const newSortBy =
-        prevSortBy === "expiryDate" ? "createdAt" : "expiryDate";
-      setSortOrder(newSortBy === "createdAt" ? "desc" : "asc"); // Default order for "createdAt" is "desc"
-      return newSortBy;
-    });
-  };
-
-  // Send notification
   const sendNotification = async (member: Member) => {
-    setIsNotifying(member._id); // Disable button for this member
+    setIsNotifying(member._id)
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
       const response = await axios.post(
         `${API_URL}/members/renewal-reminder`,
         { memberId: member._id },
@@ -59,147 +43,99 @@ export default function MemberList({ members }: Props) {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
-      );
-
-      // Assuming backend response contains a message in 'response.data.message'
-      const message =
-        response.data.message || `Notification sent to ${member.name}`;
-
-      // Display success toast with backend message
-      toast.success(message);
+      )
+      toast.success(response.data.message || `Notification sent to ${member.name}`)
     } catch (error) {
-      console.error("Error sending notification:", error);
-      // Display error toast if something goes wrong
-      toast.error(`Failed to send notification to ${member.name}`);
+      console.error("Error sending notification:", error)
+      toast.error(`Failed to send notification to ${member.name}`)
     } finally {
-      setIsNotifying(null); // Re-enable button after sending the notification
+      setIsNotifying(null)
     }
-  };
+  }
 
   return (
-    <div className="mt-8 flow-root">
-      <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div className="mb-4 flex justify-between">
-            <button
-              onClick={toggleSortBy}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md"
-            >
-              Sort by {sortBy === "expiryDate" ? "Join Date" : "Expiry Date"}
-            </button>
-          </div>
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead>
-              <tr>
-                <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
-                  MEMBER
-                </th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  STATUS
-                </th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  MEMBERSHIP
-                </th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  EXPIRY DATE
-                </th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  ACTION
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {sortedMembers.map((member) => {
-                const expiryDate = new Date(member.membershipEndDate);
-                const isExpired = expiryDate < new Date();
-                const isExpiringSoon =
-                  expiryDate <= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
-                const membershipStatus = isExpired ? "expired" : "active";
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold tracking-tight">Members</h2>
+        <button
+          onClick={toggleSort}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center gap-2"
+        >
+          Sort by {sortBy === "expiryDate" ? "Expiry Date" : "Join Date"}
+          <ArrowsUpDownIcon className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="rounded-md border overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="text-left font-medium p-4 w-[250px]">Member</th>
+              <th className="text-left font-medium p-4">Status</th>
+              <th className="text-left font-medium p-4">Membership</th>
+              <th className="text-left font-medium p-4">Expiry Date</th>
+              <th className="text-left font-medium p-4">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedMembers.map((member) => {
+              const expiryDate = new Date(member.membershipEndDate)
+              const isExpired = expiryDate < new Date()
+              const isExpiringSoon = expiryDate <= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
+              const membershipStatus = isExpired ? "expired" : "active"
 
-                return (
-                  <tr
-                    key={member._id}
-                    className="hover:bg-gray-100 cursor-pointer"
-                  >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3">
-                      <Link
-                        to={`/members/${member._id}`}
-                        className="flex items-center"
-                      >
-                        <div className="h-10 w-10 flex-shrink-0">
-                          {member.photo ? (
-                            <img
-                              className="h-10 w-10 rounded-full"
-                              src={member.photo}
-                              alt=""
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-gray-500 font-medium">
-                                {member.name.charAt(0)}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="ml-4">
-                          <div className="font-medium text-gray-900">
-                            {member.name}
-                          </div>
-                          <div className="text-gray-500">
-                            {member.phoneNumber}
-                          </div>
-                        </div>
-                      </Link>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4">
-                      <span
-                        className={clsx(
-                          "inline-flex rounded-full px-2 text-xs font-semibold leading-5",
-                          {
-                            "bg-green-100 text-green-800":
-                              membershipStatus === "active",
-                            "bg-red-100 text-red-800":
-                              membershipStatus === "expired",
-                            "bg-yellow-100 text-yellow-800":
-                              member.status === "pending",
-                          }
+              return (
+                <tr key={member._id} className="border-t border-gray-200 hover:bg-gray-50">
+                  <td className="p-4">
+                    <Link to={`/members/${member._id}`} className="flex items-center space-x-4 group">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                        {member.photo ? (
+                          <img src={member.photo} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+                        ) : (
+                          <span className="text-gray-500 font-medium">{member.name.charAt(0)}</span>
                         )}
-                      >
-                        {membershipStatus}
+                      </div>
+                      <div>
+                        <div className="font-semibold group-hover:text-blue-600 transition-colors">{member.name}</div>
+                        <div className="text-sm text-gray-500">{member.phoneNumber}</div>
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="p-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      membershipStatus === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                    }`}>
+                      {membershipStatus}
+                    </span>
+                  </td>
+                  <td className="p-4">{member.membershipType}</td>
+                  <td className="p-4">
+                    <div className="flex items-center">
+                      <span className={isExpiringSoon ? "text-red-600 font-medium" : ""}>
+                        {format(expiryDate, "MMM dd, yyyy")}
                       </span>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {member.membershipType}
-                    </td>
-                    <td
-                      className={clsx(
-                        "whitespace-nowrap px-3 py-4 text-sm",
-                        isExpiringSoon
-                          ? "text-red-600 font-medium"
-                          : "text-gray-500"
-                      )}
+                      {isExpiringSoon && <BellIcon className="h-4 w-4 text-red-500 ml-2" />}
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <button
+                      onClick={() => sendNotification(member)}
+                      disabled={isNotifying === member._id}
+                      className={`px-3 py-1 text-sm font-medium rounded-md ${
+                        isNotifying === member._id
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      }`}
                     >
-                      {format(expiryDate, "MM/dd/yyyy")}
-                      {isExpiringSoon && (
-                        <BellIcon className="h-5 w-5 text-red-500 inline ml-2" />
-                      )}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <button
-                        onClick={() => sendNotification(member)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded-md"
-                        disabled={isNotifying === member._id} // Disable button while notifying
-                      >
-                        {isNotifying === member._id ? "Notifying..." : "Notify"}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      {isNotifying === member._id ? "Notifying..." : "Notify"}
+                    </button>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
-  );
+  )
 }
+

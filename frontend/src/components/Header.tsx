@@ -1,29 +1,26 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  MagnifyingGlassIcon,
-  Bars3Icon,
-  ArrowRightOnRectangleIcon,
-} from "@heroicons/react/24/outline";
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 import axios from "axios";
 import MobileMenu from "./MobileMenu";
-import React from "react";
-import { Link } from "react-router-dom";
+
+// Icons
+import { MagnifyingGlassIcon, Bars3Icon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 // Define the member type, including the photo field
 interface Member {
   _id: string;
   name: string;
-  photo: string; // Assuming each member has a photo field
+  photo: string;
 }
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function Header() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -38,7 +35,7 @@ export default function Header() {
         `${API_URL}/members/search?query=${searchQuery}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include token in headers
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -50,130 +47,204 @@ export default function Header() {
   );
 
   const handleSignOut = () => {
-    setIsModalOpen(true); // Open the confirmation modal
+    setIsModalOpen(true);  // Open the modal when sign out is clicked
   };
 
   const confirmSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/signin");
-    setIsModalOpen(false); // Close the modal after confirming
+    setIsModalOpen(false); // Close the modal after signing out
   };
 
-  const cancelSignOut = () => {
-    setIsModalOpen(false); // Just close the modal if the user cancels
+  const handleOutsideClick = (e: MouseEvent) => {
+    // Cast e.target to HTMLElement to ensure it has the closest method
+    const target = e.target as HTMLElement;
+  
+    if (
+      target.closest("#user-menu") ||
+      target.closest(".dropdown-menu")
+    ) {
+      return; // If click is inside the dropdown or user menu, do nothing
+    }
+  
+    setIsDropdownOpen(false);
+    if (!target.closest(".search-input")) {
+      setSearchQuery(""); // Clear search input when clicking outside
+    }
   };
+  
+
+  useEffect(() => {
+    // Add a global event listener to close the dropdown and search when clicking outside
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
 
   return (
-    <header className="bg-white shadow">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 justify-between items-center">
-          {/* Mobile menu button */}
-          <button
-            type="button"
-            className="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            <Bars3Icon className="h-6 w-6" />
-          </button>
-
-          {/* Gym Name */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="text-xl font-bold text-blue-400">
-              {user.gymName || "ActiveHub"}
-            </Link>
+    <header className="bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <button
+              type="button"
+              className="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Bars3Icon className="h-6 w-6" />
+            </button>
+            <div className="flex-shrink-0 flex items-center">
+              <Link to="/" className="text-xl font-bold text-blue-600">
+                {user.gymName || "ActiveHub"}
+              </Link>
+            </div>
+            <nav className="hidden md:ml-6 md:flex md:space-x-8">
+              <Link
+                to="/"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/members"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              >
+                Members
+              </Link>
+            </nav>
           </div>
-
-          {/* Search */}
-          <div className="flex-1 max-w-lg mx-4">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="search"
-                placeholder="Search members..."
-                className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchResults && searchResults.length > 0 && (
-                <div className="absolute mt-1 w-full rounded-md bg-white shadow-lg">
-                  <ul className="max-h-60 overflow-auto rounded-md py-1 text-base">
-                    {searchResults.map((member: Member) => (
-                      <li
-                        key={member._id}
-                        className="cursor-pointer px-4 py-2 hover:bg-gray-100"
-                        onClick={() => {
-                          navigate(`/members/${member._id}`);
-                          setSearchQuery("");
-                        }}
-                      >
-                        <div className="flex items-center space-x-3">
-                          {/* Display the member's photo */}
-                          {member.photo && (
+          <div className="flex items-center">
+            <div className="flex-1 max-w-lg mx-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search members..."
+                  className="w-full sm:w-64 rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 leading-5 placeholder-gray-500 focus:border-blue-500 focus:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
+                {searchResults && searchResults.length > 0 && (
+                  <div className="absolute mt-1 w-full rounded-md bg-white shadow-lg">
+                    <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                      {searchResults.map((member: Member) => (
+                        <li
+                          key={member._id}
+                          className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-50"
+                          onClick={() => {
+                            navigate(`/members/${member._id}`);
+                            setSearchQuery("");
+                          }}
+                        >
+                          <div className="flex items-center">
                             <img
                               src={member.photo}
                               alt={member.name}
-                              className="h-8 w-8 rounded-full"
+                              className="h-6 w-6 flex-shrink-0 rounded-full"
                             />
-                          )}
-                          <span>{member.name}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                            <span className="ml-3 block truncate font-normal">{member.name}</span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="ml-4 relative flex-shrink-0">
+              <div>
+                <button
+                  type="button"
+                  className="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  id="user-menu"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <span className="sr-only">Open user menu</span>
+                  {user.photo ? (
+                    <img className="h-8 w-8 rounded-full" src={user.photo} alt="" />
+                  ) : (
+                    <UserCircleIcon className="h-8 w-8 text-gray-400" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+              {isDropdownOpen && (
+                <div
+                  className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dropdown-menu"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-menu"
+                >
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                  >
+                    Your Profile
+                  </Link>
+                  <Link
+                    to="/settings"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                  >
+                    Sign out
+                  </button>
                 </div>
               )}
             </div>
           </div>
-
-          {/* Sign Out */}
-          <div>
-            <button
-              onClick={handleSignOut}
-              className="relative inline-flex items-center justify-center p-4 px-4 py-2 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out border-2  border-blue-700 rounded-full shadow-md group"
-            >
-              {/* Animated Background and Icon */}
-              <span className="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-blue-700 group-hover:translate-x-0 ease">
-                <ArrowRightOnRectangleIcon className="w-6 h-6" />
-              </span>
-
-              {/* Front Text that Moves Out on Hover */}
-              <span className="absolute flex items-center justify-center w-full h-full  border-blue-700 transition-all duration-300 transform group-hover:translate-x-full ease">
-                Sign Out
-              </span>
-
-              {/* Invisible Text to Maintain Button Dimensions */}
-              <span className="relative invisible">Sign Out</span>
-            </button>
-          </div>
         </div>
       </div>
-
       {/* Mobile Menu */}
       <MobileMenu isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
-
-      {/* Confirmation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Are you sure you want to sign out?
-            </h2>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={cancelSignOut}
-                className="bg-gray-200 text-gray-900 py-2 px-4 rounded-md hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmSignOut}
-                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-              >
-                Confirm
-              </button>
+        <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                      Sign out
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        Are you sure you want to sign out? You will be redirected to the sign-in page.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={confirmSignOut}
+                >
+                  Sign out
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
