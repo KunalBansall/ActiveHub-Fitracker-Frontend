@@ -1,61 +1,74 @@
-import React, { useState, useEffect } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import axios from "axios"
-import { toast } from "react-hot-toast"
-import { EyeIcon, EyeSlashIcon, LockClosedIcon } from "@heroicons/react/24/outline"
-import { motion } from "framer-motion"
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  LockClosedIcon,
+} from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const ResetPassword: React.FC = () => {
-  const { id, token } = useParams<{ id: string; token: string }>()
-  const navigate = useNavigate()
+  const { id, token } = useParams<{ id: string; token: string }>();
+  const navigate = useNavigate();
 
-  const [newPassword, setNewPassword] = useState<string>("")
-  const [confirmPassword, setConfirmPassword] = useState<string>("")
-  const [loading, setLoading] = useState<boolean>(false)
-  const [showNewPassword, setShowNewPassword] = useState<boolean>(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
 
   const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match")
-      setLoading(false)
-      return
+      toast.error("Passwords do not match");
+      setLoading(false);
+      return;
     }
 
     try {
-      const response = await axios.post(`${API_URL}/auth/reset-password/${id}/${token}`, {
-        password: newPassword,
-      })
+      const response = await axios.post(
+        `${API_URL}/member-auth/set-password/${id}/${token}`,
+        {
+          password: newPassword,
+        }
+      );
 
       if (response.data.Status === "Success") {
-        toast.success(response.data.message || "Password reset successful")
-        navigate("/signin")
+        toast.success(response.data.message || "Password set successfully!");
+        console.log("Redirecting to /memberlogin...");
+
+        navigate("/memberlogin");
       }
     } catch (error: any) {
-      toast.error(error.response?.data.message || "Error resetting password")
+      toast.error(error.response?.data.message || "Error resetting password");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (!token || !id) {
-      toast.error("Invalid or expired reset link")
-      navigate("/forgot-password")
+      toast.error("Invalid or expired reset link");
+      navigate("/forgot-password");
     }
-  }, [token, id, navigate])
+  }, [token, id, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col justify-center items-center p-4"  style={{
-      backgroundImage: "url(/Activehub04.jpeg)",
-      backgroundSize: "fit", 
-      backgroundPosition: "center", 
-    }}>
+    <div
+      className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col justify-center items-center p-4"
+      style={{
+        backgroundImage: "url(/Activehub04.jpeg)",
+        backgroundSize: "fit",
+        backgroundPosition: "center",
+      }}
+    >
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -63,10 +76,15 @@ const ResetPassword: React.FC = () => {
         className="w-full max-w-md"
       >
         <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white border-opacity-20">
-          <h2 className="text-4xl font-bold text-center text-white mb-8">Reset Password</h2>
+          <h2 className="text-4xl font-bold text-center text-white mb-8">
+            Set Password
+          </h2>
           <form className="space-y-6" onSubmit={handleReset}>
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-white mb-1">
+              <label
+                htmlFor="newPassword"
+                className="block text-sm font-medium text-white mb-1"
+              >
                 New Password
               </label>
               <div className="relative">
@@ -95,7 +113,10 @@ const ResetPassword: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-1">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-white mb-1"
+              >
                 Confirm Password
               </label>
               <div className="relative">
@@ -148,8 +169,7 @@ const ResetPassword: React.FC = () => {
         </div>
       </motion.div>
     </div>
-  )
-}
+  );
+};
 
-export default ResetPassword
-
+export default ResetPassword;
