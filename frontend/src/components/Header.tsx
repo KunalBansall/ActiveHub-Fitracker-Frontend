@@ -131,11 +131,11 @@ export default function Header() {
 
           {/* Search Box in the center */}
           <div
-            className="flex-1 flex justify-center mt-1 transform 
+            className=" flex-1 flex justify-center mt-1 transform 
                hover:scale-105 
-               transition-transform duration-300 ease-in-out text-shadow-2xl z-10"
+               transition-transform duration-300 ease-in-out text-shadow-2xl z-10 ml-3 "
           >
-            <div className="relative w-full max-w-2xl">
+            <div className="relative w-full sm:w-96 ">
               <input
                 type="text"
                 placeholder="Search members..."
