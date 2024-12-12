@@ -60,8 +60,8 @@ export default function Dashboard() {
 
       <div className="mt-8">
         <h2 className="text-lg font-medium text-gray-900 mb-4">
-          Members Ending Soon
-        </h2>
+          Expiring Soon Members ⬇️
+           </h2>
         <MemberList members={sortedMembers.slice(0, 5)} />{" "}
         {/* Show top 5 members */}
       </div>

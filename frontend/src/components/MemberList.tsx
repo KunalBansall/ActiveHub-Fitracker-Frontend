@@ -52,11 +52,9 @@ export  default function MemberList({ members }: Props) {
       setIsNotifying(null)
     }
   }
-
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center ">
-        <h2 className="text-3xl font-bold tracking-tight">Members</h2>
+      <div className="flex justify-between items-center">
         <button
           onClick={toggleSort}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center gap-2"
@@ -77,15 +75,16 @@ export  default function MemberList({ members }: Props) {
             </tr>
           </thead>
           <tbody>
-            {sortedMembers.map((member) => {
-              const expiryDate = new Date(member.membershipEndDate)
-              const isExpired = expiryDate < new Date()
-              const isExpiringSoon = expiryDate <= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
-              const membershipStatus = isExpired ? "expired" : "active"
+            {sortedMembers.map((member, index) => {
+              const expiryDate = new Date(member.membershipEndDate);
+              const isExpired = expiryDate < new Date();
+              const isExpiringSoon = expiryDate <= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+              const membershipStatus = isExpired ? "expired" : "active";
 
               return (
                 <tr key={member._id} className="border-t border-gray-200 hover:bg-gray-50">
                   <td className="p-4">
+                    {/* <span className="font-semibold ">{index + 1}. </span> */}
                     <Link to={`/members/${member._id}`} className="flex items-center space-x-4 group">
                       <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
                         {member.photo ? (
@@ -101,9 +100,11 @@ export  default function MemberList({ members }: Props) {
                     </Link>
                   </td>
                   <td className="p-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      membershipStatus === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        membershipStatus === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {membershipStatus}
                     </span>
                   </td>
@@ -130,12 +131,11 @@ export  default function MemberList({ members }: Props) {
                     </button>
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
       </div>
     </div>
-  )
-}
-
+  );
+};

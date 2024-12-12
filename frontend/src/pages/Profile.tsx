@@ -1,9 +1,17 @@
-'use client'
+"use client";
 
-import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "react-query";
 import axios from "axios";
 import { useState } from "react";
-import { PencilIcon, CheckIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, CheckIcon, UserCircleIcon, XMarkIcon, MapPinIcon, EnvelopeIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
+
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -34,12 +42,21 @@ export default function ProfilePage() {
 }
 
 function Profile() {
-  const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-  const user = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem("user") || "{}") : {};
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "{}")
+      : {};
   const [formData, setFormData] = useState<AdminProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const { data: profile, isLoading, isError, error } = useQuery<AdminProfile | undefined>(
+  const {
+    data: profile,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<AdminProfile | undefined>(
     "adminProfile",
     async () => {
       const response = await axios.get(`${API_URL}/admin/profile`, {
@@ -80,12 +97,16 @@ function Profile() {
 
     if (name.startsWith("gymAddress.")) {
       const field = name.split(".")[1] as keyof GymAddress;
-      setFormData((prev) => prev ? {
-        ...prev,
-        gymAddress: { ...prev.gymAddress, [field]: value },
-      } : null);
+      setFormData((prev) =>
+        prev
+          ? {
+              ...prev,
+              gymAddress: { ...prev.gymAddress, [field]: value },
+            }
+          : null
+      );
     } else {
-      setFormData((prev) => prev ? { ...prev, [name]: value } : null);
+      setFormData((prev) => (prev ? { ...prev, [name]: value } : null));
     }
   };
 
@@ -121,7 +142,8 @@ function Profile() {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto mt-8">
         <p className="text-red-500">
-          Error fetching profile: {error instanceof Error ? error.message : "Unknown error"}
+          Error fetching profile:{" "}
+          {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
     );
@@ -137,61 +159,71 @@ function Profile() {
 
   return (
     <div className="container mx-auto py-10 px-4">
-      <div className="bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-        <div className="border-b border-gray-200 p-6">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl mx-auto overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 text-white">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Admin Profile</h1>
-            <UserCircleIcon className="w-8 h-8 text-gray-400" />
+            <h1 className="text-2xl font-bold text-white border-1 text-shadow-2xl">{formData?.gymName || profile.gymName} </h1>
+            <UserCircleIcon className="w-16 h-16 text-white bg-white/30 rounded-full p-2" />
           </div>
         </div>
-        
-        <div className="p-6">
+
+        <div className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Username</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Username
+                </label>
                 <input
                   type="text"
                   name="username"
                   value={formData?.username || profile.username}
                   onChange={handleChange}
                   disabled={!isEditing}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData?.email || profile.email}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData?.email || profile.email}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                  />
+                  <EnvelopeIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Gym Name</label>
-                <input
-                  type="text"
-                  name="gymName"
-                  value={formData?.gymName || profile.gymName}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Gym Name</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="gymName"
+                    value={formData?.gymName || profile.gymName}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                  />
+                  <BuildingOfficeIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Gym Type</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Gym Type</label>
                 <select
                   name="gymType"
                   value={formData?.gymType || profile.gymType}
                   onChange={handleChange}
                   disabled={!isEditing}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
                 >
                   <option value="CrossFit">CrossFit</option>
                   <option value="Yoga">Yoga</option>
@@ -201,9 +233,28 @@ function Profile() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Gym Address</label>
-                <div className="space-y-2 mt-1">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Gym Type</label>
+                <select
+                  name="gymType"
+                  value={formData?.gymType || profile.gymType}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                >
+                  <option value="CrossFit">CrossFit</option>
+                  <option value="Yoga">Yoga</option>
+                  <option value="Weightlifting">Weightlifting</option>
+                  <option value="Cardio">Cardio</option>
+                  <option value="Mixed">Mixed</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Gym Address</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
                   <input
                     type="text"
                     name="gymAddress.street"
@@ -211,45 +262,46 @@ function Profile() {
                     value={formData?.gymAddress?.street || profile.gymAddress.street}
                     onChange={handleChange}
                     disabled={!isEditing}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
                   />
-                  <input
-                    type="text"
-                    name="gymAddress.city"
-                    placeholder="City"
-                    value={formData?.gymAddress?.city || profile.gymAddress.city}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                  <input
-                    type="text"
-                    name="gymAddress.state"
-                    placeholder="State"
-                    value={formData?.gymAddress?.state || profile.gymAddress.state}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                  <input
-                    type="text"
-                    name="gymAddress.zipCode"
-                    placeholder="Zip Code"
-                    value={formData?.gymAddress?.zipCode || profile.gymAddress.zipCode}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                  <input
-                    type="text"
-                    name="gymAddress.country"
-                    placeholder="Country"
-                    value={formData?.gymAddress?.country || profile.gymAddress.country}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
+                  <MapPinIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                 </div>
+                <input
+                  type="text"
+                  name="gymAddress.city"
+                  placeholder="City"
+                  value={formData?.gymAddress?.city || profile.gymAddress.city}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                />
+                <input
+                  type="text"
+                  name="gymAddress.state"
+                  placeholder="State"
+                  value={formData?.gymAddress?.state || profile.gymAddress.state}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                />
+                <input
+                  type="text"
+                  name="gymAddress.zipCode"
+                  placeholder="Zip Code"
+                  value={formData?.gymAddress?.zipCode || profile.gymAddress.zipCode}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                />
+                <input
+                  type="text"
+                  name="gymAddress.country"
+                  placeholder="Country"
+                  value={formData?.gymAddress?.country || profile.gymAddress.country}
+                  onChange={handleChange}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                />
               </div>
             </div>
 
@@ -289,4 +341,3 @@ function Profile() {
     </div>
   );
 }
-

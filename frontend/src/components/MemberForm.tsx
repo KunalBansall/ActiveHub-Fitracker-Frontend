@@ -3,11 +3,13 @@ import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { Member } from "../types";
 import { Typography } from "@material-tailwind/react";
-import { toast } from "react-hot-toast"; // Importing the toast function
+import { toast } from "react-hot-toast";
+import { isValidEmail } from "../config/validations";
+import { Slider } from "@material-tailwind/react";
 
 const defaultImage = "/ah2.jpeg";
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload"; // Cloud Name: diy7wynvw
-const UPLOAD_PRESET = "ActiveHub"; // Replace with your upload preset
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload";
+const UPLOAD_PRESET = "ActiveHub";
 
 interface Props {
   onSubmit: (data: Partial<Member>) => void;
@@ -15,8 +17,8 @@ interface Props {
 }
 
 const userString = localStorage.getItem("user");
-const user = userString ? JSON.parse(userString) : {}; // Fallback to an empty object if "user" is null or undefined
-const gymName = user?.gymName; // Safe access with optional chaining
+const user = userString ? JSON.parse(userString) : {};
+const gymName = user?.gymName;
 
 export default function MemberForm({ onSubmit, initialData }: Props) {
   const [photoPreview, setPhotoPreview] = useState<string | null>(
@@ -25,6 +27,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [extensionDuration, setExtensionDuration] = useState(0);
 
   const {
     register,
@@ -79,29 +82,29 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
   };
 
   const handleFormSubmit = async (data: Partial<Member>) => {
-    setIsSubmitting(true); // Disable the button when submission starts
+    setIsSubmitting(true);
 
     try {
       await onSubmit({
         ...data,
         photo: photoPreview,
+        durationMonths: (data.durationMonths || 0) + extensionDuration,
       });
 
-      // Show success toast when member data is updated
       if (initialData) {
         toast.success(`${initialData.name}'s Profile updated successfully!`);
       } else {
-        toast.success("Member added successfully!");
+        toast.success("New member added successfully!");
       }
     } catch (error) {
       toast.error("There was an error while submitting the form.");
     } finally {
-      setIsSubmitting(false); // Enable the button when submission is complete
+      setIsSubmitting(false);
     }
   };
 
   const memberSince = initialData?.createdAt
-    ? format(new Date(initialData.createdAt), "MM/yy")
+    ? format(new Date(initialData.createdAt), "MMM/yy")
     : null;
 
   const MembershipEndDate = initialData?.membershipEndDate
@@ -111,7 +114,20 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
   const handleImageClick = () => {
     document.getElementById("fileInput")?.click();
   };
+  const handleIncrease = () => {
+    setExtensionDuration((prev) => Math.min(prev + 1, 12));
+  };
 
+  const handleDecrease = () => {
+    setExtensionDuration((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 0 && value <= 12) {
+      setExtensionDuration(value);
+    }
+  };
   return (
     <div className="relative font-serif">
       {memberSince && (
@@ -136,7 +152,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               ) : (
                 <div className="flex h-full items-center justify-center">
                   <img
-                    src={defaultImage} // Use the default image from public folder
+                    src={defaultImage}
                     alt="Default"
                     className="h-96 w-full object-top"
                   />
@@ -150,7 +166,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 <div
                   className="absolute top-2 left-2/4 transform -translate-x-2/4 flex flex-col items-center space-y-2 text-green-800"
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.7)", // Optional: Add a semi-transparent background for readability
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
                     padding: "4px 8px",
                     borderRadius: "4px",
                   }}
@@ -160,8 +176,8 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               )}
 
               {/* Blurred Caption */}
-              <figcaption className="absolute bottom-8 left-2/4 flex w-[calc(100%-4rem)] -translate-x-2/4 justify-around rounded-xl border border-white bg-white/75 py-4 px-6 shadow-lg shadow-black/5 saturate-200 backdrop-blur-sm">
-                <div>
+              <figcaption className="absolute bottom-8 left-2/4 flex w-[calc(100%-4rem)] -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-4 px-6 shadow-lg shadow-black/5 saturate-200 backdrop-blur-sm ">
+                <div className="mr-5">
                   <Typography
                     variant="h5"
                     color="blue-gray"
@@ -172,11 +188,10 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                   />
 
                   <Typography
-                    variant="h5"
                     color="blue-gray"
                     className="mt-2 font-normal"
-                    type="text"
-                    {...({ children: memberSince || "Member Since" } as any)}
+                    type="text" // Optional, if needed
+                    {...({ children: memberSince || "MM/YY" } as any)}
                   />
                 </div>
 
@@ -187,13 +202,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                     className="text-lg font-semibold mr-3"
                     {...({ children: gymName } as any)}
                   />
-
                   <Typography
                     variant="h5"
                     color="blue-gray"
-                    className="mt-2 font-normal  "
+                    className=" mt-2 font-normal mr-3"
                     {...({
-                      children: MembershipEndDate || "Expiry date",
+                      children: MembershipEndDate || " Expiry Date",
                     } as any)}
                   />
                 </div>
@@ -214,82 +228,128 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
           {/* Form Fields Section (Right Side) */}
           <div className="space-y-4">
             {/* Name Field */}
-            <div className="flex justify-between">
-              <Typography
-                className="font-semibold"
-                {...({ children: "Name" } as any)}
-              />
-
-              <input
-                {...register("name")}
-                type="text"
-                defaultValue={initialData?.name || ""}
-                className=" p-1 w-1/2 shadow-md"
-              />
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <Typography
+                  className="font-semibold"
+                  {...({ children: "Name" } as any)}
+                />
+                <input
+                  {...register("name", { required: "Name is required" })}
+                  type="text"
+                  defaultValue={initialData?.name || ""}
+                  className="p-1 w-1/2 shadow-md"
+                />
+              </div>
+              {errors.name && (
+                <span className="text-red-500 text-sm">
+                  {errors.name.message}
+                </span>
+              )}
             </div>
 
             {/* Phone Number Field */}
-            <div className="flex justify-between">
-              <Typography
-                color="blue-gray"
-                className="font-semibold"
-                {...({ children: "Phone Number" } as any)}
-              />
-
-              <input
-                {...register("phoneNumber")}
-                type="text"
-                defaultValue={initialData?.phoneNumber || ""}
-                className=" p-1 w-1/2 shadow-md"
-              />
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <Typography
+                  color="blue-gray"
+                  className="font-semibold"
+                  {...({ children: "Phone Number" } as any)}
+                />
+                <input
+                  {...register("phoneNumber", {
+                    required: "Phone number is required",
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: "Please enter only numbers",
+                    },
+                  })}
+                  type="tel"
+                  defaultValue={initialData?.phoneNumber || ""}
+                  className="p-1 w-1/2 shadow-md"
+                />
+              </div>
+              {errors.phoneNumber && (
+                <span className="text-red-500 text-sm">
+                  {errors.phoneNumber.message}
+                </span>
+              )}
             </div>
 
             {/* Email Field */}
-            <div className="flex justify-between">
-              <Typography
-                color="blue-gray"
-                className="font-semibold"
-                {...({ children: "Email" } as any)}
-              />
-
-              <input
-                {...register("email")}
-                type="email"
-                defaultValue={initialData?.email || ""}
-                className=" p-1 w-1/2 shadow-md"
-              />
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <Typography
+                  color="blue-gray"
+                  className="font-semibold"
+                  {...({ children: "Email" } as any)}
+                />
+                <input
+                  {...register("email", {
+                    required: "Email is required",
+                    validate: (value) =>
+                      isValidEmail(value || "") || "Invalid email address", // Handle undefined value
+                  })}
+                  type="email"
+                  defaultValue={initialData?.email || ""}
+                  className="p-1 w-1/2 shadow-md"
+                />
+              </div>
+              {errors.email && (
+                <span className="text-red-500 text-sm">
+                  {errors.email.message}
+                </span>
+              )}
             </div>
 
             {/* Weight Field */}
-            <div className="flex justify-between">
-              <Typography
-                color="blue-gray"
-                className="font-semibold"
-                {...({ children: "Weight (kg)" } as any)}
-              />
-
-              <input
-                {...register("weight")}
-                type="number"
-                defaultValue={initialData?.weight || ""}
-                className=" p-1 w-1/2 shadow-md"
-              />
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <Typography
+                  color="blue-gray"
+                  className="font-semibold"
+                  {...({ children: "Weight (kg)" } as any)}
+                />
+                <input
+                  {...register("weight", {
+                    required: "Weight is required",
+                    valueAsNumber: true,
+                  })}
+                  type="number"
+                  defaultValue={initialData?.weight ?? 0} // Fallback to 0 if undefined
+                  className="p-1 w-1/2 shadow-md"
+                />
+              </div>
+              {errors.weight && (
+                <span className="text-red-500 text-sm">
+                  {errors.weight.message}
+                </span>
+              )}
             </div>
 
             {/* Height Field */}
-            <div className="flex justify-between">
-              <Typography
-                color="blue-gray"
-                className="font-semibold"
-                {...({ children: "Height (cm)" } as any)}
-              />
-
-              <input
-                {...register("height")}
-                type="number"
-                defaultValue={initialData?.height || ""}
-                className=" p-1 w-1/2 shadow-md"
-              />
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <Typography
+                  color="blue-gray"
+                  className="font-semibold"
+                  {...({ children: "Height (cm)" } as any)}
+                />
+                <input
+                  {...register("height", {
+                    required: "Height is required",
+                    valueAsNumber: true,
+                  })}
+                  type="number"
+                  defaultValue={initialData?.height ?? 0} // Fallback to 0 if undefined
+                  className="p-1 w-1/2 shadow-md"
+                />
+              </div>
+              {errors.height && (
+                <span className="text-red-500 text-sm">
+                  {errors.height.message}
+                </span>
+              )}
             </div>
 
             {/* Trainer Assigned Field */}
@@ -299,12 +359,11 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 className="font-semibold"
                 {...({ children: "Trainer Assigned" } as any)}
               />
-
               <input
                 {...register("trainerAssigned")}
                 type="text"
-                defaultValue={initialData?.trainerAssigned || ""}
-                className=" p-1 w-1/2 shadow-md"
+                defaultValue={initialData?.trainerAssigned || ""} // Fallback to empty string if undefined
+                className="p-1 w-1/2 shadow-md"
               />
             </div>
 
@@ -315,11 +374,10 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 className="font-semibold"
                 {...({ children: "Membership Type" } as any)}
               />
-
               <select
                 {...register("membershipType")}
-                defaultValue={initialData?.membershipType || ""}
-                className=" p-1 w-1/2 shadow-md"
+                defaultValue={initialData?.membershipType || "basic"} // Fallback to "basic" if undefined
+                className="p-1 w-1/2 shadow-md"
               >
                 <option value="basic">basic</option>
                 <option value="premium">premium</option>
@@ -328,23 +386,21 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
             </div>
 
             {/* Duration Field */}
-            {/* Duration Months */}
             <div className="flex justify-between">
               <Typography
                 color="blue-gray"
                 className="font-semibold"
                 {...({ children: "Duration (months)" } as any)}
               />
-
               <input
                 {...register("durationMonths", {
                   valueAsNumber: true,
                   required: true,
                 })}
                 type="number"
-                min="1" // Ensure it's a positive number
-                defaultValue={initialData?.durationMonths || 1}
-                className=" p-1 w-1/2 shadow-md"
+                min="1"
+                defaultValue={initialData?.durationMonths ?? 1} // Fallback to 1 if undefined
+                className="p-1 w-1/2 shadow-md"
               />
             </div>
 
@@ -355,13 +411,12 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 className="font-semibold"
                 {...({ children: "Fees" } as any)}
               />
-
               <input
                 {...register("fees", { valueAsNumber: true, required: true })}
                 type="number"
-                min="0" // Fees should be a positive number
-                defaultValue={initialData?.fees || 500}
-                className=" p-1 w-1/2 shadow-md"
+                min="0"
+                defaultValue={initialData?.fees ?? 500} // Fallback to 500 if undefined
+                className="p-1 w-1/2 shadow-md"
               />
             </div>
 
@@ -372,11 +427,10 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                 className="font-semibold"
                 {...({ children: "Fee Status" } as any)}
               />
-
               <select
                 {...register("feeStatus", { required: true })}
-                defaultValue={initialData?.feeStatus || "due"} // Default to "due"
-                className=" p-1 w-1/2 shadow-md"
+                defaultValue={initialData?.feeStatus ?? "due"} // Fallback to "due" if undefined
+                className="p-1 w-1/2 shadow-md"
               >
                 <option value="paid">Paid</option>
                 <option value="due">Due</option>
@@ -384,12 +438,13 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
             </div>
           </div>
         </div>
+       
 
         {/* Submit Button */}
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={isSubmitting} // Disable when submitting
+            disabled={isSubmitting}
             className={`px-6 py-2 rounded-md text-white ${
               isSubmitting
                 ? "bg-gray-500 opacity-50"
@@ -397,7 +452,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
             }`}
           >
             {isSubmitting
-              ? "Adding/Updating..."
+              ? "Processing..."
               : initialData
               ? "Update Member"
               : "Add Member"}
