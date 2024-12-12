@@ -16,8 +16,9 @@ import AttendanceHistoryModal from "../components/AttendenceHistoryModal";
 import { MemberAttendance } from "../components/MemberAttendence";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload";
-const UPLOAD_PRESET = "ActiveHub";
+const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
 
 const MemberProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();

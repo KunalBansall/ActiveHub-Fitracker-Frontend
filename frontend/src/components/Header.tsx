@@ -247,15 +247,37 @@ export default function Header() {
       <MobileMenu isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
 
       {isModalOpen && (
-        <div
-          className="fixed z-10 inset-0 overflow-y-auto"
-          aria-labelledby="modal-title"
-          role="dialog"
-          aria-modal="true"
+  <div
+    className="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50"
+    aria-labelledby="modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+      <h3 className="text-lg font-semibold mb-4 text-gray-700" id="modal-title">
+        Confirm Sign Out
+      </h3>
+      <p className="text-sm text-gray-600 mb-6">
+        Are you sure you want to sign out? You will need to log in again to access your account.
+      </p>
+      <div className="flex justify-end space-x-4">
+        <button
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+          onClick={() => setIsModalOpen(false)} // Close the modal
         >
-          {/* Modal content */}
-        </div>
-      )}
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          onClick={confirmSignOut} // Confirm sign out
+        >
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </header>
   );
 }

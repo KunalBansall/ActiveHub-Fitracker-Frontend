@@ -8,8 +8,8 @@ import { isValidEmail } from "../config/validations";
 import { Slider } from "@material-tailwind/react";
 
 const defaultImage = "/ah2.jpeg";
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload";
-const UPLOAD_PRESET = "ActiveHub";
+const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
 interface Props {
   onSubmit: (data: Partial<Member>) => void;
