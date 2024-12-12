@@ -1,33 +1,37 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { Member } from '../types';
-import React from 'react';
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { Member } from "../types";
+import React from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function Attendance() {
-  const [selectedMemberId, setSelectedMemberId] = useState('');
+  const [selectedMemberId, setSelectedMemberId] = useState("");
   const queryClient = useQueryClient();
 
   // Get token from localStorage
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
-  const { data: members } = useQuery<Member[]>('members', () =>
-    axios.get(`${API_URL}/members`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((res) => res.data)
+  const { data: members } = useQuery<Member[]>("members", () =>
+    axios
+      .get(`${API_URL}/members`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data)
   );
 
-  const { data: todayAttendance } = useQuery('todayAttendance', () =>
-    axios.get(`${API_URL}/attendance/today`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then((res) => res.data)
+  const { data: todayAttendance } = useQuery("todayAttendance", () =>
+    axios
+      .get(`${API_URL}/attendance/today`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data)
   );
 
   const entryMutation = useMutation(
@@ -39,9 +43,9 @@ export default function Attendance() {
       }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('todayAttendance');
-        toast.success('Entry recorded successfully');
-        setSelectedMemberId('');
+        queryClient.invalidateQueries("todayAttendance");
+        toast.success("Entry recorded successfully");
+        setSelectedMemberId("");
       },
     }
   );
@@ -55,8 +59,8 @@ export default function Attendance() {
       }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('todayAttendance');
-        toast.success('Exit recorded successfully');
+        queryClient.invalidateQueries("todayAttendance");
+        toast.success("Exit recorded successfully");
       },
     }
   );
@@ -106,7 +110,9 @@ export default function Attendance() {
                           className="h-12 w-12 rounded-full mr-4"
                         />
                       )}
-                      <span className="text-lg font-medium text-gray-900">{member.name}</span>
+                      <span className="text-lg font-medium text-gray-900">
+                        {member.name}
+                      </span>
                     </div>
                   ) : null
                 )}
@@ -116,7 +122,9 @@ export default function Attendance() {
             <div className="flex space-x-4 mt-4">
               {/* Record Entry */}
               <button
-                onClick={() => selectedMemberId && entryMutation.mutate(selectedMemberId)}
+                onClick={() =>
+                  selectedMemberId && entryMutation.mutate(selectedMemberId)
+                }
                 disabled={!selectedMemberId}
                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50"
               >
@@ -125,7 +133,9 @@ export default function Attendance() {
 
               {/* Record Exit */}
               <button
-                onClick={() => selectedMemberId && exitMutation.mutate(selectedMemberId)}
+                onClick={() =>
+                  selectedMemberId && exitMutation.mutate(selectedMemberId)
+                }
                 disabled={!selectedMemberId}
                 className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:opacity-50"
               >
@@ -178,13 +188,15 @@ export default function Attendance() {
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {record.exitTime
                         ? new Date(record.exitTime).toLocaleTimeString()
-                        : '-'}
+                        : "-"}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {/* Display Mark Exit button only if entry is done */}
                       {record.entryTime && !record.exitTime && (
                         <button
-                          onClick={() => exitMutation.mutate(record.memberId._id)}
+                          onClick={() =>
+                            exitMutation.mutate(record.memberId._id)
+                          }
                           className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
                         >
                           Mark Exit

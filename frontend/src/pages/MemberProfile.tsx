@@ -13,6 +13,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import AttendanceHistoryModal from "../components/AttendenceHistoryModal";
+import { MemberAttendance } from "../components/MemberAttendence";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/diy7wynvw/image/upload";
@@ -118,11 +119,14 @@ const MemberProfile: React.FC = () => {
       toast.success(response.data.message || "Member updated successfully");
       setIsEditing(false);
       // Refresh member data after successful update
-      const updatedMember = await axios.get(`${API_URL}/member-auth/member/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const updatedMember = await axios.get(
+        `${API_URL}/member-auth/member/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setMember(updatedMember.data);
       reset(updatedMember.data);
     } catch (error: any) {
@@ -254,8 +258,15 @@ const MemberProfile: React.FC = () => {
                               : "bg-gray-100 border-gray-300 text-gray-500"
                           }`}
                           defaultValue={
-                            key.includes("Date")
-                              ? new Date(value as string).toLocaleDateString()
+                            key.includes("Date") && member[key as keyof Member]
+                              ? new Date(member[key as keyof Member] as string)
+                                  .toLocaleDateString("en-GB")
+                                  .split("/")
+                                  .map((part, index) => {
+                                    // If it's the year, take only the last 2 digits
+                                    return index === 2 ? part.slice(-2) : part;
+                                  })
+                                  .join("/")
                               : value
                           }
                         />
@@ -303,6 +314,9 @@ const MemberProfile: React.FC = () => {
             </form>
 
             <div className="mt-8">
+              <div className="mt-8">
+                <MemberAttendance memberId={member?._id} />
+              </div>
               <h3 className="text-lg font-medium text-gray-900">
                 Recent Attendance
               </h3>
@@ -311,17 +325,25 @@ const MemberProfile: React.FC = () => {
                   {member.attendance && member.attendance.length > 0 ? (
                     member.attendance.slice(0, 5).map((entry, index) => {
                       const entryDate = new Date(entry.entryTime);
+
+                      // Format the date to 'DD/Mon/YY'
+                      const formattedDate = `${entryDate
+                        .getDate()
+                        .toString()
+                        .padStart(2, "0")}/${entryDate.toLocaleString(
+                        "default",
+                        { month: "short" }
+                      )}/${entryDate.getFullYear().toString().slice(2)}`;
+
                       return (
                         <li key={index} className="px-4 py-4 sm:px-6">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-medium text-blue-600 truncate">
-                              {entryDate.toLocaleDateString()}
+                              {formattedDate}
                             </p>
                             <div className="ml-2 flex-shrink-0 flex">
                               <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {entry.exitTime
-                                  ? "Completed"
-                                  : "In Progress"}
+                                {entry.exitTime ? "Completed" : "In Progress"}
                               </p>
                             </div>
                           </div>
@@ -352,6 +374,7 @@ const MemberProfile: React.FC = () => {
                   )}
                 </ul>
               </div>
+
               <div className="mt-4">
                 <button
                   onClick={() => setIsHistoryModalOpen(true)}
@@ -376,4 +399,3 @@ const MemberProfile: React.FC = () => {
 };
 
 export default MemberProfile;
-

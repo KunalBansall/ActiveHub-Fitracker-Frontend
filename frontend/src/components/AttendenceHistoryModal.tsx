@@ -1,5 +1,5 @@
 import React from "react";
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Transition } from "@headlessui/react";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { Attendance, Member } from "../types";
@@ -13,12 +13,21 @@ interface AttendanceHistoryModalProps {
   attendance?: Attendance[];
 }
 
-export default function AttendanceHistoryModal({ isOpen, onClose, memberId, attendance: propAttendance }: AttendanceHistoryModalProps) {
+export default function AttendanceHistoryModal({
+  isOpen,
+  onClose,
+  memberId,
+  attendance: propAttendance,
+}: AttendanceHistoryModalProps) {
   const token = localStorage.getItem("token");
 
-  const { data: fetchedAttendance, isLoading, error } = useQuery<Attendance[]>(
+  const {
+    data: fetchedAttendance,
+    isLoading,
+    error,
+  } = useQuery<Attendance[]>(
     ["attendanceHistory", memberId],
-    () => 
+    () =>
       axios
         .get(`${API_URL}/attendance/history/${memberId}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -31,9 +40,21 @@ export default function AttendanceHistoryModal({ isOpen, onClose, memberId, atte
 
   const attendance = propAttendance || fetchedAttendance;
 
+  // Function to format date as DD/Mon/YY
+  const formatDate = (date: Date) => {
+    return `${date.getDate().toString().padStart(2, "0")}/${date.toLocaleString(
+      "default",
+      { month: "short" }
+    )}/${date.getFullYear().toString().slice(2)}`;
+  };
+
   return (
     <Transition show={isOpen} as={React.Fragment}>
-      <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={onClose}>
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-10 overflow-y-auto"
+        onClose={onClose}
+      >
         <div className="min-h-screen px-4 text-center">
           <Transition.Child
             as={React.Fragment}
@@ -47,11 +68,13 @@ export default function AttendanceHistoryModal({ isOpen, onClose, memberId, atte
             <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
-          <span className="inline-block h-screen align-middle" aria-hidden="true">
+          <span
+            className="inline-block h-screen align-middle"
+            aria-hidden="true"
+          >
             &#8203;
           </span>
-          
+
           <Transition.Child
             as={React.Fragment}
             enter="ease-out duration-300"
@@ -70,21 +93,34 @@ export default function AttendanceHistoryModal({ isOpen, onClose, memberId, atte
               </Dialog.Title>
               <div className="mt-2">
                 {isLoading ? (
-                  <p className="text-sm text-gray-500">Loading attendance history...</p>
+                  <p className="text-sm text-gray-500">
+                    Loading attendance history...
+                  </p>
                 ) : error ? (
-                  <p className="text-sm text-red-500">Error loading attendance history.</p>
+                  <p className="text-sm text-red-500">
+                    Error loading attendance history.
+                  </p>
                 ) : attendance && attendance.length > 0 ? (
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th
+                            scope="col"
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
                             Date
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th
+                            scope="col"
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
                             Entry Time
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th
+                            scope="col"
+                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          >
                             Exit Time
                           </th>
                         </tr>
@@ -93,7 +129,7 @@ export default function AttendanceHistoryModal({ isOpen, onClose, memberId, atte
                         {attendance.map((record) => (
                           <tr key={record._id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(record.entryTime).toLocaleDateString()}
+                              {formatDate(new Date(record.entryTime))}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(record.entryTime).toLocaleTimeString()}
@@ -109,7 +145,9 @@ export default function AttendanceHistoryModal({ isOpen, onClose, memberId, atte
                     </table>
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500">No attendance history found for this member.</p>
+                  <p className="text-sm text-gray-500">
+                    No attendance history found for this member.
+                  </p>
                 )}
               </div>
 
@@ -129,4 +167,3 @@ export default function AttendanceHistoryModal({ isOpen, onClose, memberId, atte
     </Transition>
   );
 }
-
