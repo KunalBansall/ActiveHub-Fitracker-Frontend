@@ -55,7 +55,7 @@ export  default function MemberList({ members }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center ">
         <h2 className="text-3xl font-bold tracking-tight">Members</h2>
         <button
           onClick={toggleSort}
@@ -65,7 +65,7 @@ export  default function MemberList({ members }: Props) {
           <ArrowsUpDownIcon className="h-4 w-4" />
         </button>
       </div>
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border overflow-hidden overflow-x-visible">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
