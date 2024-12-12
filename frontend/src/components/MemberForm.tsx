@@ -18,7 +18,6 @@ const userString = localStorage.getItem("user");
 const user = userString ? JSON.parse(userString) : {}; // Fallback to an empty object if "user" is null or undefined
 const gymName = user?.gymName; // Safe access with optional chaining
 
-
 export default function MemberForm({ onSubmit, initialData }: Props) {
   const [photoPreview, setPhotoPreview] = useState<string | null>(
     initialData?.photo || null
@@ -105,6 +104,10 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
     ? format(new Date(initialData.createdAt), "MM/yy")
     : null;
 
+  const MembershipEndDate = initialData?.membershipEndDate
+    ? format(new Date(initialData.membershipEndDate), "dd/MMM")
+    : null;
+
   const handleImageClick = () => {
     document.getElementById("fileInput")?.click();
   };
@@ -157,7 +160,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               )}
 
               {/* Blurred Caption */}
-              <figcaption className="absolute bottom-8 left-2/4 flex w-[calc(100%-4rem)] -translate-x-2/4 justify-between rounded-xl border border-white bg-white/75 py-4 px-6 shadow-lg shadow-black/5 saturate-200 backdrop-blur-sm">
+              <figcaption className="absolute bottom-8 left-2/4 flex w-[calc(100%-4rem)] -translate-x-2/4 justify-around rounded-xl border border-white bg-white/75 py-4 px-6 shadow-lg shadow-black/5 saturate-200 backdrop-blur-sm">
                 <div>
                   <Typography
                     variant="h5"
@@ -169,18 +172,31 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                   />
 
                   <Typography
+                    variant="h5"
                     color="blue-gray"
                     className="mt-2 font-normal"
-                    type="text" // Optional, if needed
-                    {...({ children: memberSince || "MM/YY" } as any)}
+                    type="text"
+                    {...({ children: memberSince || "Member Since" } as any)}
                   />
                 </div>
-                <Typography
-                  variant="h5"
-                  color="blue-gray"
-                  className="text-lg font-semibold mr-3"
-                  {...({ children: gymName } as any)}
-                />
+
+                <div>
+                  <Typography
+                    variant="h5"
+                    color="blue-gray"
+                    className="text-lg font-semibold mr-3"
+                    {...({ children: gymName } as any)}
+                  />
+
+                  <Typography
+                    variant="h5"
+                    color="blue-gray"
+                    className="mt-2 font-normal  "
+                    {...({
+                      children: MembershipEndDate || "Expiry date",
+                    } as any)}
+                  />
+                </div>
               </figcaption>
             </div>
 

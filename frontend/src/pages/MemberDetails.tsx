@@ -39,7 +39,34 @@ export default function MemberDetails() {
     }
   );
 
-  const handleSubmit = (data: Partial<Member>) => mutation.mutate(data);
+  const handleSubmit = (data: Partial<Member>) => {
+    const payload: Partial<Member> = {};
+
+    // Check each field and add only modified fields to the payload
+    if (data.name !== member?.name) payload.name = data.name;
+    if (data.photo !== member?.photo) payload.photo = data.photo;
+    if (data.phoneNumber !== member?.phoneNumber)
+      payload.phoneNumber = data.phoneNumber;
+    if (data.email !== member?.email) payload.email = data.email;
+    if (data.weight !== member?.weight) payload.weight = data.weight;
+    if (data.height !== member?.height) payload.height = data.height;
+    if (data.trainerAssigned !== member?.trainerAssigned)
+      payload.trainerAssigned = data.trainerAssigned;
+    if (data.membershipType !== member?.membershipType)
+      payload.membershipType = data.membershipType;
+    if (data.durationMonths !== member?.durationMonths)
+      payload.durationMonths = data.durationMonths;
+    if (data.fees !== member?.fees) payload.fees = data.fees;
+    if (data.feeStatus !== member?.feeStatus)
+      payload.feeStatus = data.feeStatus;
+
+    // Send payload only if there are changes
+    if (Object.keys(payload).length > 0) {
+      mutation.mutate(payload);
+    } else {
+      console.log("No changes detected. Update skipped.");
+    }
+  };
 
   if (!member) return null;
 
@@ -70,4 +97,3 @@ export default function MemberDetails() {
     </div>
   );
 }
-

@@ -3,7 +3,10 @@
 @tailwind utilities;
 
 .text-outline {
-    text-shadow: 2px 2px 0px #000, -2px 2px 0px #000, 2px -2px 0px #000, -2px -2px 0px #000;
-  }
-  
- 
+  text-shadow: 2px 2px 0px #000, -2px 2px 0px #000, 2px -2px 0px #000,
+    -2px -2px 0px #000;
+}
+
+.text-shadow-2xl {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2), 4px 4px 6px rgba(0, 0, 0, 0.2);
+}
