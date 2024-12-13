@@ -372,16 +372,16 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               <Typography
                 color="blue-gray"
                 className="font-semibold"
-                {...({ children: "Membership Type" } as any)}
+                {...({ children: "Slot" } as any)}
               />
               <select
-                {...register("membershipType")}
-                defaultValue={initialData?.membershipType || "basic"} // Fallback to "basic" if undefined
+                {...register("slot")}
+                defaultValue={initialData?.slot || "Evening"} // Fallback to "basic" if undefined
                 className="p-1 w-1/2 shadow-md"
               >
-                <option value="basic">basic</option>
-                <option value="premium">premium</option>
-                <option value="platinum">platinum</option>
+                <option value="Evening">Evening</option>
+                <option value="Morning">Morning</option>
+                <option value="Free Pass">Free Pass</option>
               </select>
             </div>
 

@@ -227,7 +227,7 @@ const MemberProfile: React.FC = () => {
                       "name",
                       "email",
                       "phoneNumber",
-                      "membershipType",
+                      "slot",
                       "membershipStartDate",
                       "membershipEndDate",
                       "durationMonths",
@@ -239,7 +239,7 @@ const MemberProfile: React.FC = () => {
                       "name",
                       "email",
                       "phoneNumber",
-                      "membershipType",
+                      "slot",
                     ].includes(key);
                     return (
                       <div key={key}>

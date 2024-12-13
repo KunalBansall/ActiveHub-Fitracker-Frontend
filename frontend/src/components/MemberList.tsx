@@ -108,7 +108,7 @@ export  default function MemberList({ members }: Props) {
                       {membershipStatus}
                     </span>
                   </td>
-                  <td className="p-4">{member.membershipType}</td>
+                  <td className="p-4">{member.slot}</td>
                   <td className="p-4">
                     <div className="flex items-center">
                       <span className={isExpiringSoon ? "text-red-600 font-medium" : ""}>

@@ -13,7 +13,7 @@ export interface Member {
   feeStatus: 'paid' | 'due';
   photo?: string | null;
   status: 'active' | 'expired' | 'pending';
-  membershipType: 'basic' | 'premium' | 'platinum';
+  slot: 'Morning' | 'Evening' | 'free pass';
   lastCheckIn?: string | null; 
   createdAt :string;
   attendance:Attendance[];

@@ -56,8 +56,8 @@ export default function MemberDetails() {
     if (data.height !== member?.height) payload.height = data.height;
     if (data.trainerAssigned !== member?.trainerAssigned)
       payload.trainerAssigned = data.trainerAssigned;
-    if (data.membershipType !== member?.membershipType)
-      payload.membershipType = data.membershipType;
+    if (data.slot !== member?.slot)
+      payload.slot = data.slot;
     if (data.durationMonths !== member?.durationMonths)
       payload.durationMonths = data.durationMonths;
     if (data.fees !== member?.fees) payload.fees = data.fees;
