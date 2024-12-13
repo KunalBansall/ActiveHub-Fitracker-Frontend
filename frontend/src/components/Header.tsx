@@ -1,8 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 import axios from "axios";
 import MobileMenu from "./MobileMenu";
+
+const defaultImage = "/ah2.jpeg";
 
 // Icons
 import {
@@ -150,7 +152,7 @@ export default function Header() {
                 />
               </div>
               {searchResults && searchResults.length > 0 && (
-                <div className="absolute mt-1 w-full rounded-md bg-opacity-85 bg-white shadow-lg z-10">
+                <div className="absolute mt-1 w-full rounded-md bg-opacity-85 bg-white shadow-lg z-10 overflow-auto">
                   <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm ">
                     {searchResults.map((member: Member) => (
                       <li
@@ -163,7 +165,7 @@ export default function Header() {
                       >
                         <div className="flex items-center">
                           <img
-                            src={member.photo}
+                            src={member.photo || defaultImage}
                             alt={member.name}
                             className="h-6 w-6 flex-shrink-0 rounded-full"
                           />
@@ -247,37 +249,40 @@ export default function Header() {
       <MobileMenu isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
 
       {isModalOpen && (
-  <div
-    className="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50"
-    aria-labelledby="modal-title"
-    role="dialog"
-    aria-modal="true"
-  >
-    <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-      <h3 className="text-lg font-semibold mb-4 text-gray-700" id="modal-title">
-        Confirm Sign Out
-      </h3>
-      <p className="text-sm text-gray-600 mb-6">
-        Are you sure you want to sign out? You will need to log in again to access your account.
-      </p>
-      <div className="flex justify-end space-x-4">
-        <button
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-          onClick={() => setIsModalOpen(false)} // Close the modal
+        <div
+          className="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
         >
-          Cancel
-        </button>
-        <button
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-          onClick={confirmSignOut} // Confirm sign out
-        >
-          Sign Out
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h3
+              className="text-lg font-semibold mb-4 text-gray-700"
+              id="modal-title"
+            >
+              Confirm Sign Out
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to sign out? You will need to log in again
+              to access your account.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                onClick={() => setIsModalOpen(false)} // Close the modal
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                onClick={confirmSignOut} // Confirm sign out
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

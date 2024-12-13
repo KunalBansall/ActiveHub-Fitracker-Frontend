@@ -89,8 +89,28 @@ export default function MemberDetails() {
   const handleExtendMembership = (extensionMonths: number) => {
     if (member) {
       const updatedDuration = (member.durationMonths || 0) + extensionMonths;
+
+      // Calculate the new membership end date
+      const currentEndDate = member.membershipEndDate
+        ? new Date(member.membershipEndDate)
+        : new Date();
+      const newEndDate = new Date(
+        currentEndDate.setMonth(currentEndDate.getMonth() + extensionMonths)
+      );
+
+      // Format the expiration date to display only the month and year
+      const options = { year: "numeric", month: "long" } as const;
+      const formattedDate = newEndDate.toLocaleDateString(undefined, options);
+
+      // Show toast notification
+      toast.success(
+        `${member.name}'s membership extended till ${formattedDate}!`
+      );
+
+      // Update member details
       handleSubmit({ durationMonths: updatedDuration });
     }
+
     setIsExtendModalOpen(false);
   };
 
@@ -111,52 +131,52 @@ export default function MemberDetails() {
             Update Member
           </h1>
           <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-        color="blue"
-        className="flex items-center justify-center px-4 py-2 rounded-md text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
-        onClick={() => setIsExtendModalOpen(true)}
-        aria-label="Extend Membership" // Optional for accessibility
-        title="Extend Membership"
-        id="extend-membership-btn" // Added id to satisfy ButtonProps
-        {...({} as any)}  // Bypass TypeScript check for missing props
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
-            clipRule="evenodd"
-          />
-        </svg>
-        Extend Membership
-      </Button>
-      <Button
-        color="green"
-        className="flex items-center justify-center px-4 py-2 rounded-md text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
-        onClick={() => setIsHistoryModalOpen(true)}
-        aria-label="View Attendance History" // Optional for accessibility
-        title="View Attendance History"
-        id="view-attendance-history-btn" // Added id to satisfy ButtonProps
-        {...({} as any)}  // Bypass TypeScript check for missing props
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-            clipRule="evenodd"
-          />
-        </svg>
-        View Attendance History
-      </Button>
+            <Button
+              color="blue"
+              className="flex items-center justify-center px-4 py-2 rounded-md text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+              onClick={() => setIsExtendModalOpen(true)}
+              aria-label="Extend Membership" // Optional for accessibility
+              title="Extend Membership"
+              id="extend-membership-btn" // Added id to satisfy ButtonProps
+              {...({} as any)} // Bypass TypeScript check for missing props
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Extend Membership
+            </Button>
+            <Button
+              color="green"
+              className="flex items-center justify-center px-4 py-2 rounded-md text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+              onClick={() => setIsHistoryModalOpen(true)}
+              aria-label="View Attendance History" // Optional for accessibility
+              title="View Attendance History"
+              id="view-attendance-history-btn" // Added id to satisfy ButtonProps
+              {...({} as any)} // Bypass TypeScript check for missing props
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              View Attendance History
+            </Button>
           </div>
         </div>
 

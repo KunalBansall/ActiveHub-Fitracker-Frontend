@@ -87,7 +87,7 @@ export default function AttendanceHistoryModal({
             <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
               <Dialog.Title
                 as="h3"
-                className="text-lg font-medium leading-6 text-gray-900"
+                className="text-lg leading-6 text-gray-900 font-semibold"
               >
                 Attendance History
               </Dialog.Title>
@@ -128,7 +128,7 @@ export default function AttendanceHistoryModal({
                       <tbody className="bg-white divide-y divide-gray-200">
                         {attendance.map((record) => (
                           <tr key={record._id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
                               {formatDate(new Date(record.entryTime))}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
