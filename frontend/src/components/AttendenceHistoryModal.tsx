@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useQuery } from "react-query";
 import axios from "axios";
-import { Attendance, Member } from "../types";
+import { Attendance } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -19,6 +19,9 @@ export default function AttendanceHistoryModal({
   memberId,
   attendance: propAttendance,
 }: AttendanceHistoryModalProps) {
+  const [displayCount, setDisplayCount] = useState(10);
+  const [localAttendance, setLocalAttendance] = useState<Attendance[]>([]);
+
   const token = localStorage.getItem("token");
 
   const {
@@ -34,19 +37,41 @@ export default function AttendanceHistoryModal({
         })
         .then((res) => res.data),
     {
-      enabled: !!memberId && isOpen,
+      enabled: !!memberId && isOpen && !propAttendance,
     }
   );
 
-  const attendance = propAttendance || fetchedAttendance;
+  useEffect(() => {
+    if (propAttendance) {
+      setLocalAttendance(propAttendance);
+    } else if (fetchedAttendance) {
+      setLocalAttendance(fetchedAttendance);
+    }
+  }, [propAttendance, fetchedAttendance]);
 
-  // Function to format date as DD/Mon/YY
   const formatDate = (date: Date) => {
     return `${date.getDate().toString().padStart(2, "0")}/${date.toLocaleString(
       "default",
       { month: "short" }
     )}/${date.getFullYear().toString().slice(2)}`;
   };
+
+  const calculateDuration = (entryTime: string, exitTime: string | null) => {
+    const entry = new Date(entryTime);
+    const exit = exitTime ? new Date(exitTime) : new Date();
+    const diff = exit.getTime() - entry.getTime();
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
+  const handleLoadMore = () => {
+    setDisplayCount((prevCount) => prevCount + 10);
+  };
+
+  // console.log("Local attendance:", localAttendance);
+  // console.log("Display count:", displayCount);
 
   return (
     <Transition show={isOpen} as={React.Fragment}>
@@ -84,10 +109,10 @@ export default function AttendanceHistoryModal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+            <div className="inline-block w-full max-w-xl p-6 my-8 overflow-hidden text-center align-middle transition-all transform bg-white shadow-xl rounded-2xl ">
               <Dialog.Title
                 as="h3"
-                className="text-lg leading-6 text-gray-900 font-semibold"
+                className="text-2xl leading-6 text-blue-900 font-bold mb-4 text-shadow-2xl"
               >
                 Attendance History
               </Dialog.Title>
@@ -100,47 +125,65 @@ export default function AttendanceHistoryModal({
                   <p className="text-sm text-red-500">
                     Error loading attendance history.
                   </p>
-                ) : attendance && attendance.length > 0 ? (
+                ) : localAttendance && localAttendance.length > 0 ? (
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
                           <th
                             scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
                           >
                             Date
                           </th>
                           <th
                             scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
                           >
                             Entry Time
                           </th>
                           <th
                             scope="col"
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
                           >
                             Exit Time
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                          >
+                            Session Duration
                           </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {attendance.map((record) => (
-                          <tr key={record._id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
-                              {formatDate(new Date(record.entryTime))}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(record.entryTime).toLocaleTimeString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {record.exitTime
-                                ? new Date(record.exitTime).toLocaleTimeString()
-                                : "Still Active"}
-                            </td>
-                          </tr>
-                        ))}
+                        {localAttendance
+                          .slice(0, displayCount)
+                          .map((record) => (
+                            <tr key={record._id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                                {formatDate(new Date(record.entryTime))}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {new Date(
+                                  record.entryTime
+                                ).toLocaleTimeString()}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {record.exitTime
+                                  ? new Date(
+                                      record.exitTime
+                                    ).toLocaleTimeString()
+                                  : "Still Active"}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {calculateDuration(
+                                  record.entryTime,
+                                  record.exitTime ?? null
+                                )}
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
@@ -151,10 +194,21 @@ export default function AttendanceHistoryModal({
                 )}
               </div>
 
-              <div className="mt-4">
+              {localAttendance && localAttendance.length > displayCount && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={handleLoadMore}
+                    className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 transition-colors duration-200"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-6">
                 <button
                   type="button"
-                  className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500"
+                  className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 transition-colors duration-200"
                   onClick={onClose}
                 >
                   Close

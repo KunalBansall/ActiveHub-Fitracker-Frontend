@@ -9,9 +9,15 @@ import {
 } from "react-query";
 import axios from "axios";
 import { useState } from "react";
-import { PencilIcon, CheckIcon, UserCircleIcon, XMarkIcon, MapPinIcon, EnvelopeIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
-
-
+import {
+  PencilIcon,
+  CheckIcon,
+  UserCircleIcon,
+  XMarkIcon,
+  MapPinIcon,
+  EnvelopeIcon,
+  BuildingOfficeIcon,
+} from "@heroicons/react/24/outline";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -158,184 +164,208 @@ function Profile() {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl mx-auto overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 text-white">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white border-1 text-shadow-2xl">{formData?.gymName || profile.gymName} </h1>
-            <UserCircleIcon className="w-16 h-16 text-white bg-white/30 rounded-full p-2" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
+            <div className="flex items-center justify-between space-x-4">
+              <h1 className="text-4xl font-bold text-white">
+                {formData?.gymName || profile.gymName}
+              </h1>
+              <UserCircleIcon className="w-24 h-24 text-white bg-white/30 rounded-full p-2 transition-transform duration-300 hover:scale-110" />
+            </div>
           </div>
-        </div>
 
-        <div className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData?.username || profile.username}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData?.email || profile.email}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                  />
-                  <EnvelopeIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Gym Name</label>
-                <div className="relative">
+          <div className="p-8 bg-gray-50 space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Username
+                  </label>
                   <input
                     type="text"
-                    name="gymName"
-                    value={formData?.gymName || profile.gymName}
+                    name="username"
+                    value={formData?.username || profile.username}
                     onChange={handleChange}
                     disabled={!isEditing}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                      isEditing ? "animate-pulse" : ""
+                    }`}
                   />
-                  <BuildingOfficeIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData?.email || profile.email}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                        isEditing ? "animate-pulse" : ""
+                      }`}
+                    />
+                    <EnvelopeIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Gym Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="gymName"
+                      value={formData?.gymName || profile.gymName}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                        isEditing ? "animate-pulse" : ""
+                      }`}
+                    />
+                    <BuildingOfficeIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Gym Type
+                  </label>
+                  <select
+                    name="gymType"
+                    value={formData?.gymType || profile.gymType}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                      isEditing ? "animate-pulse" : ""
+                    }`}
+                  >
+                    <option value="CrossFit">CrossFit</option>
+                    <option value="Yoga">Yoga</option>
+                    <option value="Weightlifting">Weightlifting</option>
+                    <option value="Cardio">Cardio</option>
+                    <option value="Mixed">Mixed</option>
+                  </select>
+                </div>
+
+                <div className="col-span-full space-y-2">
+                  <label className="text-lg font-medium text-gray-700 mb-2 block">
+                    Gym Address
+                  </label>
+                  {/* <MapPinIcon className="absolute left-1 top-2.5 h-5 w-5 text-gray-400" /> */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
+                    <div className="relative flex justify-around">
+                      <input
+                        type="text"
+                        name="gymAddress.street"
+                        placeholder="Street"
+                        value={
+                          formData?.gymAddress?.street ||
+                          profile.gymAddress.street
+                        }
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                          isEditing ? "animate-pulse" : ""
+                        }`}
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      name="gymAddress.city"
+                      placeholder="City"
+                      value={
+                        formData?.gymAddress?.city || profile.gymAddress.city
+                      }
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                        isEditing ? "animate-pulse" : ""
+                      }`}
+                    />
+                    <input
+                      type="text"
+                      name="gymAddress.state"
+                      placeholder="State"
+                      value={
+                        formData?.gymAddress?.state || profile.gymAddress.state
+                      }
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                        isEditing ? "animate-pulse" : ""
+                      }`}
+                    />
+                    <input
+                      type="text"
+                      name="gymAddress.zipCode"
+                      placeholder="Zip Code"
+                      value={
+                        formData?.gymAddress?.zipCode ||
+                        profile.gymAddress.zipCode
+                      }
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                        isEditing ? "animate-pulse" : ""
+                      }`}
+                    />
+                    <input
+                      type="text"
+                      name="gymAddress.country"
+                      placeholder="Country"
+                      value={
+                        formData?.gymAddress?.country ||
+                        profile.gymAddress.country
+                      }
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out ${
+                        isEditing ? "animate-pulse" : ""
+                      }`}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Gym Type</label>
-                <select
-                  name="gymType"
-                  value={formData?.gymType || profile.gymType}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                >
-                  <option value="CrossFit">CrossFit</option>
-                  <option value="Yoga">Yoga</option>
-                  <option value="Weightlifting">Weightlifting</option>
-                  <option value="Cardio">Cardio</option>
-                  <option value="Mixed">Mixed</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Gym Type</label>
-                <select
-                  name="gymType"
-                  value={formData?.gymType || profile.gymType}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                >
-                  <option value="CrossFit">CrossFit</option>
-                  <option value="Yoga">Yoga</option>
-                  <option value="Weightlifting">Weightlifting</option>
-                  <option value="Cardio">Cardio</option>
-                  <option value="Mixed">Mixed</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Gym Address</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="gymAddress.street"
-                    placeholder="Street"
-                    value={formData?.gymAddress?.street || profile.gymAddress.street}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                  />
-                  <MapPinIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              {isEditing ? (
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                  >
+                    <CheckIcon className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                  >
+                    Cancel
+                  </button>
                 </div>
-                <input
-                  type="text"
-                  name="gymAddress.city"
-                  placeholder="City"
-                  value={formData?.gymAddress?.city || profile.gymAddress.city}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                />
-                <input
-                  type="text"
-                  name="gymAddress.state"
-                  placeholder="State"
-                  value={formData?.gymAddress?.state || profile.gymAddress.state}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                />
-                <input
-                  type="text"
-                  name="gymAddress.zipCode"
-                  placeholder="Zip Code"
-                  value={formData?.gymAddress?.zipCode || profile.gymAddress.zipCode}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                />
-                <input
-                  type="text"
-                  name="gymAddress.country"
-                  placeholder="Country"
-                  value={formData?.gymAddress?.country || profile.gymAddress.country}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 transition duration-150 ease-in-out"
-                />
-              </div>
-            </div>
-
-            {isEditing ? (
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="submit"
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <CheckIcon className="w-4 h-4 mr-2" />
-                  Save Changes
-                </button>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  onClick={() => {
+                    setFormData(profile);
+                    setIsEditing(true);
+                  }}
+                  className="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
                 >
-                  Cancel
+                  <PencilIcon className="w-4 h-4 mr-2" />
+                  Edit Profile
                 </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setFormData(profile);
-                  setIsEditing(true);
-                }}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <PencilIcon className="w-4 h-4 mr-2" />
-                Edit Profile
-              </button>
-            )}
-          </form>
+              )}
+            </form>
+          </div>
         </div>
       </div>
     </div>

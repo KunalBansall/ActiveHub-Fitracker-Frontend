@@ -81,7 +81,7 @@ export function MemberAttendance({ memberId }: MemberAttendanceProps) {
   };
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4 mb-4">
       <MessageDisplay />
       <h2 className="text-2xl font-bold">Record Attendance</h2>
       <div className="flex space-x-4">
