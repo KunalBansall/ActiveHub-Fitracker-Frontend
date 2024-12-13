@@ -59,7 +59,7 @@ export  default function MemberList({ members }: Props) {
           onClick={toggleSort}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center gap-2"
         >
-          Sort by {sortBy === "expiryDate" ? "Expiry Date" : "Join Date"}
+          Sort by {sortBy === "expiryDate" ? "Join Date" : "Expiry Date"}
           <ArrowsUpDownIcon className="h-4 w-4" />
         </button>
       </div>
