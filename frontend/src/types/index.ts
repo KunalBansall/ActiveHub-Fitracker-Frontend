@@ -45,3 +45,9 @@ export interface Attendance {
   entryTime: string;
   exitTime?: string | null;
 }
+
+export interface CustomJwtPayload {
+  id: string;
+  email: string;
+  role: string;
+}

@@ -1,45 +1,62 @@
-import React, { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useForm } from "react-hook-form"
-import axios from "axios"
-import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline"
-import { motion } from "framer-motion"
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  EnvelopeIcon,
+  LockClosedIcon,
+} from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
+import { CustomJwtPayload } from "../types/index";
 
 interface SignInForm {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function SignIn() {
-  const [error, setError] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const navigate = useNavigate()
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignInForm>()
+  } = useForm<SignInForm>();
 
   const onSubmit = async (data: SignInForm) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/signin`, data)
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("user", JSON.stringify(response.data))
-      navigate("/")
+      const response = await axios.post(`${API_URL}/auth/signin`, data);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data));
+
+      // Decode the JWT token using the custom type
+      const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
+      const role = decodedToken.role;
+
+      if (role === "owner") {
+        navigate("/owner-logs"); // Redirect to owner-specific route
+      } else {
+        navigate("/"); // Redirect to the default route
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred")
+      setError(err.response?.data?.message || "An error occurred");
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col justify-center items-center p-4" 
-    style={{
-      backgroundImage: "url(/Activehub04.jpeg)",
-      backgroundSize: "fit", 
-      backgroundPosition: "center", 
-    }}
+    <div
+      className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col justify-center items-center p-4"
+      style={{
+        backgroundImage: "url(/Activehub04.jpeg)",
+        backgroundSize: "fit",
+        backgroundPosition: "center",
+      }}
     >
       <motion.div
         initial={{ opacity: 0, y: -50 }}
@@ -48,15 +65,23 @@ export default function SignIn() {
         className="w-full max-w-md"
       >
         <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white border-opacity-20">
-          <h2 className="text-4xl font-bold text-center text-white mb-8">Welcome Back</h2>
+          <h2 className="text-4xl font-bold text-center text-white mb-8">
+            Welcome Back
+          </h2>
           {error && (
-            <div className="mb-4 bg-red-500 bg-opacity-20 border border-red-500 text-red-100 px-4 py-3 rounded-lg relative" role="alert">
+            <div
+              className="mb-4 bg-red-500 bg-opacity-20 border border-red-500 text-red-100 px-4 py-3 rounded-lg relative"
+              role="alert"
+            >
               <span className="block sm:inline">{error}</span>
             </div>
           )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-white mb-1"
+              >
                 Email address
               </label>
               <div className="relative">
@@ -76,11 +101,16 @@ export default function SignIn() {
                 />
               </div>
               {errors.email && (
-                <p className="mt-2 text-sm text-red-300">{errors.email.message}</p>
+                <p className="mt-2 text-sm text-red-300">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-white mb-1"
+              >
                 Password
               </label>
               <div className="relative">
@@ -107,7 +137,9 @@ export default function SignIn() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-2 text-sm text-red-300">{errors.password.message}</p>
+                <p className="mt-2 text-sm text-red-300">
+                  {errors.password.message}
+                </p>
               )}
             </div>
             <div>
@@ -152,6 +184,5 @@ export default function SignIn() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }
-

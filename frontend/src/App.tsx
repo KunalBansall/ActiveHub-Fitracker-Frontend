@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import MemberProfile from "./pages/MemberProfile";
 import MemberLoginPage from "./pages/MemberLogin";
 import PrivateRoute from "./components/PrivateRoute";
+import OwnerLogs from "./components/OwnerLogs";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -50,7 +51,10 @@ export default function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+          <Route
+            path="/reset-password/:id/:token"
+            element={<ResetPassword />}
+          />
 
           {/* Member-specific routes */}
           <Route path="/memberlogin" element={<MemberLoginPage />} />
@@ -77,6 +81,8 @@ export default function App() {
                     <Route path="/members/:id" element={<MemberDetails />} />
                     <Route path="/attendance" element={<Attendance />} />
                     <Route path="/profile" element={<Profile />} />
+
+                    <Route path="/owner-logs" element={<OwnerLogs />} />
                   </Routes>
                 </AdminLayout>
               </PrivateRoute>
