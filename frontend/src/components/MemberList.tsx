@@ -1,40 +1,57 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
-import { toast } from "react-hot-toast"
-import { format } from "date-fns"
-import { Member } from "../types"
-import { BellIcon, ArrowsUpDownIcon } from '@heroicons/react/24/outline'
-import axios from "axios"
+import React, { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { format } from "date-fns";
+import { Member } from "../types";
+import { BellIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 
 interface Props {
-  members: Member[]
+  members: Member[];
 }
 
-export  default function MemberList({ members }: Props) {
-  const [sortBy, setSortBy] = useState<"expiryDate" | "createdAt">("expiryDate")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [isNotifying, setIsNotifying] = useState<string | null>(null)
+const MemberList: React.FC<Props> = ({ members }) => {
+  const [sortBy, setSortBy] = useState<"expiryDate" | "createdAt">("expiryDate");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [isNotifying, setIsNotifying] = useState<string | null>(null);
 
-  const sortedMembers = [...members].sort((a, b) => {
-    let valueA = sortBy === "expiryDate" ? new Date(a.membershipEndDate).getTime() : new Date(a.createdAt).getTime()
-    let valueB = sortBy === "expiryDate" ? new Date(b.membershipEndDate).getTime() : new Date(b.createdAt).getTime()
-    return sortOrder === "asc" ? valueA - valueB : valueB - valueA
-  })
+  // Memoized sorted members
+  const sortedMembers = useMemo(() => {
+    return [...members].sort((a, b) => {
+      let valueA =
+        sortBy === "expiryDate"
+          ? new Date(a.membershipEndDate).getTime()
+          : new Date(a.createdAt).getTime();
+      let valueB =
+        sortBy === "expiryDate"
+          ? new Date(b.membershipEndDate).getTime()
+          : new Date(b.createdAt).getTime();
+      return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+    });
+  }, [members, sortBy, sortOrder]);
 
   const toggleSort = () => {
     if (sortBy === "expiryDate") {
-      setSortBy("createdAt")
-      setSortOrder("desc")
+      setSortBy("createdAt");
+      setSortOrder("desc");
     } else {
-      setSortBy("expiryDate")
-      setSortOrder("asc")
+      setSortBy("expiryDate");
+      setSortOrder("asc");
     }
-  }
+  };
 
+  // Notification logic with local storage tracking to prevent redundant calls
   const sendNotification = async (member: Member) => {
-    setIsNotifying(member._id)
+    const lastNotified = localStorage.getItem(`notified_${member._id}`);
+    if (lastNotified && Date.now() - Number(lastNotified) < 3600000) {
+      // 1 hour
+      toast.error("Notification already sent recently.");
+      return;
+    }
+
+    setIsNotifying(member._id);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
       const response = await axios.post(
         `${API_URL}/members/renewal-reminder`,
         { memberId: member._id },
@@ -43,15 +60,17 @@ export  default function MemberList({ members }: Props) {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
-      )
-      toast.success(response.data.message || `Notification sent to ${member.name}`)
+      );
+      localStorage.setItem(`notified_${member._id}`, String(Date.now()));
+      toast.success(response.data.message || `Notification sent to ${member.name}`);
     } catch (error) {
-      console.error("Error sending notification:", error)
-      toast.error(`Failed to send notification to ${member.name}`)
+      console.error("Error sending notification:", error);
+      toast.error(`Failed to send notification to ${member.name}`);
     } finally {
-      setIsNotifying(null)
+      setIsNotifying(null);
     }
-  }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -75,34 +94,51 @@ export  default function MemberList({ members }: Props) {
             </tr>
           </thead>
           <tbody>
-            {sortedMembers.map((member, index) => {
+            {sortedMembers.map((member) => {
               const expiryDate = new Date(member.membershipEndDate);
               const isExpired = expiryDate < new Date();
               const isExpiringSoon = expiryDate <= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
               const membershipStatus = isExpired ? "expired" : "active";
 
               return (
-                <tr key={member._id} className="border-t border-gray-200 hover:bg-gray-50">
+                <tr
+                  key={member._id}
+                  className="border-t border-gray-200 hover:bg-gray-50"
+                >
                   <td className="p-4">
-                    {/* <span className="font-semibold ">{index + 1}. </span> */}
-                    <Link to={`/members/${member._id}`} className="flex items-center space-x-4 group">
+                    <Link
+                      to={`/members/${member._id}`}
+                      className="flex items-center space-x-4 group"
+                    >
                       <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
                         {member.photo ? (
-                          <img src={member.photo} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+                          <img
+                            src={member.photo}
+                            alt={member.name}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
                         ) : (
-                          <span className="text-gray-500 font-medium">{member.name.charAt(0)}</span>
+                          <span className="text-gray-500 font-medium">
+                            {member.name.charAt(0)}
+                          </span>
                         )}
                       </div>
                       <div>
-                        <div className="font-semibold group-hover:text-blue-600 transition-colors">{member.name}</div>
-                        <div className="text-sm text-gray-500">{member.phoneNumber}</div>
+                        <div className="font-semibold group-hover:text-blue-600 transition-colors">
+                          {member.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {member.phoneNumber}
+                        </div>
                       </div>
                     </Link>
                   </td>
                   <td className="p-4">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        membershipStatus === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        membershipStatus === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
                       }`}
                     >
                       {membershipStatus}
@@ -111,10 +147,16 @@ export  default function MemberList({ members }: Props) {
                   <td className="p-4">{member.slot}</td>
                   <td className="p-4">
                     <div className="flex items-center">
-                      <span className={isExpiringSoon ? "text-red-600 font-medium" : ""}>
+                      <span
+                        className={
+                          isExpiringSoon ? "text-red-600 font-medium" : ""
+                        }
+                      >
                         {format(expiryDate, "MMM dd, yyyy")}
                       </span>
-                      {isExpiringSoon && <BellIcon className="h-4 w-4 text-red-500 ml-2" />}
+                      {isExpiringSoon && (
+                        <BellIcon className="h-4 w-4 text-red-500 ml-2" />
+                      )}
                     </div>
                   </td>
                   <td className="p-4">
@@ -139,3 +181,5 @@ export  default function MemberList({ members }: Props) {
     </div>
   );
 };
+
+export default React.memo(MemberList);
