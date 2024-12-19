@@ -57,7 +57,7 @@ export default function SignUp() {
         className="w-full max-w-4xl"
       >
         <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white border-opacity-20">
-          <h2 className="text-4xl font-bold text-center text-white mb-8">Register Your Gym</h2>
+          <h2 className="text-4xl font-bold text-center text-white mb-8">Register Your GYM</h2>
           {error && (
             <div className="mb-4 bg-red-500 bg-opacity-20 border border-red-500 text-red-100 px-4 py-3 rounded-lg relative" role="alert">
               <span className="block sm:inline">{error}</span>
