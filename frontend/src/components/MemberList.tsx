@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { Member } from "../types";
 import { BellIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import StatusBadge,{HollowStatusBadge} from "./StatusBadge";
 
 interface Props {
   members: Member[];
@@ -15,9 +16,36 @@ const MemberList: React.FC<Props> = ({ members }) => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isNotifying, setIsNotifying] = useState<string | null>(null);
 
+  interface filtersInitType{
+    filterOptions:string[],
+    selectedFilters:string[]
+  }
+  const filtersInit : filtersInitType={"filterOptions":["expired","expires soon"],"selectedFilters":[]};
+  
+  const [filters,setFilters]=useState(filtersInit);
+ 
+  const addFilter = (e:React.MouseEvent<HTMLElement>)=>{
+    const value=e.currentTarget.dataset.value;
+ 
+    setFilters((prev:any)=>(
+        {   ...prev,
+            filterOptions:prev.filterOptions.filter((f:string)=>f!=value),
+            selectedFilters:[...prev.selectedFilters,value]
+        }
+        ))
+  }
+  const removeFilter = (e:React.MouseEvent<HTMLButtonElement>)=>{
+        const value = e.currentTarget.dataset.value;
+ 
+        setFilters((prev:any)=>({
+                filterOptions:[...prev.filterOptions,value],
+                selectedFilters:prev.selectedFilters.filter((f:string)=>f!=value)
+        }))
+  }
+
   // Memoized sorted members
   const sortedMembers = useMemo(() => {
-    return [...members].sort((a, b) => {
+    const sortedMembers = [...members].sort((a, b) => {
       let valueA =
         sortBy === "expiryDate"
           ? new Date(a.membershipEndDate).getTime()
@@ -28,7 +56,30 @@ const MemberList: React.FC<Props> = ({ members }) => {
           : new Date(b.createdAt).getTime();
       return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
     });
-  }, [members, sortBy, sortOrder]);
+
+    if(filters?.selectedFilters.length > 0 ){
+        
+        return sortedMembers.filter((m)=>{
+            const FiltersAsSet =new Set(filters.selectedFilters);
+            const daysToExpiry=Math.round((Number(new Date(m.membershipEndDate)) - Number(new Date(Date.now()))) / (24 * 60 * 60 * 1000));
+            
+ 
+
+            if(FiltersAsSet.has("expired") && ( daysToExpiry <= 0)){
+                return true;
+            }
+            
+            if(FiltersAsSet.has("expires soon") && ( daysToExpiry>=1 && daysToExpiry <= 300  )){
+                return true;
+            }
+            
+            return false;
+        
+        })
+    }
+    return sortedMembers;
+  
+}, [members, sortBy, sortOrder,filters.selectedFilters]);
 
   const toggleSort = () => {
     if (sortBy === "expiryDate") {
@@ -70,10 +121,9 @@ const MemberList: React.FC<Props> = ({ members }) => {
       setIsNotifying(null);
     }
   };
-
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex gap-2 items-center">
         <button
           onClick={toggleSort}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center gap-2"
@@ -81,6 +131,10 @@ const MemberList: React.FC<Props> = ({ members }) => {
           Sort by {sortBy === "expiryDate" ? "Join Date" : "Expiry Date"}
           <ArrowsUpDownIcon className="h-4 w-4" />
         </button>
+        {filters?.selectedFilters && filters.selectedFilters.map((s)=><StatusBadge Text={s} isRemovable={true} removeFilter={removeFilter}/>)}
+        
+       {filters.filterOptions.map((f)=><HollowStatusBadge Text={f} isRemovable={true} Handler={addFilter}/>)}
+
       </div>
       <div className="rounded-md border overflow-hidden overflow-x-visible">
         <table className="w-full text-sm">
@@ -134,15 +188,7 @@ const MemberList: React.FC<Props> = ({ members }) => {
                     </Link>
                   </td>
                   <td className="p-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        membershipStatus === "active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {membershipStatus}
-                    </span>
+                    <StatusBadge Text={membershipStatus}/>
                   </td>
                   <td className="p-4">{member.slot}</td>
                   <td className="p-4">
