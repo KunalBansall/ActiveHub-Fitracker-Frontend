@@ -69,7 +69,7 @@ const MemberList: React.FC<Props> = ({ members }) => {
                 return true;
             }
             
-            if(FiltersAsSet.has("expires soon") && ( daysToExpiry>=1 && daysToExpiry <= 300  )){
+            if(FiltersAsSet.has("expires soon") && ( daysToExpiry>=1 && daysToExpiry <= 5  )){
                 return true;
             }
             
