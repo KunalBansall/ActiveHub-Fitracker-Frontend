@@ -38,8 +38,8 @@ const MemberList: React.FC<Props> = ({ members }) => {
         const value = e.currentTarget.dataset.value;
  
         setFilters((prev:any)=>({
-                filterOptions:[...prev.filterOptions,value],
-                selectedFilters:prev.selectedFilters.filter((f:string)=>f!=value)
+                selectedFilters:prev.selectedFilters.filter((f:string)=>f!=value),
+                filterOptions:[...prev.filterOptions,value]
         }))
   }
 
@@ -62,8 +62,6 @@ const MemberList: React.FC<Props> = ({ members }) => {
         return sortedMembers.filter((m)=>{
             const FiltersAsSet =new Set(filters.selectedFilters);
             const daysToExpiry=Math.round((Number(new Date(m.membershipEndDate)) - Number(new Date(Date.now()))) / (24 * 60 * 60 * 1000));
-            
- 
 
             if(FiltersAsSet.has("expired") && ( daysToExpiry <= 0)){
                 return true;

@@ -20,15 +20,21 @@ export default function AddMember() {
       }),
     {
       onSuccess: (response) => {
-        const { emailSent, member } = response.data || {};
-        const memberName = member?.name || "Member"; // Access the member's name properly
-        const message = emailSent
-          ? `${memberName} joins our Family. Welcomed.`
-          : `${memberName} joins our Family.`;
-        toast.success(message);
+        if(response.status!=400){
+            toast.success("New member added successfully!");
+              
+            const { emailSent, member } = response.data || {};
+            const memberName = member?.name || "Member"; // Access the member's name properly
+            const message = emailSent
+            ? `${memberName} joins our Family. Welcomed.`
+            : `${memberName} joins our Family.`;
+            toast.success(message);
 
-        queryClient.invalidateQueries("members");
-        navigate("/members");
+            queryClient.invalidateQueries("members");
+            navigate("/members");
+        }
+
+        
       },
       onError: (error) => {
         if (axios.isAxiosError(error)) {

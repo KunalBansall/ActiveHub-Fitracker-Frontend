@@ -85,17 +85,18 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
     setIsSubmitting(true);
 
     try {
-      await onSubmit({
+      onSubmit({
         ...data,
         photo: photoPreview,
         durationMonths: (data.durationMonths || 0) + extensionDuration,
       });
 
-      if (initialData) {
-        toast.success(`${initialData.name}'s Profile updated successfully!`);
-      } else {
-        toast.success("New member added successfully!");
-      }
+    //   -->moved to useMutate in AddMember.tsx
+    //   if (initialData) {
+    //     toast.success(`${initialData.name}'s Profile updated successfully!`);
+    //   } else {
+    //     toast.success("New member added successfully!");
+    //   }
     } catch (error) {
       toast.error("There was an error while submitting the form.");
     } finally {
@@ -127,7 +128,11 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
     if (!isNaN(value) && value >= 0 && value <= 12) {
       setExtensionDuration(value);
     }
+
+   
   };
+
+  
   return (
     <div className="relative font-serif">
       {memberSince && (
@@ -311,6 +316,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                   {...({ children: "Weight (kg)" } as any)}
                 />
                 <input
+                  id="member-metrics"
                   {...register("weight", {
                     required: "Weight is required",
                     valueAsNumber: true,
@@ -336,6 +342,8 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                   {...({ children: "Height (cm)" } as any)}
                 />
                 <input
+                id="member-metrics"
+                  
                   {...register("height", {
                     required: "Height is required",
                     valueAsNumber: true,

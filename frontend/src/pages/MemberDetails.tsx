@@ -35,7 +35,8 @@ export default function MemberDetails() {
         headers: { Authorization: `Bearer ${token}` },
       }),
     {
-      onSuccess: () => {
+      onSuccess: (data:any) => {
+        toast.success(`${data.name}'s Profile updated successfully!`);
         queryClient.invalidateQueries(["member", id]);
         queryClient.invalidateQueries("members");
         navigate("/members");
