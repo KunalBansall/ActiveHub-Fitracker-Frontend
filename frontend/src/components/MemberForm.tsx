@@ -316,7 +316,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                     valueAsNumber: true,
                   })}
                   type="number"
-                  defaultValue={initialData?.weight ?? 0} // Fallback to 0 if undefined
+                  defaultValue={initialData?.weight ?? 50} // Fallback to 0 if undefined
                   className="p-1 w-1/2 shadow-md"
                 />
               </div>
@@ -341,7 +341,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
                     valueAsNumber: true,
                   })}
                   type="number"
-                  defaultValue={initialData?.height ?? 0} // Fallback to 0 if undefined
+                  defaultValue={initialData?.height ?? 160} // Fallback to 0 if undefined
                   className="p-1 w-1/2 shadow-md"
                 />
               </div>
@@ -362,7 +362,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               <input
                 {...register("trainerAssigned")}
                 type="text"
-                defaultValue={initialData?.trainerAssigned || ""} // Fallback to empty string if undefined
+                defaultValue={initialData?.trainerAssigned || "Yes"} // Fallback to empty string if undefined
                 className="p-1 w-1/2 shadow-md"
               />
             </div>
@@ -429,7 +429,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               />
               <select
                 {...register("feeStatus", { required: true })}
-                defaultValue={initialData?.feeStatus ?? "due"} // Fallback to "due" if undefined
+                defaultValue={initialData?.feeStatus ?? "paid"} // Fallback to "due" if undefined
                 className="p-1 w-1/2 shadow-md"
               >
                 <option value="paid">Paid</option>
