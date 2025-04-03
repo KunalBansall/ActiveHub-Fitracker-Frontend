@@ -27,7 +27,11 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [extensionDuration, setExtensionDuration] = useState(0);
+  const [membershipEndDate, setMembershipEndDate] = useState<string>(
+    initialData?.membershipEndDate 
+      ? format(new Date(initialData.membershipEndDate), "yyyy-MM-dd")
+      : format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd") // Default to 30 days from now
+  );
 
   const {
     register,
@@ -88,7 +92,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
       await onSubmit({
         ...data,
         photo: photoPreview,
-        durationMonths: (data.durationMonths || 0) + extensionDuration,
+        membershipEndDate: membershipEndDate, // Use the selected date instead of calculating from duration
       });
 
       if (initialData) {
@@ -114,20 +118,7 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
   const handleImageClick = () => {
     document.getElementById("fileInput")?.click();
   };
-  const handleIncrease = () => {
-    setExtensionDuration((prev) => Math.min(prev + 1, 12));
-  };
 
-  const handleDecrease = () => {
-    setExtensionDuration((prev) => Math.max(prev - 1, 0));
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0 && value <= 12) {
-      setExtensionDuration(value);
-    }
-  };
   return (
     <div className="relative font-serif">
       {memberSince && (
@@ -385,23 +376,21 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
               </select>
             </div>
 
-            {/* Duration Field */}
-            <div className="flex justify-between">
-              <Typography
-                color="blue-gray"
-                className="font-semibold"
-                {...({ children: "Duration (months)" } as any)}
-              />
-              <input
-                {...register("durationMonths", {
-                  valueAsNumber: true,
-                  required: true,
-                })}
-                type="number"
-                min="1"
-                defaultValue={initialData?.durationMonths ?? 1} // Fallback to 1 if undefined
-                className="p-1 w-1/2 shadow-md"
-              />
+            {/* Membership End Date Field */}
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <Typography
+                  color="blue-gray"
+                  className="font-semibold"
+                  {...({ children: "Membership End Date" } as any)}
+                />
+                <input
+                  type="date"
+                  value={membershipEndDate}
+                  onChange={(e) => setMembershipEndDate(e.target.value)}
+                  className="p-1 w-1/2 shadow-md"
+                />
+              </div>
             </div>
 
             {/* Fees Field */}

@@ -38,7 +38,7 @@ export default function MemberDetails() {
       onSuccess: () => {
         queryClient.invalidateQueries(["member", id]);
         queryClient.invalidateQueries("members");
-        navigate("/members");
+        // navigate("/members");
       },
     }
   );
@@ -58,24 +58,33 @@ export default function MemberDetails() {
       payload.trainerAssigned = data.trainerAssigned;
     if (data.slot !== member?.slot)
       payload.slot = data.slot;
-    if (data.durationMonths !== member?.durationMonths)
-      payload.durationMonths = data.durationMonths;
     if (data.fees !== member?.fees) payload.fees = data.fees;
     if (data.feeStatus !== member?.feeStatus)
       payload.feeStatus = data.feeStatus;
-
-    // Calculate new membership end date if duration has changed
-    if (payload.durationMonths) {
-      const currentEndDate = member?.membershipEndDate
-        ? new Date(member.membershipEndDate)
-        : new Date();
-      const newEndDate = new Date(
-        currentEndDate.setMonth(
-          currentEndDate.getMonth() +
-            (payload.durationMonths - (member?.durationMonths || 0))
-        )
-      );
-      payload.membershipEndDate = newEndDate.toISOString();
+    
+    // Check if membershipEndDate has changed and add it to the payload
+    if (data.membershipEndDate && data.membershipEndDate !== member?.membershipEndDate) {
+      payload.membershipEndDate = data.membershipEndDate;
+    }
+    
+    // For backward compatibility - calculate end date if duration has changed
+    // This can be removed once the application fully transitions to using end date directly
+    if (data.durationMonths !== member?.durationMonths) {
+      payload.durationMonths = data.durationMonths;
+      
+      // Only calculate end date from duration if membershipEndDate wasn't directly set
+      if (!payload.membershipEndDate) {
+        const currentEndDate = member?.membershipEndDate
+          ? new Date(member.membershipEndDate)
+          : new Date();
+        const newEndDate = new Date(
+          currentEndDate.setMonth(
+            currentEndDate.getMonth() +
+              (payload.durationMonths! - (member?.durationMonths || 0))
+          )
+        );
+        payload.membershipEndDate = newEndDate.toISOString();
+      }
     }
 
     // Send payload only if there are changes

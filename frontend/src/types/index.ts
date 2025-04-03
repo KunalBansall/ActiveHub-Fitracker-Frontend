@@ -8,7 +8,7 @@ export interface Member {
   trainerAssigned: string;
   membershipStartDate: string;
   membershipEndDate: string;
-  durationMonths: number;
+  durationMonths?: number;
   fees: number;
   feeStatus: 'paid' | 'due';
   photo?: string | null;
