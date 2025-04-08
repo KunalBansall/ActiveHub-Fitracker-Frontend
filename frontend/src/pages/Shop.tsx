@@ -281,11 +281,11 @@ export default function ShopPage() {
                 <div className="mt-2 flex items-center">
                   <CurrencyDollarIcon className="h-5 w-5 text-gray-400 mr-1" />
                   <span className="font-medium text-gray-900">
-                    ${product.price.toFixed(2)}
+                    ${product.discountPrice ? product.discountPrice.toFixed(2) : product.price.toFixed(2)}
                   </span>
                   {product.discountPrice && (
                     <span className="ml-2 text-sm text-gray-500 line-through">
-                      ${product.discountPrice.toFixed(2)}
+                      ${product.price.toFixed(2)}
                     </span>
                   )}
                 </div>

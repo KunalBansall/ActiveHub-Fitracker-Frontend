@@ -53,14 +53,14 @@ export default function Header() {
   );
 
   const handleSignOut = () => {
-    setIsModalOpen(true); // Open the modal when sign out is clicked
+    setIsModalOpen(true);
   };
 
   const confirmSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/signin");
-    setIsModalOpen(false); // Close the modal after signing out
+    setIsModalOpen(false);
   };
 
   const handleOutsideClick = (e: MouseEvent) => {
@@ -72,7 +72,7 @@ export default function Header() {
 
     setIsDropdownOpen(false);
     if (!target.closest(".search-input")) {
-      setSearchQuery(""); // Clear search input when clicking outside
+      setSearchQuery("");
     }
   };
 
@@ -85,20 +85,20 @@ export default function Header() {
 
   return (
     <header className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-14 sm:h-16 items-center">
+          <div className="flex items-center">
             <button
               type="button"
-              className="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+              className="lg:hidden inline-flex items-center justify-center rounded-md p-1.5 sm:p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <Bars3Icon className="h-6 w-6" />
+              <Bars3Icon className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
-            <div className="flex-shrink-0 flex items-center bg-opacity-85 z-10">
+            <div className="flex-shrink-0 flex items-center bg-opacity-85 z-10 ml-2 sm:ml-0">
               <Link
                 to="/"
-                className="text-xl font-bold text-blue-600 
+                className="text-lg sm:text-xl font-bold text-blue-600 
                text-shadow-2xl 
                transform 
                hover:scale-105 
@@ -133,27 +133,27 @@ export default function Header() {
 
           {/* Search Box in the center */}
           <div
-            className=" flex-1 flex justify-center mt-1 transform 
+            className="flex-1 flex justify-center mt-1 transform 
                hover:scale-105 
-               transition-transform duration-300 ease-in-out text-shadow-2xl z-10 ml-3 "
+               transition-transform duration-300 ease-in-out text-shadow-2xl z-10 ml-2 sm:ml-3"
           >
-            <div className="relative w-full sm:w-96 ">
+            <div className="relative w-full sm:w-96">
               <input
                 type="text"
                 placeholder="Search members..."
-                className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 leading-5 placeholder-gray-500 focus:border-blue-500 focus:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm search-input z-10"
+                className="w-full rounded-md border border-gray-300 bg-white py-1.5 sm:py-2 pl-8 sm:pl-10 pr-3 leading-5 placeholder-gray-500 focus:border-blue-500 focus:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs sm:text-sm search-input z-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3">
                 <MagnifyingGlassIcon
-                  className="h-5 w-5 text-gray-400"
+                  className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
                   aria-hidden="true"
                 />
               </div>
               {searchResults && searchResults.length > 0 && (
                 <div className="absolute mt-1 w-full rounded-md bg-opacity-85 bg-white shadow-lg z-10 overflow-auto">
-                  <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm ">
+                  <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {searchResults.map((member: Member) => (
                       <li
                         key={member._id}
@@ -167,9 +167,9 @@ export default function Header() {
                           <img
                             src={member.photo || defaultImage}
                             alt={member.name}
-                            className="h-6 w-6 flex-shrink-0 rounded-full"
+                            className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 rounded-full"
                           />
-                          <span className="ml-3 block truncate font-normal">
+                          <span className="ml-2 sm:ml-3 block truncate text-xs sm:text-sm font-normal">
                             {member.name}
                           </span>
                         </div>
@@ -183,14 +183,14 @@ export default function Header() {
 
           {/* User profile and sign-out */}
           <div
-            className="ml-4 relative flex-shrink-0 transform 
+            className="ml-2 sm:ml-4 relative flex-shrink-0 transform 
                hover:scale-105 
                transition-transform duration-300 ease-in-out text-shadow-2xl z-10"
           >
             <div>
               <button
                 type="button"
-                className="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 bg-opacity-85 shadow-lg "
+                className="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 bg-opacity-85 shadow-lg"
                 id="user-menu"
                 aria-expanded="false"
                 aria-haspopup="true"
@@ -199,13 +199,13 @@ export default function Header() {
                 <span className="sr-only">Open user menu</span>
                 {user.photo ? (
                   <img
-                    className="h-8 w-8 rounded-full"
+                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-full"
                     src={user.photo}
                     alt=""
                   />
                 ) : (
                   <UserCircleIcon
-                    className="h-8 w-8 text-gray-400"
+                    className="h-7 w-7 sm:h-8 sm:w-8 text-gray-400"
                     aria-hidden="true"
                   />
                 )}
@@ -213,28 +213,28 @@ export default function Header() {
             </div>
             {isDropdownOpen && (
               <div
-                className="origin-top-right absolute right-0 mt-2 w-48 rounded-md py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dropdown-menu bg-opacity-85  shadow-lg z-10"
+                className="origin-top-right absolute right-0 mt-2 w-40 sm:w-48 rounded-md py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dropdown-menu bg-opacity-85 shadow-lg z-10"
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="user-menu"
               >
                 <Link
                   to="/profile"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
                   role="menuitem"
                 >
                   Your Profile
                 </Link>
                 <Link
                   to="/settings"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
                   role="menuitem"
                 >
                   Settings
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
                   role="menuitem"
                 >
                   Sign out
@@ -250,32 +250,32 @@ export default function Header() {
 
       {isModalOpen && (
         <div
-          className="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50 p-4"
           aria-labelledby="modal-title"
           role="dialog"
           aria-modal="true"
         >
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-sm">
             <h3
-              className="text-lg font-semibold mb-4 text-gray-700"
+              className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-700"
               id="modal-title"
             >
               Confirm Sign Out
             </h3>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
               Are you sure you want to sign out? You will need to log in again
               to access your account.
             </p>
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end space-x-3 sm:space-x-4">
               <button
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                onClick={() => setIsModalOpen(false)} // Close the modal
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-xs sm:text-sm"
+                onClick={() => setIsModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                onClick={confirmSignOut} // Confirm sign out
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-xs sm:text-sm"
+                onClick={confirmSignOut}
               >
                 Sign Out
               </button>

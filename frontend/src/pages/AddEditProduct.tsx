@@ -28,6 +28,7 @@ type FormValues = {
   category: ProductCategory;
   inventory: number;
   featured: boolean;
+  isActive: boolean;
 };
 
 export default function AddEditProductPage() {
@@ -56,6 +57,7 @@ export default function AddEditProductPage() {
       category: "supplements",
       inventory: 1,
       featured: false,
+      isActive: true,
     },
   });
 
@@ -80,6 +82,7 @@ export default function AddEditProductPage() {
           category: data.category,
           inventory: data.inventory,
           featured: data.featured,
+          isActive: data.isActive,
         });
 
         // Set images and featured image
@@ -446,7 +449,7 @@ export default function AddEditProductPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                      Price* ($)
+                      Actual Price* (₹)
                     </label>
                     <input
                       type="number"
@@ -472,7 +475,7 @@ export default function AddEditProductPage() {
                       htmlFor="discountPrice"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Discount Price ($)
+                      Selling Price (₹)
                     </label>
                     <input
                       type="number"
@@ -482,7 +485,7 @@ export default function AddEditProductPage() {
                       {...register("discountPrice", {
                         valueAsNumber: true,
                         validate: (value, formValues) =>
-                          !value || value < formValues.price || "Discount must be less than price",
+                          !value || value < formValues.price || "Selling price must be less than actual price",
                       })}
                       className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
                         errors.discountPrice ? "border-red-300" : ""
@@ -518,22 +521,28 @@ export default function AddEditProductPage() {
                 </div>
 
                 {/* Featured */}
-                <div className="flex items-center">
-                  <Controller
-                    name="featured"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        type="checkbox"
-                        id="featured"
-                        checked={field.value}
-                        onChange={field.onChange}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                    )}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="featured"
+                    {...register("featured")}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
-                    Feature this product
+                  <label htmlFor="featured" className="text-sm font-medium text-gray-700">
+                    Featured Product
+                  </label>
+                </div>
+
+                {/* Active */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    {...register("isActive")}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+                    Active Product
                   </label>
                 </div>
               </div>

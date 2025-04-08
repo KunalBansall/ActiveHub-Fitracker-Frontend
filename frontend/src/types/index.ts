@@ -67,6 +67,7 @@ export interface Product {
   rating: number;
   reviews?: ProductReview[];
   featured: boolean;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }

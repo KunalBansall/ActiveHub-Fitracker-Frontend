@@ -59,6 +59,14 @@ const MemberProductDetail: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        
+        // Check if product is active
+        if (!response.data.isActive) {
+          setError("This product is currently not available.");
+          setProduct(null);
+          return;
+        }
+        
         setProduct(response.data);
         setError(null);
       } catch (memberEndpointError) {
@@ -70,6 +78,14 @@ const MemberProductDetail: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        
+        // Check if product is active in fallback response
+        if (!fallbackResponse.data.isActive) {
+          setError("This product is currently not available.");
+          setProduct(null);
+          return;
+        }
+        
         setProduct(fallbackResponse.data);
         setError(null);
       }

@@ -58,7 +58,9 @@ const MemberShop: React.FC = () => {
           },
         });
         
-        setProducts(response.data);
+        // Filter out inactive products
+        const activeProducts = response.data.filter((product: Product) => product.isActive);
+        setProducts(activeProducts);
         setError(null);
       } catch (memberEndpointError) {
         console.error("Error with member endpoint:", memberEndpointError);
@@ -74,7 +76,9 @@ const MemberShop: React.FC = () => {
           },
         });
         
-        setProducts(fallbackResponse.data);
+        // Filter out inactive products from fallback response
+        const activeProducts = fallbackResponse.data.filter((product: Product) => product.isActive);
+        setProducts(activeProducts);
         setError(null);
       }
     } catch (err) {
@@ -87,7 +91,7 @@ const MemberShop: React.FC = () => {
   };
 
   const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) && product.isActive
   );
 
   return (

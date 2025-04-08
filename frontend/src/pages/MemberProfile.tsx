@@ -387,102 +387,102 @@ const MemberProfile: React.FC = () => {
 
   const renderProfileTab = () => (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4 sm:p-6">
-        <form onSubmit={handleSubmit(handleSave)} className="space-y-4 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-4 sm:mb-6">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">Personal Information</h3>
+      <div className="p-3 sm:p-6">
+        <form onSubmit={handleSubmit(handleSave)} className="space-y-3 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-3 sm:mb-6">
+            <h3 className="text-base sm:text-xl font-semibold text-gray-800">Personal Information</h3>
             {!isEditing ? (
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                <PencilIcon className="h-4 w-4 mr-2" />
+                <PencilIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Edit Profile
               </button>
             ) : null}
       </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 sm:gap-x-6 gap-y-3 sm:gap-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+              <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700">Name</label>
               <input
                 type="text"
                 id="name"
                 {...register("name")}
                 disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+              <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700">Email</label>
               <input
                 type="email"
                 id="email"
                 {...register("email")}
                 disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+              <label htmlFor="phoneNumber" className="block text-xs sm:text-sm font-medium text-gray-700">Phone Number</label>
               <input
                 type="text"
                 id="phoneNumber"
                 {...register("phoneNumber")}
                 disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor="slot" className="block text-sm font-medium text-gray-700">Slot</label>
+              <label htmlFor="slot" className="block text-xs sm:text-sm font-medium text-gray-700">Slot</label>
               <input
                 type="text"
                 id="slot"
                 {...register("slot")}
                 disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500 text-xs sm:text-sm"
               />
             </div>
           </div>
           
-          <div className="mt-6 sm:mt-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Membership Information</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 sm:mt-8">
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Membership Information</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 sm:gap-x-6 gap-y-3 sm:gap-y-4 p-2 sm:p-4 bg-gray-50 rounded-lg">
               <div>
-                <label htmlFor="membershipStartDate" className="block text-sm font-medium text-gray-500">Start Date</label>
+                <label htmlFor="membershipStartDate" className="block text-xs sm:text-sm font-medium text-gray-500">Start Date</label>
                 <input
                   type="text"
                   id="membershipStartDate"
                   value={member?.membershipStartDate ? new Date(member.membershipStartDate).toLocaleDateString() : ''}
                   disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white text-gray-900 text-sm sm:text-base"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white text-gray-900 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="membershipEndDate" className="block text-sm font-medium text-gray-500">End Date</label>
+                <label htmlFor="membershipEndDate" className="block text-xs sm:text-sm font-medium text-gray-500">End Date</label>
                 <input
                   type="text"
                   id="membershipEndDate"
                   value={member?.membershipEndDate ? new Date(member.membershipEndDate).toLocaleDateString() : ''}
                   disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white text-gray-900 text-sm sm:text-base"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white text-gray-900 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="fees" className="block text-sm font-medium text-gray-500">Fees</label>
+                <label htmlFor="fees" className="block text-xs sm:text-sm font-medium text-gray-500">Fees</label>
                 <input
                   type="text"
                   id="fees"
                   value={member?.fees || ''}
                   disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white text-gray-900 text-sm sm:text-base"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-white text-gray-900 text-xs sm:text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="feeStatus" className="block text-sm font-medium text-gray-500">Fee Status</label>
+                <label htmlFor="feeStatus" className="block text-xs sm:text-sm font-medium text-gray-500">Fee Status</label>
                 <div className="mt-1 flex items-center">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm ${
+                  <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs sm:text-sm ${
                     member?.feeStatus === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {member?.feeStatus?.toUpperCase() || 'N/A'}
@@ -493,23 +493,23 @@ const MemberProfile: React.FC = () => {
           </div>
 
           {isEditing && (
-            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4 sm:pt-6">
+            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-3 sm:pt-6">
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="w-full sm:w-auto px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <span className="flex items-center justify-center">
-                  <XMarkIcon className="h-4 w-4 mr-2" />
+                  <XMarkIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Cancel
                 </span>
               </button>
           <button
                 type="submit"
-                className="w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent shadow-sm text-xs sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <span className="flex items-center justify-center">
-                  <CheckIcon className="h-4 w-4 mr-2" />
+                  <CheckIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Save Changes
                 </span>
           </button>
@@ -518,12 +518,12 @@ const MemberProfile: React.FC = () => {
         </form>
         </div>
 
-      <div className="p-4 sm:p-6 bg-gray-50 border-t border-gray-100">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Profile Photo</h3>
+      <div className="p-3 sm:p-6 bg-gray-50 border-t border-gray-100">
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900">Profile Photo</h3>
         </div>
-        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-          <div className="relative h-24 w-24 sm:h-32 sm:w-32 rounded-full overflow-hidden border-4 border-white shadow-md group">
+        <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-6">
+          <div className="relative h-20 w-20 sm:h-32 sm:w-32 rounded-full overflow-hidden border-4 border-white shadow-md group">
             {photoPreview ? (
               <img
                 src={photoPreview}
@@ -532,7 +532,7 @@ const MemberProfile: React.FC = () => {
               />
             ) : (
               <div className="h-full w-full flex items-center justify-center bg-gray-200">
-                <UserCircleIcon className="h-16 w-16 sm:h-24 sm:w-24 text-gray-400" />
+                <UserCircleIcon className="h-12 w-12 sm:h-24 sm:w-24 text-gray-400" />
               </div>
             )}
             
@@ -541,8 +541,8 @@ const MemberProfile: React.FC = () => {
               htmlFor="profile-photo-input" 
               className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 cursor-pointer"
             >
-              <div className="bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <PencilIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+              <div className="bg-white rounded-full p-1.5 sm:p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <PencilIcon className="h-3 w-3 sm:h-5 sm:w-5 text-gray-700" />
               </div>
             </label>
             
@@ -556,13 +556,13 @@ const MemberProfile: React.FC = () => {
                   />
               </div>
           <div className="text-center sm:text-left">
-            <p className="text-sm font-medium text-gray-900">Upload a new photo</p>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <p className="text-xs sm:text-sm font-medium text-gray-900">Upload a new photo</p>
+            <p className="text-xs text-gray-500 mt-0.5 sm:mt-1">
               JPG, PNG or GIF. Max size of 2MB.
             </p>
                         <label
               htmlFor="profile-photo-input-button"
-              className="mt-3 sm:mt-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+              className="mt-2 sm:mt-4 inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
                         >
               Change Photo
                         </label>
@@ -806,27 +806,27 @@ const MemberProfile: React.FC = () => {
   );
 
   const renderShopTab = () => (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {/* Hero Banner for Shop */}
       <div className="relative rounded-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/90 to-purple-600/90 mix-blend-multiply"></div>
-        <div className="relative bg-cover bg-center h-48 sm:h-64" style={{ backgroundImage: "url('/Activehub04.jpeg')" }}>
-          <div className="px-4 sm:px-6 py-6 sm:py-10 h-full flex flex-col justify-between">
+        <div className="relative bg-cover bg-center h-40 sm:h-64" style={{ backgroundImage: "url('/Activehub04.jpeg')" }}>
+          <div className="px-3 sm:px-6 py-4 sm:py-10 h-full flex flex-col justify-between">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">Welcome back, {member?.name || 'Member'}!</h2>
-              <p className="mt-2 text-base sm:text-xl text-indigo-100">Discover products tailored to your fitness journey</p>
+              <h2 className="text-xl sm:text-3xl font-bold text-white">Welcome back, {member?.name || 'Member'}!</h2>
+              <p className="mt-1 sm:mt-2 text-sm sm:text-xl text-indigo-100">Discover products tailored to your fitness journey</p>
             </div>
             <div className="flex flex-wrap gap-2 sm:gap-3 mb-2">
               <Link
                 to="/member-shop"
-                className="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Browse All Products
-                <ChevronRightIcon className="ml-2 h-4 w-4" aria-hidden="true" />
+                <ChevronRightIcon className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
               </Link>
               <Link
                 to={`/member-shop?category=supplements`}
-                className="inline-flex items-center px-3 sm:px-4 py-2 border border-white/30 text-sm font-medium rounded-md shadow-sm text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/50"
+                className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-white/30 text-xs sm:text-sm font-medium rounded-md shadow-sm text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/50"
               >
                 My Favorites
               </Link>
@@ -836,19 +836,19 @@ const MemberProfile: React.FC = () => {
       </div>
       
       {/* Member Stats and Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
         <div className="bg-indigo-50 rounded-xl p-3 sm:p-4 shadow-sm">
-          <div className="flex items-start space-x-3">
+          <div className="flex items-start space-x-2 sm:space-x-3">
             <div className="flex-shrink-0 rounded-md bg-indigo-100 p-2 sm:p-3">
-              <CreditCardIcon className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600" />
+              <CreditCardIcon className="h-4 w-4 sm:h-6 sm:w-6 text-indigo-600" />
             </div>
             <div>
               <p className="text-xs sm:text-sm text-indigo-700">Membership Status</p>
-              <p className="text-base sm:text-lg font-semibold text-gray-900 mt-1">
+              <p className="text-sm sm:text-lg font-semibold text-gray-900 mt-0.5 sm:mt-1">
                 {member?.status?.toUpperCase() || 'ACTIVE'}
               </p>
-              <div className="mt-1 sm:mt-2">
-                <span className="text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+              <div className="mt-0.5 sm:mt-2">
+                <span className="text-xs inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
                   {member?.status === 'active' ? '15%' : '10%'} Shop Discount
                 </span>
               </div>
@@ -857,17 +857,17 @@ const MemberProfile: React.FC = () => {
         </div>
         
         <div className="bg-amber-50 rounded-xl p-3 sm:p-4 shadow-sm">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 rounded-md bg-amber-100 p-3">
-              <StarIcon className="h-6 w-6 text-amber-600" />
+          <div className="flex items-start space-x-2 sm:space-x-3">
+            <div className="flex-shrink-0 rounded-md bg-amber-100 p-2 sm:p-3">
+              <StarIcon className="h-4 w-4 sm:h-6 sm:w-6 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm text-amber-700">Loyalty Points</p>
-              <p className="text-lg font-semibold text-gray-900 mt-1">
+              <p className="text-xs sm:text-sm text-amber-700">Loyalty Points</p>
+              <p className="text-sm sm:text-lg font-semibold text-gray-900 mt-0.5 sm:mt-1">
                 {member?.fees ? Math.floor(member.fees / 100) : 0} points
               </p>
-              <div className="mt-2">
-                <span className="text-xs inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+              <div className="mt-0.5 sm:mt-2">
+                <span className="text-xs inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
                   Redeem for discounts
                 </span>
               </div>
@@ -876,17 +876,17 @@ const MemberProfile: React.FC = () => {
         </div>
         
         <div className="bg-emerald-50 rounded-xl p-3 sm:p-4 shadow-sm">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 rounded-md bg-emerald-100 p-3">
-              <CalendarIcon className="h-6 w-6 text-emerald-600" />
+          <div className="flex items-start space-x-2 sm:space-x-3">
+            <div className="flex-shrink-0 rounded-md bg-emerald-100 p-2 sm:p-3">
+              <CalendarIcon className="h-4 w-4 sm:h-6 sm:w-6 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm text-emerald-700">Membership Duration</p>
-              <p className="text-lg font-semibold text-gray-900 mt-1">
+              <p className="text-xs sm:text-sm text-emerald-700">Membership Duration</p>
+              <p className="text-sm sm:text-lg font-semibold text-gray-900 mt-0.5 sm:mt-1">
                 {member?.durationMonths || 0} Months Plan
               </p>
-              <div className="mt-2">
-                <span className="text-xs inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+              <div className="mt-0.5 sm:mt-2">
+                <span className="text-xs inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                   {member?.membershipEndDate ? 
                     `Expires ${new Date(member.membershipEndDate).toLocaleDateString()}` : 
                     'Active Membership'}
@@ -899,25 +899,25 @@ const MemberProfile: React.FC = () => {
       
       {/* Personalized Recommendations */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 sm:mb-6">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-800">Recommended For You</h3>
-            <span className="text-sm text-gray-500">Based on your {member?.status || 'active'} membership</span>
+        <div className="p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-0 mb-3 sm:mb-6">
+            <h3 className="text-base sm:text-xl font-semibold text-gray-800">Recommended For You</h3>
+            <span className="text-xs sm:text-sm text-gray-500">Based on your {member?.status || 'active'} membership</span>
           </div>
 
           {shopLoading ? (
-            <div className="py-8 sm:py-12 flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-t-2 border-indigo-500"></div>
+            <div className="py-6 sm:py-12 flex justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 sm:h-10 sm:w-10 border-t-2 border-indigo-500"></div>
             </div>
           ) : featuredProducts.length === 0 ? (
-            <div className="py-8 sm:py-12 text-center">
-              <ShoppingBagIcon className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-300" />
+            <div className="py-6 sm:py-12 text-center">
+              <ShoppingBagIcon className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-300" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">No products available</h3>
-              <p className="mt-1 text-sm text-gray-500">Check back soon for new products!</p>
+              <p className="mt-1 text-xs sm:text-sm text-gray-500">Check back soon for new products!</p>
             </div>
           ) : (
             <div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                 {featuredProducts.slice(0, 3).map((product) => (
                   <div 
                     key={product._id} 
@@ -928,27 +928,27 @@ const MemberProfile: React.FC = () => {
                         <img
                           src={product.images.find(img => img.publicId === product.featuredImageId)?.url || product.images[0].url}
                           alt={product.name}
-                          className="w-full h-48 object-cover object-center"
+                          className="w-full h-36 sm:h-48 object-cover object-center"
                         />
                       ) : (
-                        <div className="w-full h-48 flex items-center justify-center">
-                          <ShoppingBagIcon className="h-10 w-10 text-gray-400" />
+                        <div className="w-full h-36 sm:h-48 flex items-center justify-center">
+                          <ShoppingBagIcon className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
                         </div>
                       )}
                       {product.discountPrice && (
-                        <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-2 py-1 m-2 rounded">
+                        <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 m-1.5 sm:m-2 rounded">
                           SALE
               </div>
                       )}
                     </div>
-                    <div className="p-4">
-                      <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                    <div className="p-2 sm:p-4">
+                      <h3 className="text-xs sm:text-sm font-medium text-gray-900 truncate">{product.name}</h3>
                       <div className="mt-1 flex items-center">
                         <div className="flex flex-1">
                           {[0, 1, 2, 3, 4].map((rating) => (
                             <StarIcon
                               key={rating}
-                              className={`h-4 w-4 ${
+                              className={`h-3 w-3 sm:h-4 sm:w-4 ${
                                 product.rating > rating ? 'text-yellow-400' : 'text-gray-300'
                               }`}
                             />
@@ -958,8 +958,8 @@ const MemberProfile: React.FC = () => {
                           ({product.reviews?.length || 0})
                         </span>
                       </div>
-                      <div className="mt-2 flex justify-between items-center">
-                        <p className="text-sm font-medium text-gray-900">
+                      <div className="mt-1 sm:mt-2 flex justify-between items-center">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900">
                           ₹{product.price}
                           {product.discountPrice && (
                             <span className="ml-1 text-xs text-gray-500 line-through">
@@ -967,14 +967,14 @@ const MemberProfile: React.FC = () => {
                             </span>
                           )}
                         </p>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
                           {product.category}
                         </span>
                       </div>
-                      <div className="mt-4">
+                      <div className="mt-2 sm:mt-4">
                         <Link
                           to={`/member-shop/product/${product._id}`}
-                          className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          className="w-full inline-flex justify-center items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           View Details
                         </Link>
@@ -984,13 +984,13 @@ const MemberProfile: React.FC = () => {
                 ))}
               </div>
               
-              <div className="mt-6 sm:mt-8 text-center">
+              <div className="mt-4 sm:mt-8 text-center">
                 <Link
                   to="/member-shop"
-                  className="inline-flex items-center px-3 sm:px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   View All Products
-                  <ChevronRightIcon className="ml-2 h-4 w-4" aria-hidden="true" />
+                  <ChevronRightIcon className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
                 </Link>
               </div>
             </div>
@@ -1000,10 +1000,10 @@ const MemberProfile: React.FC = () => {
       
       {/* Featured Categories */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 sm:p-6">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Shop by Category</h3>
+        <div className="p-3 sm:p-6">
+          <h3 className="text-base sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-6">Shop by Category</h3>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
             {['Supplements', 'Equipment', 'Apparel', 'Accessories'].map((category) => (
               <Link
                 key={category}
@@ -1011,8 +1011,8 @@ const MemberProfile: React.FC = () => {
                 className="group block"
               >
                 <div className="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-100 shadow-sm group-hover:opacity-75 transition-opacity">
-                  <div className="p-3 sm:p-4 flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-50 to-purple-50 group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
-                    <ShoppingBagIcon className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-500 mb-2 sm:mb-3" />
+                  <div className="p-2 sm:p-4 flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-50 to-purple-50 group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
+                    <ShoppingBagIcon className="h-5 w-5 sm:h-8 sm:w-8 text-indigo-500 mb-1 sm:mb-3" />
                     <span className="text-xs sm:text-sm font-medium text-gray-900">{category}</span>
                   </div>
                 </div>
@@ -1024,45 +1024,45 @@ const MemberProfile: React.FC = () => {
       
       {/* Special Offers */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 sm:p-6">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Special Offers</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-lg border border-indigo-100">
+        <div className="p-3 sm:p-6">
+          <h3 className="text-base sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-6">Special Offers</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-3 sm:p-4 rounded-lg border border-indigo-100">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="bg-indigo-100 rounded-full p-3">
-                    <FireIcon className="h-6 w-6 text-indigo-600" />
+                  <div className="bg-indigo-100 rounded-full p-2 sm:p-3">
+                    <FireIcon className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600" />
                   </div>
                 </div>
-                <div className="ml-4">
-                  <h4 className="text-base font-medium text-gray-900">{member?.status || 'Member'} Special</h4>
-                  <p className="mt-1 text-sm text-gray-500">
+                <div className="ml-3 sm:ml-4">
+                  <h4 className="text-sm sm:text-base font-medium text-gray-900">{member?.status || 'Member'} Special</h4>
+                  <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-gray-500">
                     Get 20% off for items in your wishlist this week
                   </p>
-                  <p className="mt-1 text-sm font-medium text-indigo-600">
+                  <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm font-medium text-indigo-600">
                     Use code: MEMBER{member?._id?.substring(0, 4) || '2023'}
                               </p>
                             </div>
                           </div>
             </div>
               
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border border-amber-100">
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 sm:p-4 rounded-lg border border-amber-100">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="bg-amber-100 rounded-full p-3">
-                    <ClockIcon className="h-6 w-6 text-amber-600" />
+                  <div className="bg-amber-100 rounded-full p-2 sm:p-3">
+                    <ClockIcon className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600" />
                   </div>
                 </div>
-                <div className="ml-4">
-                  <h4 className="text-base font-medium text-gray-900">Limited Time Offer</h4>
-                  <p className="mt-1 text-sm text-gray-500">
+                <div className="ml-3 sm:ml-4">
+                  <h4 className="text-sm sm:text-base font-medium text-gray-900">Limited Time Offer</h4>
+                  <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-gray-500">
                     Buy one get one free on selected supplements
                   </p>
-                  <p className="mt-1 text-sm font-medium text-amber-600">
+                  <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm font-medium text-amber-600">
                     Expires in 5 days
                               </p>
                             </div>
-                          </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1194,11 +1194,11 @@ const MemberProfile: React.FC = () => {
                     View Order Details
                     <ChevronRightIcon className="ml-1 h-4 w-4" />
                   </Link>
-                </div>
               </div>
+            </div>
             );
           })}
-        </div>
+          </div>
       </div>
     );
   };
@@ -1232,8 +1232,8 @@ const MemberProfile: React.FC = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Header with added cart icon */}
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
             <div className="flex items-center space-x-3">
               <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
                 {member?.photo ? (
@@ -1246,16 +1246,16 @@ const MemberProfile: React.FC = () => {
                   <UserCircleIcon className="h-full w-full text-gray-400" />
                 )}
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{member?.name || 'Member Profile'}</h1>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900">{member?.name || 'Member Profile'}</h1>
             </div>
-            <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end">
               <MemberNavCart />
               <div className="sm:mt-0">
                 <button
                   onClick={handleSignOut}
-                  className="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white focus:ring-offset-indigo-700 transition-colors"
+                  className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white focus:ring-offset-indigo-700 transition-colors"
                 >
-                  <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
+                  <ArrowRightOnRectangleIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                   <span className="hidden sm:inline">Sign Out</span>
                 </button>
               </div>
@@ -1265,63 +1265,63 @@ const MemberProfile: React.FC = () => {
       </div>
 
       {/* Tabs and Content */}
-      <div className="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-8">
         {/* Tab navigation - Make scrollable on mobile */}
-        <div className="border-b border-gray-200 mb-4 sm:mb-6">
+        <div className="border-b border-gray-200 mb-3 sm:mb-6">
           <nav className="-mb-px flex overflow-x-auto hide-scrollbar">
             <button
               onClick={() => setCurrentTab('shop')}
-              className={`whitespace-nowrap py-3 sm:py-4 px-3 sm:px-4 border-b-2 font-medium text-sm flex-shrink-0 ${
+              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
                 currentTab === 'shop'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <ShoppingBagIcon className="h-5 w-5 inline mr-1" />
+              <ShoppingBagIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
               <span>Shop</span>
             </button>
             <button
               onClick={() => setCurrentTab('orders')}
-              className={`whitespace-nowrap py-3 sm:py-4 px-3 sm:px-4 border-b-2 font-medium text-sm flex-shrink-0 ${
+              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
                 currentTab === 'orders'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <ClockIcon className="h-5 w-5 inline mr-1" />
+              <ClockIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
               <span>Orders</span>
             </button>
             <button
               onClick={() => setCurrentTab('attendance')}
-              className={`whitespace-nowrap py-3 sm:py-4 px-3 sm:px-4 border-b-2 font-medium text-sm flex-shrink-0 ${
+              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
                 currentTab === 'attendance'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <CalendarDaysIcon className="h-5 w-5 inline mr-1" />
+              <CalendarDaysIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
               <span>Attendance</span>
             </button>
             <button
               onClick={() => setCurrentTab('profile')}
-              className={`whitespace-nowrap py-3 sm:py-4 px-3 sm:px-4 border-b-2 font-medium text-sm flex-shrink-0 ${
+              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
                 currentTab === 'profile'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <UserCircleIcon className="h-5 w-5 inline mr-1" />
+              <UserCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
               <span>Profile</span>
             </button>
             <button
               onClick={() => setCurrentTab('membership')}
-              className={`whitespace-nowrap py-3 sm:py-4 px-3 sm:px-4 border-b-2 font-medium text-sm flex-shrink-0 ${
+              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
                 currentTab === 'membership'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <CreditCardIcon className="h-5 w-5 inline mr-1" />
+              <CreditCardIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
               <span>Membership</span>
             </button>
           </nav>
