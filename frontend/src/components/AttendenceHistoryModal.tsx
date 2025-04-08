@@ -32,8 +32,10 @@ export default function AttendanceHistoryModal({
     ["attendanceHistory", memberId],
     () =>
       axios
-        .get(`${API_URL}/attendance/history/${memberId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        .get(`${API_URL}/member-attendance/history`, {
+          headers: { 
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         })
         .then((res) => res.data),
     {

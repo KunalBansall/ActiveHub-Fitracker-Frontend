@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
+import { CartProvider } from "./context/CartContext";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -25,9 +26,22 @@ const MemberLoginPage = lazy(() => import("./pages/MemberLogin"));
 const SetPassword = lazy(() => import("./pages/MemberSetPassword"));
 const OwnerLogs = lazy(() => import("./components/OwnerLogs"));
 
+// Shop-related pages
+const Shop = lazy(() => import("./pages/Shop"));
+const AddEditProduct = lazy(() => import("./pages/AddEditProduct"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const MemberShop = lazy(() => import("./pages/MemberShop"));
+const MemberProductDetail = lazy(() => import("./pages/MemberProductDetail"));
+const MemberOrders = lazy(() => import("./pages/MemberOrders"));
+const AdminOrders = lazy(() => import("./pages/AdminOrders"));
+
 // Minimal layout for member-specific routes
 const MemberLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
-  return <div>{children}</div>;
+  return (
+    <CartProvider>
+      <div className="min-h-screen bg-gray-50">{children}</div>
+    </CartProvider>
+  );
 };
 
 // Admin layout with sidebar and header
@@ -76,6 +90,30 @@ export default function App() {
                 </MemberLayout>
               }
             />
+            <Route
+              path="/member-shop"
+              element={
+                <MemberLayout>
+                  <MemberShop />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-shop/product/:id"
+              element={
+                <MemberLayout>
+                  <MemberProductDetail />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-orders"
+              element={
+                <MemberLayout>
+                  <MemberOrders />
+                </MemberLayout>
+              }
+            />
 
             {/* Admin-specific routes (protected by PrivateRoute) */}
             <Route
@@ -91,6 +129,13 @@ export default function App() {
                       <Route path="/attendance" element={<Attendance />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/owner-logs" element={<OwnerLogs />} />
+                      
+                      {/* Shop Routes */}
+                      <Route path="/shop" element={<Shop />} />
+                      <Route path="/shop/add-product" element={<AddEditProduct />} />
+                      <Route path="/shop/products/:id" element={<ProductDetail />} />
+                      <Route path="/shop/products/:id/edit" element={<AddEditProduct />} />
+                      <Route path="/orders" element={<AdminOrders />} />
                     </Routes>
                   </AdminLayout>
                 </PrivateRoute>

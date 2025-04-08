@@ -7,6 +7,8 @@ import {
   BellIcon,
   Cog6ToothIcon,
   UserIcon,
+  ShoppingBagIcon,
+  TruckIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import React from "react";
@@ -15,6 +17,8 @@ export const navigation = [
   { name: "Members", href: "/members", icon: UsersIcon },
   { name: "Attendance", href: "/attendance", icon: ClockIcon },
   { name: "Payments", href: "/payments", icon: CreditCardIcon },
+  { name: "Shop", href: "/shop", icon: ShoppingBagIcon },
+  { name: "Orders", href: "/orders", icon: TruckIcon },
   { name: "Notifications", href: "/notifications", icon: BellIcon },
   { name: "Profile", href: "/profile", icon: UserIcon },
 ];
@@ -26,7 +30,8 @@ export default function Sidebar() {
     <div className="hidden lg:flex h-full w-64 flex-col bg-gray-900">
       <nav className="flex-1 space-y-1 px-2 py-4">
         {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
+          const isActive = location.pathname === item.href || 
+                          (item.href !== '/' && location.pathname.startsWith(item.href));
           return (
             <Link
               key={item.name}
