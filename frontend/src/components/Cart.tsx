@@ -7,10 +7,10 @@ import { toast } from 'react-hot-toast';
 
 // Payment method options
 const PAYMENT_METHODS = [
-  { id: 'card', name: 'Credit/Debit Card' },
-  { id: 'upi', name: 'UPI Payment' },
-  { id: 'cash', name: 'Cash on Delivery' },
-  { id: 'wallet', name: 'Digital Wallet' },
+  // { id: 'card', name: 'Credit/Debit Card' }
+  // { id: 'upi', name: 'UPI Payment' },
+  { id: 'cash', name: 'Cash on Delivery' }
+  // { id: 'wallet', name: 'Digital Wallet' },
 ];
 
 const Cart: React.FC = () => {

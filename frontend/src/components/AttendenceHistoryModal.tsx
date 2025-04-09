@@ -11,6 +11,7 @@ interface AttendanceHistoryModalProps {
   onClose: () => void;
   memberId?: string;
   attendance?: Attendance[];
+  isAdmin?: boolean;
 }
 
 export default function AttendanceHistoryModal({
@@ -18,6 +19,7 @@ export default function AttendanceHistoryModal({
   onClose,
   memberId,
   attendance: propAttendance,
+  isAdmin = false,
 }: AttendanceHistoryModalProps) {
   const [displayCount, setDisplayCount] = useState(10);
   const [localAttendance, setLocalAttendance] = useState<Attendance[]>([]);
@@ -29,17 +31,22 @@ export default function AttendanceHistoryModal({
     isLoading,
     error,
   } = useQuery<Attendance[]>(
-    ["attendanceHistory", memberId],
-    () =>
-      axios
-        .get(`${API_URL}/member-attendance/history`, {
+    ["attendanceHistory", memberId, isAdmin],
+    () => {
+      const endpoint = isAdmin 
+        ? `${API_URL}/attendance/history/${memberId}`
+        : `${API_URL}/member-attendance/history`;
+      
+      return axios
+        .get(endpoint, {
           headers: { 
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         })
-        .then((res) => res.data),
+        .then((res) => res.data);
+    },
     {
-      enabled: !!memberId && isOpen && !propAttendance,
+      enabled: !!token && isOpen && !propAttendance,
     }
   );
 

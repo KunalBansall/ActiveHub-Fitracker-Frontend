@@ -199,6 +199,7 @@ export default function MemberDetails() {
           isOpen={isHistoryModalOpen}
           onClose={() => setIsHistoryModalOpen(false)}
           memberId={id}
+          isAdmin={true}
         />
 
         {/* Modal for Extending Membership */}
