@@ -242,11 +242,16 @@ const MemberShop: React.FC = () => {
                   <p className="mt-1 text-sm text-gray-500 line-clamp-2">{product.description}</p>
                   <div className="mt-2 flex justify-between items-center">
                     <p className="text-sm font-medium text-gray-900">
-                      ₹{product.price}
+                      ₹{product.discountPrice ? product.discountPrice.toFixed(2) : product.price.toFixed(2)}
                       {product.discountPrice && (
-                        <span className="ml-1 text-xs text-gray-500 line-through">
-                          ₹{product.discountPrice}
-                        </span>
+                        <>
+                          <span className="ml-1 text-xs text-gray-500 line-through">
+                            ₹{product.price.toFixed(2)}
+                          </span>
+                          <span className="ml-1 text-xs font-medium text-green-600">
+                            ({Math.round(((product.price - product.discountPrice) / product.price) * 100)}% off)
+                          </span>
+                        </>
                       )}
                     </p>
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">

@@ -12,6 +12,7 @@ interface Product {
   image: string;
   isActive: boolean;
   isFeatured: boolean;
+  discountPrice?: number;
 }
 
 const Products = () => {
@@ -78,7 +79,14 @@ const Products = () => {
                   <div className="text-sm text-gray-900">{product.category}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">${product.price}</div>
+                  <div className="text-sm text-gray-900">
+                    ₹{product.discountPrice ? product.discountPrice.toFixed(2) : product.price.toFixed(2)}
+                    {product.discountPrice && (
+                      <span className="ml-2 text-xs text-gray-500 line-through">
+                        ₹{product.price.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center space-x-2">

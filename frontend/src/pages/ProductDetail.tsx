@@ -296,10 +296,10 @@ export default function ProductDetailPage() {
 
               <div className="mt-6">
                 <div className="flex items-end">
-                  <h3 className="text-3xl font-bold text-gray-900">${product.price.toFixed(2)}</h3>
+                  <h3 className="text-3xl font-bold text-gray-900">₹{product.discountPrice ? product.discountPrice.toFixed(2) : product.price.toFixed(2)}</h3>
                   {product.discountPrice && (
                     <h3 className="ml-2 text-lg text-gray-500 line-through">
-                      ${product.discountPrice.toFixed(2)}
+                      ₹{product.price.toFixed(2)}
                     </h3>
                   )}
                 </div>

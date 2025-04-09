@@ -24,6 +24,14 @@ const Cart: React.FC = () => {
     clearCart 
   } = useCart();
   
+  // Calculate total using discounted prices when available
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price = item.discountPrice || item.price;
+      return total + (price * item.quantity);
+    }, 0);
+  };
+  
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -106,7 +114,7 @@ const Cart: React.FC = () => {
       const orderItems = cartItems.map(item => ({
         productId: item.productId,
         name: item.name,
-        price: item.price,
+        price: item.discountPrice || item.price,
         quantity: item.quantity,
         image: item.image
       }));
@@ -116,7 +124,7 @@ const Cart: React.FC = () => {
         { 
           memberId,
           products: orderItems,
-          totalAmount: cartTotal,
+          totalAmount: calculateTotal(),
           paymentMethod,
           address,
           notes: orderNotes
@@ -270,12 +278,22 @@ const Cart: React.FC = () => {
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Order Summary</h3>
                   <div className="text-sm text-gray-600">
-                    <p>{cartItems.length} items: ₹{cartTotal.toFixed(2)}</p>
+                    <p>{cartItems.length} items: ₹{calculateTotal().toFixed(2)}</p>
                     <p>Shipping: ₹50.00</p>
-                    <p>Tax (5%): ₹{(cartTotal * 0.05).toFixed(2)}</p>
+                    <p>Tax (5%): ₹{(calculateTotal() * 0.05).toFixed(2)}</p>
                     <div className="border-t border-gray-200 mt-2 pt-2 font-medium text-gray-900">
-                      Total: ₹{(cartTotal + 50 + (cartTotal * 0.05)).toFixed(2)}
+                      Total: ₹{(calculateTotal() + 50 + (calculateTotal() * 0.05)).toFixed(2)}
                     </div>
+                    {cartItems.some(item => item.discountPrice) && (
+                      <div className="mt-2 text-sm text-green-600">
+                        You saved: ₹{cartItems.reduce((total, item) => {
+                          if (item.discountPrice) {
+                            return total + ((item.price - item.discountPrice) * item.quantity);
+                          }
+                          return total;
+                        }, 0).toFixed(2)}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -535,7 +553,19 @@ const Cart: React.FC = () => {
                                   {item.name}
                                 </Link>
                               </h3>
-                              <p className="ml-4">₹{item.price.toFixed(2)}</p>
+                              <p className="ml-4">
+                                ₹{(item.discountPrice || item.price).toFixed(2)}
+                                {item.discountPrice && (
+                                  <>
+                                    <span className="ml-1 text-xs text-gray-500 line-through">
+                                      ₹{item.price.toFixed(2)}
+                                    </span>
+                                    <span className="ml-1 text-xs font-medium text-green-600">
+                                      ({Math.round(((item.price - item.discountPrice) / item.price) * 100)}% off)
+                                    </span>
+                                  </>
+                                )}
+                              </p>
                             </div>
                           </div>
                           
@@ -544,6 +574,7 @@ const Cart: React.FC = () => {
                               <button
                                 onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                                 className="p-1 rounded-full border border-gray-300 hover:bg-gray-100"
+                                disabled={item.quantity <= 1}
                               >
                                 <MinusIcon className="h-4 w-4" />
                               </button>
@@ -551,7 +582,7 @@ const Cart: React.FC = () => {
                               <button
                                 onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                                 className="p-1 rounded-full border border-gray-300 hover:bg-gray-100"
-                                disabled={item.quantity >= item.productDetails.inventory}
+                                disabled={item.quantity >= (item.productDetails.inventory || 10)}
                               >
                                 <PlusIcon className="h-4 w-4" />
                               </button>
@@ -580,7 +611,7 @@ const Cart: React.FC = () => {
               <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
                 <div className="flex justify-between text-base font-medium text-gray-900">
                   <p>Subtotal</p>
-                  <p>₹{cartTotal.toFixed(2)}</p>
+                  <p>₹{calculateTotal().toFixed(2)}</p>
                 </div>
                 <p className="mt-0.5 text-sm text-gray-500">
                   Shipping and taxes calculated at checkout.

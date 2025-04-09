@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 
 interface CartItem extends OrderItem {
   productDetails: Product;
+  discountPrice?: number;
 }
 
 interface CartContextType {
@@ -38,7 +39,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   
   // Calculate derived values
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const cartTotal = cartItems.reduce((total, item) => {
+    const price = item.discountPrice || item.price;
+    return total + (price * item.quantity);
+  }, 0);
   
   // Load cart from localStorage on initial load
   useEffect(() => {
@@ -68,7 +72,9 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
-          quantity: updatedItems[existingItemIndex].quantity + quantity
+          quantity: updatedItems[existingItemIndex].quantity + quantity,
+          discountPrice: product.discountPrice,
+          price: product.discountPrice || product.price
         };
         toast.success(`Updated ${product.name} quantity in cart`);
         return updatedItems;
@@ -77,7 +83,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         const newItem: CartItem = {
           productId: product._id,
           name: product.name,
-          price: product.price,
+          price: product.discountPrice || product.price,
+          discountPrice: product.discountPrice,
           quantity: quantity,
           image: product.images[0]?.url || '',
           productDetails: product
@@ -111,7 +118,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   
   const clearCart = () => {
     setCartItems([]);
-    toast.success('Cart cleared');
+    // toast.success('Cart cleared');
   };
   
   return (
