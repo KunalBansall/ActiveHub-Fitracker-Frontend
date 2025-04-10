@@ -18,6 +18,8 @@ import {
   CameraIcon,
 } from "@heroicons/react/24/outline"
 import toast from "react-hot-toast"
+import ProfileFooterAd from "../components/ads/ProfileFooterAd"
+import { useAds } from "../context/AdContext"
 
 interface GymAddress {
   street: string
@@ -306,6 +308,8 @@ export default function ProfilePage() {
     }
   }
 
+  const { ads, loading: adsLoading } = useAds();
+
   if (!token) {
     return (
       <div className="mx-auto max-w-2xl rounded-lg bg-white shadow-md">
@@ -361,7 +365,7 @@ export default function ProfilePage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="container mx-auto px-4 py-8">
       {/* Header Section */}
       <div className="relative bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600">
         <div className="absolute inset-0 bg-black/10" />
@@ -755,6 +759,11 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      
+      {/* Add the ProfileFooterAd component at the bottom */}
+      {!adsLoading && ads.length > 0 && (
+        <ProfileFooterAd ad={ads[1]} />
+      )}
     </div>
   )
 }

@@ -9,11 +9,16 @@ import {
   UserIcon,
   ShoppingBagIcon,
   TruckIcon,
+  MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import SidebarAd from "./ads/SidebarAd";
+import { useAds } from "../context/AdContext";
+import { jwtDecode } from "jwt-decode";
 
-export const navigation = [
+// Create regular navigation items without the Ads entry
+export const regularNavigation = [
   { name: "Members", href: "/members", icon: UsersIcon },
   { name: "Attendance", href: "/attendance", icon: ClockIcon },
   { name: "Payments", href: "/payments", icon: CreditCardIcon },
@@ -23,8 +28,38 @@ export const navigation = [
   { name: "Profile", href: "/profile", icon: UserIcon },
 ];
 
+// The Ads navigation item
+const adsNavItem = { name: "Ads", href: "/ads", icon: MegaphoneIcon };
+
 export default function Sidebar() {
   const location = useLocation();
+  const { ads, loading } = useAds();
+  const [isOwner, setIsOwner] = useState(false);
+  const [navigation, setNavigation] = useState(regularNavigation);
+
+  // Check if the current user is the owner
+  useEffect(() => {
+    const checkIfOwner = () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        const decoded = jwtDecode(token);
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // Check if user's email matches OWNER_EMAIL or role is 'owner'
+        if (user.role === 'owner' || user.email === process.env.OWNER_EMAIL) {
+          setIsOwner(true);
+          // Add the Ads item to navigation if the user is the owner
+          setNavigation([...regularNavigation, adsNavItem]);
+        }
+      } catch (error) {
+        console.error('Error checking owner status:', error);
+      }
+    };
+    
+    checkIfOwner();
+  }, []);
 
   return (
     <div className="hidden lg:flex h-full w-64 flex-col bg-gray-900">
@@ -57,6 +92,13 @@ export default function Sidebar() {
           );
         })}
       </nav>
+      
+      {/* SidebarAd at the bottom */}
+      <div className="mt-auto p-3">
+        {!loading && ads.length > 0 && (
+          <SidebarAd ad={ads[0]} />
+        )}
+      </div>
     </div>
   );
 }

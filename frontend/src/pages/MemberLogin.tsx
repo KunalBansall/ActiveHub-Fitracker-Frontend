@@ -25,6 +25,9 @@ const MemberLoginPage: React.FC = () => {
 
       localStorage.setItem("token", token)
       localStorage.setItem("userId", userId)
+      
+      // Set the justLoggedIn flag to trigger the full-screen ad
+      sessionStorage.setItem("justLoggedIn", "true")
 
       toast.success("Login successful!")
       navigate(`/member/${userId}`)

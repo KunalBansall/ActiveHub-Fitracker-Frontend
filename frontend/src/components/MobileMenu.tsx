@@ -1,9 +1,17 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Link, useLocation } from "react-router-dom";
-import { navigation } from "./Sidebar";
 import clsx from "clsx";
 import React from "react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { regularNavigation } from "./Sidebar";
+
+// Define the NavigationItem type
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+}
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -51,7 +59,7 @@ export default function MobileMenu({ isOpen, setIsOpen }: MobileMenuProps) {
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
                     <li>
                       <ul role="list" className="-mx-2 space-y-1">
-                        {navigation.map((item) => (
+                        {regularNavigation.map((item: NavigationItem) => (
                           <li key={item.name}>
                             <Link
                               to={item.href}

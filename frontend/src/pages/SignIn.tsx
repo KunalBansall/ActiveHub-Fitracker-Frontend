@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
@@ -13,6 +13,8 @@ import {
 import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import { CustomJwtPayload } from "../types/index";
+import AuthPageAd from "../components/ads/AuthPageAd";
+import { AdProvider, useAds } from "../context/AdContext";
 
 interface SignInForm {
   email: string;
@@ -21,10 +23,22 @@ interface SignInForm {
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-export default function SignIn() {
+// Wrapper that provides the AdProvider context
+const SignInWrapper = () => {
+  return (
+    <AdProvider role="admin">
+      <SignInContent />
+    </AdProvider>
+  );
+};
+
+// Main content component that uses the context
+const SignInContent = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { ads, loading } = useAds();
+  
   const {
     register,
     handleSubmit,
@@ -36,6 +50,9 @@ export default function SignIn() {
       const response = await axios.post(`${API_URL}/auth/signin`, data);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data));
+      
+      // Set the justLoggedIn flag to trigger the full-screen ad
+      sessionStorage.setItem("justLoggedIn", "true");
 
       // Decode the JWT token using the custom type
       const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
@@ -209,30 +226,38 @@ export default function SignIn() {
           </motion.div>
         </div>
 
-        {/* Right side - Image/Branding (hidden on very small screens) */}
+        {/* Right side - Ad or Brand content */}
         <div className="hidden sm:flex sm:w-1/2 bg-gradient-to-br from-blue-500 to-purple-700 text-white flex-col justify-center items-center p-8">
-          <div className="max-w-md mx-auto text-center">
-            <img 
-              src="/Activehub04.jpeg" 
-              alt="ActiveHub" 
-              className="w-32 h-32 mx-auto mb-8 rounded-full object-cover border-4 border-white shadow-lg"
-            />
-            <h1 className="text-4xl font-bold mb-6">ActiveHub Admin</h1>
-            <p className="text-xl opacity-90 mb-8">Your comprehensive gym management solution. Manage members, track performance, and grow your business.</p>
-            <div className="grid grid-cols-3 gap-4 max-w-xs mx-auto">
-              <div className="aspect-square rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-4">
-                <UserIcon className="h-8 w-8" />
-              </div>
-              <div className="aspect-square rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-4">
-                <BuildingOfficeIcon className="h-8 w-8" />
-              </div>
-              <div className="aspect-square rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-4">
-                <span className="text-3xl">📊</span>
+          {!loading && ads.length > 0 ? (
+            <div className="max-w-md mx-auto">
+              <AuthPageAd ad={ads[0]} />
+            </div>
+          ) : (
+            <div className="max-w-md mx-auto text-center">
+              <img 
+                src="/Activehub04.jpeg" 
+                alt="ActiveHub" 
+                className="w-32 h-32 mx-auto mb-8 rounded-full object-cover border-4 border-white shadow-lg"
+              />
+              <h1 className="text-4xl font-bold mb-6">ActiveHub Admin</h1>
+              <p className="text-xl opacity-90 mb-8">Your comprehensive gym management solution. Manage members, track performance, and grow your business.</p>
+              <div className="grid grid-cols-3 gap-4 max-w-xs mx-auto">
+                <div className="aspect-square rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-4">
+                  <UserIcon className="h-8 w-8" />
+                </div>
+                <div className="aspect-square rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-4">
+                  <BuildingOfficeIcon className="h-8 w-8" />
+                </div>
+                <div className="aspect-square rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center p-4">
+                  <span className="text-3xl">📊</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SignInWrapper;

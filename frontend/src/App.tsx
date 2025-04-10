@@ -1,11 +1,14 @@
 import React, { lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Toaster } from "react-hot-toast";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import { CartProvider } from "./context/CartContext";
+import { AdProvider } from "./context/AdContext";
+import TopOverlayAdContainer from "./components/TopOverlayAdContainer";
+import TopFullScreenAdContainer from "./components/TopFullScreenAdContainer";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -25,6 +28,7 @@ const MemberProfile = lazy(() => import("./pages/MemberProfile"));
 const MemberLoginPage = lazy(() => import("./pages/MemberLogin"));
 const SetPassword = lazy(() => import("./pages/MemberSetPassword"));
 const OwnerLogs = lazy(() => import("./components/OwnerLogs"));
+const AdManager = lazy(() => import("./pages/AdManager"));
 
 // Shop-related pages
 const Shop = lazy(() => import("./pages/Shop"));
@@ -35,25 +39,53 @@ const MemberProductDetail = lazy(() => import("./pages/MemberProductDetail"));
 const MemberOrders = lazy(() => import("./pages/MemberOrders"));
 const AdminOrders = lazy(() => import("./pages/AdminOrders"));
 
+// Check if the current user is the owner
+const isOwner = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user.role === 'owner' || user.email === process.env.OWNER_EMAIL;
+  } catch (error) {
+    return false;
+  }
+};
+
+// Owner-only route protection
+const OwnerRoute: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+  if (!isOwner()) {
+    return <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
+};
+
 // Minimal layout for member-specific routes
 const MemberLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   return (
-    <CartProvider>
-      <div className="min-h-screen bg-gray-50">{children}</div>
-    </CartProvider>
+    <AdProvider role="member">
+      <CartProvider>
+        <div className="min-h-screen bg-gray-50">
+          <TopFullScreenAdContainer />
+          <TopOverlayAdContainer />
+          {children}
+        </div>
+      </CartProvider>
+    </AdProvider>
   );
 };
 
 // Admin layout with sidebar and header
 const AdminLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-auto p-4">{children}</main>
+    <AdProvider role="admin">
+      <div className="flex flex-col h-screen bg-gray-100">
+        <TopFullScreenAdContainer />
+        <TopOverlayAdContainer />
+        <Header />
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar />
+          <main className="flex-1 overflow-auto p-4">{children}</main>
+        </div>
       </div>
-    </div>
+    </AdProvider>
   );
 };
 
@@ -129,6 +161,15 @@ export default function App() {
                       <Route path="/attendance" element={<Attendance />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/owner-logs" element={<OwnerLogs />} />
+                      {/* Owner-only route */}
+                      <Route 
+                        path="/ads" 
+                        element={
+                          <OwnerRoute>
+                            <AdManager />
+                          </OwnerRoute>
+                        } 
+                      />
                       
                       {/* Shop Routes */}
                       <Route path="/shop" element={<Shop />} />
