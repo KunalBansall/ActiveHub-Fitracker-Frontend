@@ -48,7 +48,7 @@ export default function Sidebar() {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         
         // Check if user's email matches OWNER_EMAIL or role is 'owner'
-        if (user.role === 'owner' || user.email === process.env.OWNER_EMAIL) {
+        if (user.role === 'owner' || user.email === import.meta.env.VITE_OWNER_EMAIL) {
           setIsOwner(true);
           // Add the Ads item to navigation if the user is the owner
           setNavigation([...regularNavigation, adsNavItem]);
