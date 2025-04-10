@@ -12,7 +12,9 @@
     "baseUrl": "src",  // Add baseUrl to point to the src folder
     "paths": {
       "@/*": ["*"]  // Add path alias for @ to resolve to src/
-    }
+    },
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["react", "react-dom"]
   },
   "include": ["src"]
 }
