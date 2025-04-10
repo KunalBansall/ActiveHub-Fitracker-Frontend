@@ -64,17 +64,17 @@ export default function ProfilePage() {
       const response = await axios.get(`${API_URL}/admin/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      console.log('API Profile Response:', response.data)
+      // console.log('API Profile Response:', response.data)
       return response.data
     },
     {
       enabled: !!token,
       onSuccess: (data) => {
-        console.log('Profile loaded successfully:', data)
-        console.log('Photo data:', data.photos)
+        // console.log('Profile loaded successfully:', data)
+        // console.log('Photo data:', data.photos)
       },
       onError: (err) => {
-        console.error('Error loading profile:', err)
+        // console.error('Error loading profile:', err)
       }
     }
   )
@@ -88,7 +88,7 @@ export default function ProfilePage() {
   // Add effect to verify photos persist after reload
   useEffect(() => {
     if (profile) {
-      console.log('Profile Photos after load:', profile.photos)
+      // console.log('Profile Photos after load:', profile.photos)
     }
   }, [profile])
 
@@ -96,7 +96,7 @@ export default function ProfilePage() {
     async (updatedProfile: Partial<AdminProfile>) => {
       const loadingToastId = toast.loading('Updating profile...')
       
-      console.log('Sending profile update with data:', updatedProfile)
+      // console.log('Sending profile update with data:', updatedProfile)
       
       // Ensure photos array is included in the update
       if (!updatedProfile.photos && formData?.photos) {
@@ -120,18 +120,18 @@ export default function ProfilePage() {
         profilePhotoId: updatedProfile.profilePhotoId || profile?.profilePhotoId
       }
       
-      console.log('Sending complete profile update:', completeProfile)
+      // console.log('Sending complete profile update:', completeProfile)
       
       try {
         const response = await axios.put(`${API_URL}/admin/profile`, completeProfile, {
           headers: { Authorization: `Bearer ${token}` },
         })
         toast.dismiss(loadingToastId)
-        console.log('Profile update response:', response.data)
+        // console.log('Profile update response:', response.data)
         return response.data
       } catch (error) {
         toast.dismiss(loadingToastId)
-        console.error('Error updating profile:', error)
+        // console.error('Error updating profile:', error)  
         throw error
       }
     },
@@ -150,7 +150,7 @@ export default function ProfilePage() {
         toast.success('Profile updated successfully')
       },
       onError: (error) => {
-        console.error('Profile update error:', error)
+        // console.error('Profile update error:', error)
         toast.error('Failed to update profile. Please try again.')
       },
     }
@@ -199,7 +199,7 @@ export default function ProfilePage() {
 
       toast.success(`Successfully uploaded ${uploadedPhotos.length} photos`)
     } catch (error) {
-      console.error('Upload error:', error)
+      // console.error('Upload error:', error)
       toast.error('Failed to upload photos. Please try again.')
     } finally {
       setIsUploading(false)
@@ -262,7 +262,7 @@ export default function ProfilePage() {
         profilePhotoId: formData.profilePhotoId || (formData.photos && formData.photos.length > 0 ? formData.photos[0].publicId : undefined)
       }
       
-      console.log('Submitting form with data:', completeData)
+      // console.log('Submitting form with data:', completeData)
       mutation.mutate(completeData)
     }
   }
@@ -289,7 +289,7 @@ export default function ProfilePage() {
         profilePhotoId: formData?.profilePhotoId || profile.profilePhotoId
       }
       
-      console.log('Saving photos directly with full profile data:', photoPayload)
+      // console.log('Saving photos directly with full profile data:', photoPayload)
       
       const response = await axios.put(`${API_URL}/admin/profile`, photoPayload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -297,14 +297,14 @@ export default function ProfilePage() {
       
       toast.dismiss(loadingToastId)
       toast.success('Photos saved successfully')
-      console.log('Photo save response:', response.data)
+      // console.log('Photo save response:', response.data)
       
       // Refresh the profile data
       queryClient.invalidateQueries("adminProfile")
     } catch (error) {
       toast.dismiss(loadingToastId)
       toast.error('Failed to save photos')
-      console.error('Photo save error:', error)
+      // console.error('Photo save error:', error)
     }
   }
 
@@ -357,12 +357,12 @@ export default function ProfilePage() {
   const photos = (isEditing ? formData?.photos : profile?.photos) || []
   
   // Log current photo state for debugging
-  console.log('Current photos state:', {
-    isEditing,
-    formDataPhotos: formData?.photos,
-    profilePhotos: profile?.photos,
-    displayedPhotos: photos
-  })
+  //    console.log('Current photos state:', {
+  //   isEditing,
+  //   formDataPhotos: formData?.photos,
+  //   profilePhotos: profile?.photos,
+  //   displayedPhotos: photos
+  // })
 
   return (
     <div className="container mx-auto px-4 py-8">

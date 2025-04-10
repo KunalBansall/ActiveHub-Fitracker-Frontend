@@ -34,7 +34,7 @@ const AdManager: React.FC = () => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         
         // Check if user's email matches OWNER_EMAIL or role is 'owner'
-        if (user.role === 'owner' || user.email === process.env.OWNER_EMAIL) {
+        if (user.role === 'owner' || user.email === import.meta.env.VITE_OWNER_EMAIL) {
           setIsAuthorized(true);
         } else {
           // Redirect non-owners
