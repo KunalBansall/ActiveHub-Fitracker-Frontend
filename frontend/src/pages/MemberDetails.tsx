@@ -8,7 +8,7 @@ import ExtendMembershipModal from "../components/ExtendMemberShipModal";
 import { Member } from "../types";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-hot-toast";
-
+import LoadingSpinner from "../components/LoadingSpinner";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function MemberDetails() {
@@ -126,7 +126,9 @@ export default function MemberDetails() {
   if (isLoading && !member) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        {/* <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div> */}
+        <LoadingSpinner size="xl" />
+
       </div>
     );
   }

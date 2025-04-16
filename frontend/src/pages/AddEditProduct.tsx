@@ -15,7 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import { Product, ProductCategory, ProductImage } from "../types";
-
+import LoadingSpinner from "../components/LoadingSpinner";
 const API_URL = import.meta.env.VITE_API_URL;
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -278,7 +278,8 @@ export default function AddEditProductPage() {
                   {isUploading && (
                     <div className="mt-4 text-center">
                       <div className="inline-flex items-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mr-2"></div>
+                        {/* <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mr-2"></div> */}
+                        <LoadingSpinner size="xl" />
                         <span className="text-sm text-gray-500">Uploading...</span>
                       </div>
                     </div>

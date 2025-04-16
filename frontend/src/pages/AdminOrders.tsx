@@ -12,7 +12,7 @@ import {
   MagnifyingGlassIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
-
+import LoadingSpinner from '../components/LoadingSpinner';
 interface OrderItem {
   productId: string;
   name: string;
@@ -247,7 +247,8 @@ const AdminOrders: React.FC = () => {
         
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+            {/* <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div> */}
+            <LoadingSpinner size="xl" />
           </div>
         ) : error ? (
           <div className="bg-red-50 p-4 rounded-md m-6">

@@ -14,6 +14,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Product, ProductCategory } from "../types";
 import toast from "react-hot-toast";
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -193,8 +194,8 @@ export default function ShopPage() {
 
       {/* Products list */}
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="flex items-center justify-center py-20">
+          <LoadingSpinner size="lg" />
         </div>
       ) : isError ? (
         <div className="bg-red-50 p-4 rounded-md">

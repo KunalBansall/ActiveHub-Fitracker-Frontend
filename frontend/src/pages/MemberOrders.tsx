@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import MemberNavCart from '../components/MemberNavCart';
 import Cart from '../components/Cart';
-
+import LoadingSpinner from '../components/LoadingSpinner';
 interface OrderItem {
   productId: string;
   name: string;
@@ -160,7 +160,8 @@ const MemberOrders: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            {/* <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div> */}
+            <LoadingSpinner size="xl" />
           </div>
         ) : error ? (
           <div className="bg-red-50 p-4 rounded-md">

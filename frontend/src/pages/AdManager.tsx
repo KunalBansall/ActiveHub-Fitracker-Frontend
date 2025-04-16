@@ -9,6 +9,7 @@ import {
   ListBulletIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 // Simple classNames utility function
 const classNames = (...classes: (string | boolean | undefined)[]) => {
@@ -59,7 +60,7 @@ const AdManager: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <LoadingSpinner size="xl" />
       </div>
     );
   }

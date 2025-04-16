@@ -6,7 +6,7 @@ import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { Ad } from '../../context/AdContext';
 import EditAdModal from './EditAdModal';
 import { toast } from 'react-hot-toast';
-
+import LoadingSpinner from '../LoadingSpinner';
 // Define the API base URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -159,7 +159,8 @@ const AdList: React.FC<AdListProps> = ({ onEdit, refreshTrigger = 0 }) => {
       
       {loading ? (
         <div className="flex justify-center items-center p-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          {/* <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div> */}
+          <LoadingSpinner size="xl" />
         </div>
       ) : filteredAds.length === 0 ? (
         <div className="p-8 text-center text-gray-500">

@@ -19,6 +19,7 @@ import { StarIcon } from "@heroicons/react/24/outline";
 import { useCart } from "../context/CartContext";
 import Cart from "../components/Cart";
 import MemberNavCart from "../components/MemberNavCart";
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -34,6 +35,8 @@ const MemberProductDetail: React.FC = () => {
   const [reviewRating, setReviewRating] = useState<number>(5);
   const [reviewComment, setReviewComment] = useState<string>("");
   const [submittingReview, setSubmittingReview] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
   
   // Get cart functions from context
   const { addToCart } = useCart();
@@ -114,9 +117,17 @@ const MemberProductDetail: React.FC = () => {
     setQuantity(parseInt(e.target.value));
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product && product.inventory > 0) {
-      addToCart(product, quantity);
+      setIsAddingToCart(true);
+      try {
+        await addToCart(product, quantity);
+      } catch (err) {
+        console.error("Error adding to cart:", err);
+        toast.error("Failed to add to cart. Please try again later.");
+      } finally {
+        setIsAddingToCart(false);
+      }
     }
   };
 
@@ -390,15 +401,22 @@ const MemberProductDetail: React.FC = () => {
                   </div>
 
                   <div className="mt-6">
-                    <button
-                      type="button"
-                      onClick={handleAddToCart}
-                      className="w-full bg-blue-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                      disabled={product.inventory <= 0}
-                    >
-                      <ShoppingCartIcon className="h-5 w-5 mr-2" />
-                      {product.inventory > 0 ? "Add to Cart" : "Out of Stock"}
-                    </button>
+                    {isAddingToCart ? (
+                      <div className="flex items-center">
+                        <LoadingSpinner size="sm" className="mr-2" />
+                        Adding...
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleAddToCart}
+                        className="w-full bg-blue-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        disabled={product.inventory <= 0}
+                      >
+                        <ShoppingCartIcon className="h-5 w-5 mr-2" />
+                        {product.inventory > 0 ? "Add to Cart" : "Out of Stock"}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
