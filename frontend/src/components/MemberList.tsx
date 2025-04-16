@@ -229,9 +229,9 @@ const MemberList: React.FC<Props> = ({ members }) => {
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="font-medium flex items-center">
-                      <CalendarIcon className="h-3.5 w-3.5 mr-1" /> Expires:
+                      <CalendarIcon className="h-3.5 w-3.5 mr-1" /> Expires on:
                     </div>
-                    <div className={isExpiringSoon ? "text-red-600 font-medium" : ""}>
+                    <div className={isExpiringSoon || status === 'expired' ? "text-red-600 font-medium" : ""}>
                       {format(date, "MMM dd, yyyy")}
                     </div>
                   </div>
@@ -325,7 +325,7 @@ const MemberList: React.FC<Props> = ({ members }) => {
                       <td className="p-4">
                         <div className="flex items-center">
                           <CalendarIcon className="h-4 w-4 text-gray-400 mr-1.5" />
-                          <span className={isExpiringSoon ? "text-red-600 font-medium" : "text-gray-600"}>
+                          <span className={isExpiringSoon || status === 'expired' ? "text-red-600 font-medium" : "text-gray-600"}>
                             {format(date, "MMM dd, yyyy")}
                           </span>
                         </div>
@@ -395,7 +395,7 @@ const MemberList: React.FC<Props> = ({ members }) => {
                         </div>
                         <div className="flex items-center">
                           <CalendarIcon className="h-3.5 w-3.5 mr-1" />
-                          <span className={isExpiringSoon ? "text-red-600 font-medium" : ""}>
+                          <span className={isExpiringSoon || status === 'expired' ? "text-red-600 font-medium" : ""}>
                             {format(date, "MMM dd, yyyy")}
                           </span>
                         </div>
