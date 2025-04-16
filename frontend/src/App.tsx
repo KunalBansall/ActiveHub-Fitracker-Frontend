@@ -30,6 +30,7 @@ const MemberLoginPage = lazy(() => import("./pages/MemberLogin"));
 const SetPassword = lazy(() => import("./pages/MemberSetPassword"));
 const OwnerLogs = lazy(() => import("./components/OwnerLogs"));
 const AdManager = lazy(() => import("./pages/AdManager"));
+const Announcements = lazy(() => import("./pages/Announcements"));
 
 // Shop-related pages
 const Shop = lazy(() => import("./pages/Shop"));
@@ -39,6 +40,9 @@ const MemberShop = lazy(() => import("./pages/MemberShop"));
 const MemberProductDetail = lazy(() => import("./pages/MemberProductDetail"));
 const MemberOrders = lazy(() => import("./pages/MemberOrders"));
 const AdminOrders = lazy(() => import("./pages/AdminOrders"));
+
+// Add to lazy imports at the top
+const CloudinaryTest = lazy(() => import("./components/CloudinaryTest"));
 
 // Check if the current user is the owner
 const isOwner = () => {
@@ -110,6 +114,7 @@ export default function App() {
             path="/reset-password/:id/:token"
             element={<ResetPassword />}
           />
+          <Route path="/cloudinary-test" element={<CloudinaryTest />} />
 
           {/* Member-specific routes */}
           <Route path="/memberlogin" element={<MemberLoginPage />} />
@@ -161,6 +166,7 @@ export default function App() {
                     <Route path="/attendance" element={<Attendance />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/owner-logs" element={<OwnerLogs />} />
+                    <Route path="/announcements" element={<Announcements />} />
                     {/* Owner-only route */}
                     <Route 
                       path="/ads" 

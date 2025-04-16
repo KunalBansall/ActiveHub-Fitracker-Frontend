@@ -10,6 +10,7 @@ import {
   ShoppingBagIcon,
   TruckIcon,
   MegaphoneIcon,
+  SpeakerWaveIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
@@ -21,10 +22,9 @@ import { jwtDecode } from "jwt-decode";
 export const regularNavigation = [
   { name: "Members", href: "/members", icon: UsersIcon },
   { name: "Attendance", href: "/attendance", icon: ClockIcon },
-  { name: "Payments", href: "/payments", icon: CreditCardIcon },
+  { name: "Announcements", href: "/announcements", icon: SpeakerWaveIcon },
   { name: "Shop", href: "/shop", icon: ShoppingBagIcon },
   { name: "Orders", href: "/orders", icon: TruckIcon },
-  { name: "Notifications", href: "/notifications", icon: BellIcon },
   { name: "Profile", href: "/profile", icon: UserIcon },
 ];
 

@@ -21,12 +21,14 @@ import {
   FireIcon,
   ChevronRightIcon,
   CalendarDaysIcon,
+  SpeakerWaveIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/24/solid";
 import AttendanceHistoryModal from "../components/AttendenceHistoryModal";
 import { MemberAttendance } from "../components/MemberAttendence";
 import MemberNavCart from "../components/MemberNavCart";
 import Cart from "../components/Cart";
+import MemberAnnouncements from "../components/MemberAnnouncements";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
@@ -35,6 +37,7 @@ const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 // Tabs for the profile page - reordered as requested
 const tabs = [
   { id: 'shop', name: 'Shop', icon: ShoppingBagIcon },
+  { id: 'announcements', name: 'Announcements', icon: SpeakerWaveIcon },
   { id: 'attendance', name: 'Attendance', icon: CalendarIcon },
   { id: 'membership', name: 'Membership', icon: CreditCardIcon },
   { id: 'profile', name: 'Profile', icon: UserCircleIcon },
@@ -766,7 +769,7 @@ const MemberProfile: React.FC = () => {
                   </div>
                   <div className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
                     <div className="flex justify-between items-center mb-1">
-                      <h4 className="text-sm font-medium text-gray-900">Payment Completed</h4>
+                      <h4 className="text-sm sm:text-base font-medium text-gray-900">Payment Completed</h4>
                       <time className="text-xs text-gray-500">
                         {member?.membershipStartDate ? new Date(member.membershipStartDate).toLocaleDateString() : ''}
                       </time>
@@ -1203,16 +1206,40 @@ const MemberProfile: React.FC = () => {
     );
   };
 
+  const renderAnnouncementsTab = () => {
+    if (!member) return <div className="py-6">Loading...</div>;
+
+    // Use the gymId if available or fallback to member's _id which should be associated with a gym
+    const gymIdentifier = (member as any).gymId || member._id;
+
+    return (
+      <div className="px-4 py-6">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Gym Announcements
+          </h2>
+          <p className="text-gray-500 mt-1">
+            Stay updated with the latest news and events at your gym
+          </p>
+        </div>
+        
+        <MemberAnnouncements gymId={gymIdentifier} />
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (currentTab) {
-      case 'shop':
-        return renderShopTab();
+      case 'profile':
+        return renderProfileTab();
       case 'attendance':
         return renderAttendanceTab();
       case 'membership':
         return renderMembershipTab();
-      case 'profile':
-        return renderProfileTab();
+      case 'shop':
+        return renderShopTab();
+      case 'announcements':
+        return renderAnnouncementsTab();
       case 'orders':
         return renderOrdersTab();
       default:
@@ -1323,6 +1350,17 @@ const MemberProfile: React.FC = () => {
             >
               <CreditCardIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
               <span>Membership</span>
+            </button>
+            <button
+              onClick={() => setCurrentTab('announcements')}
+              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
+                currentTab === 'announcements'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <SpeakerWaveIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
+              <span>Announcements</span>
             </button>
           </nav>
         </div>
