@@ -238,7 +238,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between h-16 items-center">
           {/* Left section: Logo and mobile menu */}
@@ -461,7 +461,7 @@ export default function Header() {
       {/* Sign out confirmation modal */}
       {isModalOpen && (
         <div
-          className="fixed z-50 inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50 p-4"
+          className="fixed z-[90] inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50 p-4"
           aria-labelledby="modal-title"
           role="dialog"
           aria-modal="true"

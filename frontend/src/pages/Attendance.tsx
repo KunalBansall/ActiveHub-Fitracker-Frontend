@@ -138,6 +138,11 @@ export default function Attendance() {
 
   const selectedMember = members?.find(member => member._id === selectedMemberId);
 
+  // Sort attendance records with most recent first (based on entry time)
+  const sortedAttendance = todayAttendance ? [...todayAttendance].sort((a, b) => {
+    return new Date(b.entryTime).getTime() - new Date(a.entryTime).getTime();
+  }) : [];
+
   return (
     <div className="space-y-6">
       {/* Header Section */}
@@ -403,7 +408,7 @@ export default function Attendance() {
             <div className="py-12 flex justify-center">
               <ArrowPathIcon className="h-8 w-8 text-gray-400 animate-spin" />
             </div>
-          ) : todayAttendance?.length === 0 ? (
+          ) : sortedAttendance.length === 0 ? (
             <div className="text-center py-12">
               <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
               <h3 className="text-lg font-medium text-gray-900 mb-1">No attendance records for today</h3>
@@ -438,7 +443,7 @@ export default function Attendance() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {todayAttendance?.map((record: any) => {
+                    {sortedAttendance.map((record: any) => {
                       const entryTime = new Date(record.entryTime);
                       const exitTime = record.exitTime ? new Date(record.exitTime) : null;
                       
