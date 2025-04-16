@@ -41,9 +41,6 @@ const MemberProductDetail = lazy(() => import("./pages/MemberProductDetail"));
 const MemberOrders = lazy(() => import("./pages/MemberOrders"));
 const AdminOrders = lazy(() => import("./pages/AdminOrders"));
 
-// Add to lazy imports at the top
-const CloudinaryTest = lazy(() => import("./components/CloudinaryTest"));
-
 // Check if the current user is the owner
 const isOwner = () => {
   try {
@@ -114,7 +111,6 @@ export default function App() {
             path="/reset-password/:id/:token"
             element={<ResetPassword />}
           />
-          <Route path="/cloudinary-test" element={<CloudinaryTest />} />
 
           {/* Member-specific routes */}
           <Route path="/memberlogin" element={<MemberLoginPage />} />
