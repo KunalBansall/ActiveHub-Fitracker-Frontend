@@ -120,3 +120,46 @@ export interface ShippingAddress {
   zipCode: string;
   country: string;
 }
+
+export interface Exercise {
+  name: string;
+  sets: number;
+  reps: string;
+  restTime: number;
+  completed: 'completed' | 'skipped' | 'rescheduled' | 'pending';
+  alternativeExercise?: string;
+  equipmentRequired: string[];
+  notes?: string;
+}
+
+export interface DailyWorkout {
+  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  focus: string;
+  completed: boolean;
+  exercises: Exercise[];
+  warmup: string[];
+  cooldown: string[];
+  memberNotes?: string;
+}
+
+export interface WorkoutPlan {
+  _id: string;
+  memberId: string;
+  gymId: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  goal: 'muscle_gain' | 'fat_loss' | 'strength' | 'endurance' | 'general_fitness';
+  experienceLevel: 'beginner' | 'intermediate' | 'advanced';
+  preferredWorkoutDays: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday')[];
+  accessType: 'gym' | 'home' | 'both';
+  dailyWorkouts: DailyWorkout[];
+  active: boolean;
+  consistency: number;
+  completedWorkouts: number;
+  missedWorkouts: number;
+  injuries: string[];
+  limitations: string[];
+  createdAt: string;
+  updatedAt: string;
+}

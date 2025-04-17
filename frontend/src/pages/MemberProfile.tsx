@@ -33,6 +33,22 @@ import {
   IdentificationIcon,
   CheckCircleIcon,
   GiftIcon,
+  ArrowPathIcon,
+  CurrencyDollarIcon,
+  ClipboardIcon,
+  EnvelopeIcon,
+  BriefcaseIcon,
+  ArrowsUpDownIcon,
+  ShoppingCartIcon,
+  MegaphoneIcon,
+  UserIcon,
+  TagIcon,
+  BeakerIcon,
+  AdjustmentsHorizontalIcon,
+  SquaresPlusIcon,
+  SparklesIcon,
+  ShieldCheckIcon,
+  CheckBadgeIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/24/solid";
 import AttendanceHistoryModal from "../components/AttendenceHistoryModal";
@@ -40,6 +56,16 @@ import { MemberAttendance } from "../components/MemberAttendence";
 import MemberNavCart from "../components/MemberNavCart";
 import Cart from "../components/Cart";
 import MemberAnnouncements from "../components/MemberAnnouncements";
+import SignOutConfirmation from '../components/SignOutConfirmation';
+
+// Import the workout service and types
+import { 
+  getMemberWorkoutPlan, 
+  getTodaysWorkout, 
+  updateExerciseStatus, 
+  addMemberNotes 
+} from '../services/workoutService';
+import { WorkoutPlan, DailyWorkout, Exercise } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
@@ -70,7 +96,7 @@ interface Order {
   createdAt: string;
 }
 
-const MemberProfile: React.FC = () => {
+const MemberProfile = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -87,6 +113,8 @@ const MemberProfile: React.FC = () => {
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
 
   // Add a ref for the profile menu
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -177,6 +205,10 @@ const MemberProfile: React.FC = () => {
       fetchRecentAttendance();
     } else if (currentTab === 'orders') {
       fetchRecentOrders();
+    } else if (currentTab === 'dashboard') {
+      // Fetch workout plan and latest announcement for the dashboard
+      fetchWorkoutPlan();
+      fetchLatestAnnouncements();
     }
   }, [currentTab]);
 
@@ -854,20 +886,20 @@ const MemberProfile: React.FC = () => {
           <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
           
           <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
-            <Link
+              <Link
               to="/member-attendance"
               className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
-            >
+              >
               <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
               Check In
-            </Link>
-            <Link
+              </Link>
+              <Link
               to="/member-workout"
               className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
-            >
+              >
               <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
               Today's Workout
-            </Link>
+              </Link>
           </div>
         </div>
       </div>
@@ -997,11 +1029,15 @@ const MemberProfile: React.FC = () => {
                       </div>
                       <div className="mt-1 sm:mt-2 flex justify-between items-center">
                         <p className="text-xs sm:text-sm font-medium text-gray-900">
-                          ₹{product.price}
-                          {product.discountPrice && (
+                          {product.discountPrice ? (
+                            <>
+                              ₹{product.discountPrice.toFixed(2)}
                             <span className="ml-1 text-xs text-gray-500 line-through">
-                              ₹{product.discountPrice}
+                                ₹{product.price.toFixed(2)}
                             </span>
+                            </>
+                          ) : (
+                            <>₹{product.price.toFixed(2)}</>
                           )}
                         </p>
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
@@ -1262,412 +1298,787 @@ const MemberProfile: React.FC = () => {
     );
   };
 
-  const renderDashboardTab = () => (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg overflow-hidden shadow-lg">
-        <div className="px-4 py-5 sm:p-6 text-white">
-          <h2 className="text-xl font-bold">Welcome back, {member?.name?.split(' ')[0] || 'Member'}!</h2>
-          <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
-          
-          <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
-            <button
-              onClick={() => setCurrentTab('attendance')}
-              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
-            >
-              <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
-              Check In
-            </button>
-            <button
-              onClick={() => setCurrentTab('workout')}
-              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
-            >
-              <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
-              Today's Workout
-            </button>
-          </div>
-        </div>
-      </div>
+  const renderDashboardTab = () => {
+    // Get the latest announcement if available
+    const latestAnnouncement = announcements && announcements.length > 0 
+      ? announcements[0] 
+      : null;
+    
+    // Get workout data for the Next Workout card
+    const nextWorkout = workoutPlan?.dailyWorkouts?.find((workout: any) => {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const today = days[new Date().getDay()];
+      return workout.day === today;
+    }) || null;
 
-      {/* Quick Info Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Next Workout Card */}
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-500">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <FireIcon className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-500" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-gray-900">Next Workout</h3>
-              <div className="mt-1 text-sm text-gray-600">
-                <p className="font-medium">Upper Body Strength</p>
-                <p className="text-xs mt-1">Today • {member?.slot || '5:00 PM'}</p>
-              </div>
-              <div className="mt-2">
-                <Link
-                  to="/member-workout"
-                  className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
-                >
-                  View details
-                  <ChevronRightIcon className="ml-1 h-3 w-3" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Membership Status Card */}
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <CreditCardIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-gray-900">Membership Status</h3>
-              <div className="mt-1 text-sm text-gray-600">
-                <p className="font-medium">{member?.status === 'active' ? 'Active' : 'Inactive'}</p>
-                <p className="text-xs mt-1">
-                  {member?.membershipEndDate ? 
-                    `Valid until ${new Date(member.membershipEndDate).toLocaleDateString()}` : 
-                    'No expiration date'}
-                </p>
-              </div>
-              <div className="mt-2">
-                <button
-                  onClick={() => setCurrentTab('membership')}
-                  className="text-xs text-green-600 hover:text-green-800 font-medium flex items-center"
-                >
-                  View details
-                  <ChevronRightIcon className="ml-1 h-3 w-3" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Latest Announcements Card */}
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-amber-500">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <SpeakerWaveIcon className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-gray-900">Latest Announcements</h3>
-              <div className="mt-1 text-sm text-gray-600">
-                <p className="font-medium">New classes added</p>
-                <p className="text-xs mt-1">Posted 2 days ago</p>
-              </div>
-              <div className="mt-2">
-                <button
-                  onClick={() => setCurrentTab('announcements')}
-                  className="text-xs text-amber-600 hover:text-amber-800 font-medium flex items-center"
-                >
-                  View all announcements
-                  <ChevronRightIcon className="ml-1 h-3 w-3" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Featured Products Section */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 sm:p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-gray-900">Featured Products</h2>
-            <Link
-              to="/member-shop"
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              View All
-            </Link>
-          </div>
-          
-          {shopLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-indigo-500"></div>
-            </div>
-          ) : featuredProducts.length === 0 ? (
-            <div className="text-center py-8">
-              <ShoppingBagIcon className="mx-auto h-10 w-10 text-gray-300" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No featured products</h3>
-              <p className="mt-1 text-sm text-gray-500">Check back soon for new featured products.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {featuredProducts.slice(0, 4).map((product) => (
-                <div key={product._id} className="bg-white border border-gray-200 rounded-md overflow-hidden group">
-                  <div className="aspect-w-1 aspect-h-1 bg-gray-200 overflow-hidden">
-                    {product.images && product.images.length > 0 ? (
-                      <img
-                        src={product.images[0].url}
-                        alt={product.name}
-                        className="w-full h-48 object-cover object-center group-hover:opacity-75"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-48 bg-gray-100">
-                        <ShoppingBagIcon className="h-12 w-12 text-gray-300" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                    <div className="mt-1 flex justify-between items-center">
-                      <p className="text-sm font-medium text-gray-900">₹{product.price}</p>
-                      <div className="flex">
-                        {[0, 1, 2, 3, 4].map((rating) => (
-                          <StarIcon
-                            key={rating}
-                            className={`h-4 w-4 ${
-                              product.rating > rating ? 'text-yellow-400' : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <Link
-                        to={`/member-shop/product/${product._id}`}
-                        className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                      >
-                        Add to cart
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Shop by Category */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 sm:p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Shop by Category</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['Supplements', 'Apparel', 'Equipment', 'Accessories'].map((category, index) => (
-              <Link
-                key={category}
-                to={`/member-shop?category=${category.toLowerCase()}`}
-                className="group flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-indigo-50 transition-colors"
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        {/* Welcome Banner */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg overflow-hidden shadow-lg">
+          <div className="px-4 py-5 sm:p-6 text-white">
+            <h2 className="text-xl font-bold">Welcome back, {member?.name?.split(' ')[0] || 'Member'}!</h2>
+            <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
+            
+            <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
+              <button
+                onClick={() => setCurrentTab('attendance')}
+                className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
               >
-                <ShoppingBagIcon className="h-8 w-8 text-gray-400 group-hover:text-indigo-500" />
-                <span className="mt-2 text-sm font-medium text-gray-900">{category}</span>
-              </Link>
-            ))}
+                <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
+                Check In
+              </button>
+              <button
+                onClick={() => setCurrentTab('workout')}
+                className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
+              >
+                <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
+                Today's Workout
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Member Benefits */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 sm:p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Member Benefits</h2>
-          <div className="bg-indigo-50 rounded-lg p-4">
-            <div className="flex">
+        {/* Quick Info Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Next Workout Card */}
+          <div className="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-500">
+            <div className="flex items-start">
               <div className="flex-shrink-0">
-                <GiftIcon className="h-6 w-6 text-indigo-600" />
+                <FireIcon className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-500" />
               </div>
               <div className="ml-3">
-                <h3 className="text-md font-medium text-gray-900">Special Member Discounts</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Enjoy exclusive discounts on supplements, apparel, and personal training sessions.
-                </p>
-                <div className="mt-3">
-                  <Link
-                    to="/member-perks"
-                    className="inline-flex items-center px-3 py-1.5 border border-indigo-600 rounded-md text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+                <h3 className="text-sm font-medium text-gray-900">Next Workout</h3>
+                <div className="mt-1 text-sm text-gray-600">
+                  <p className="font-medium">{nextWorkout ? nextWorkout.focus : "Upper Body Strength"}</p>
+                  <p className="text-xs mt-1">Today • {member?.slot || '5:00 PM'}</p>
+                </div>
+                <div className="mt-2">
+                  <button
+                    onClick={() => setCurrentTab('workout')}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
                   >
-                    Explore Benefits
-                    <ChevronRightIcon className="ml-1 h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderWorkoutTab = () => (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Today's Workout */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-5 sm:px-6 sm:py-6 text-white">
-          <h2 className="text-xl font-bold">Today's Workout Plan</h2>
-          <p className="mt-1 text-indigo-100">Upper Body Strength</p>
-        </div>
-        <div className="px-4 py-5 sm:p-6">
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-base font-medium text-gray-900">Warm-up (10 minutes)</h3>
-              <ul className="mt-2 space-y-2 text-sm text-gray-600">
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                  <span>5 minutes light cardio (treadmill, bike, or elliptical)</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                  <span>Dynamic stretching for shoulders, chest, and arms</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                  <span>Arm circles and light resistance band exercises</span>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-base font-medium text-gray-900">Main Workout (40 minutes)</h3>
-              <ul className="mt-2 space-y-4 text-sm text-gray-600">
-                <li className="border-l-4 border-indigo-200 pl-3 py-1">
-                  <p className="font-medium text-gray-900">Bench Press</p>
-                  <p>4 sets of 8-10 reps | Rest: 90 seconds between sets</p>
-                </li>
-                <li className="border-l-4 border-indigo-200 pl-3 py-1">
-                  <p className="font-medium text-gray-900">Dumbbell Shoulder Press</p>
-                  <p>3 sets of 10-12 reps | Rest: 60 seconds between sets</p>
-                </li>
-                <li className="border-l-4 border-indigo-200 pl-3 py-1">
-                  <p className="font-medium text-gray-900">Lat Pulldowns</p>
-                  <p>4 sets of 10-12 reps | Rest: 60 seconds between sets</p>
-                </li>
-                <li className="border-l-4 border-indigo-200 pl-3 py-1">
-                  <p className="font-medium text-gray-900">Seated Cable Rows</p>
-                  <p>3 sets of 10-12 reps | Rest: 60 seconds between sets</p>
-                </li>
-                <li className="border-l-4 border-indigo-200 pl-3 py-1">
-                  <p className="font-medium text-gray-900">Bicep Curls</p>
-                  <p>3 sets of 12 reps | Rest: 45 seconds between sets</p>
-                </li>
-                <li className="border-l-4 border-indigo-200 pl-3 py-1">
-                  <p className="font-medium text-gray-900">Tricep Pushdowns</p>
-                  <p>3 sets of 12 reps | Rest: 45 seconds between sets</p>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-base font-medium text-gray-900">Cool Down (10 minutes)</h3>
-              <ul className="mt-2 space-y-2 text-sm text-gray-600">
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                  <span>Static stretching for chest, shoulders, back, and arms</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                  <span>Foam rolling for tight areas</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-                  <span>5 minutes light walking or cycling</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="mt-8 flex justify-center">
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <CalendarIcon className="h-5 w-5 mr-2" aria-hidden="true" />
-              Log This Workout
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Workout Statistics */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Your Progress</h3>
-        </div>
-        <div className="px-4 py-5 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <p className="text-sm font-medium text-gray-500">Workouts This Month</p>
-              <p className="mt-2 text-3xl font-bold text-indigo-600">12</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <p className="text-sm font-medium text-gray-500">Consistency</p>
-              <p className="mt-2 text-3xl font-bold text-green-600">85%</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4 text-center">
-              <p className="text-sm font-medium text-gray-500">Weight Lifted</p>
-              <p className="mt-2 text-3xl font-bold text-amber-600">3,540 kg</p>
-            </div>
-          </div>
-          
-          <div className="mt-6">
-            <h4 className="text-base font-medium text-gray-900 mb-4">Recent Activity</h4>
-            <div className="space-y-4">
-              {[
-                { name: 'Full Body Workout', date: '2 days ago', duration: '65 min' },
-                { name: 'Cardio Session', date: '4 days ago', duration: '45 min' },
-                { name: 'Lower Body Strength', date: '1 week ago', duration: '70 min' }
-              ].map((workout, index) => (
-                <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <div className="bg-indigo-100 p-2 rounded-full mr-4">
-                    <FireIcon className="h-5 w-5 text-indigo-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{workout.name}</p>
-                    <p className="text-xs text-gray-500">{workout.date} • {workout.duration}</p>
-                  </div>
-                  <button className="text-sm text-indigo-600 hover:text-indigo-800">Details</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Upcoming Classes */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Upcoming Classes</h3>
-        </div>
-        <div className="px-4 py-5 sm:p-6">
-          <div className="divide-y divide-gray-200">
-            {[
-              { name: 'HIIT Circuit', time: 'Today, 6:00 PM', instructor: 'John D.', spots: 4 },
-              { name: 'Yoga Flow', time: 'Tomorrow, 9:00 AM', instructor: 'Sarah M.', spots: 7 },
-              { name: 'Spin Class', time: 'Wednesday, 5:30 PM', instructor: 'Mike T.', spots: 2 }
-            ].map((class_, index) => (
-              <div key={index} className="py-4 flex justify-between items-center">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{class_.name}</p>
-                  <p className="text-xs text-gray-500">{class_.time} • Instructor: {class_.instructor}</p>
-                </div>
-                <div className="flex items-center">
-                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full mr-3">
-                    {class_.spots} spots left
-                  </span>
-                  <button className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                    Reserve
+                    View details
+                    <ChevronRightIcon className="ml-1 h-3 w-3" />
                   </button>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
           
-          <div className="mt-6 text-center">
-            <Link
-              to="/member-classes"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-            >
-              View All Classes
-              <ChevronRightIcon className="ml-2 h-4 w-4" />
-            </Link>
+          {/* Membership Status Card */}
+          <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <CreditCardIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-gray-900">Membership Status</h3>
+                <div className="mt-1 text-sm text-gray-600">
+                  <p className="font-medium">{member?.status === 'active' ? 'Active' : 'Inactive'}</p>
+                  <p className="text-xs mt-1">
+                    {member?.membershipEndDate ? 
+                      `Valid until ${new Date(member.membershipEndDate).toLocaleDateString()}` : 
+                      'No expiration date'}
+                  </p>
+                </div>
+                <div className="mt-2">
+                  <button
+                    onClick={() => setCurrentTab('membership')}
+                    className="text-xs text-green-600 hover:text-green-800 font-medium flex items-center"
+                  >
+                    View details
+                    <ChevronRightIcon className="ml-1 h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Latest Announcements Card */}
+          <div className="bg-white rounded-lg shadow p-4 border-l-4 border-amber-500">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <SpeakerWaveIcon className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-gray-900">Latest Announcements</h3>
+                <div className="mt-1 text-sm text-gray-600">
+                  {latestAnnouncement ? (
+                    <>
+                      <p className="font-medium">{latestAnnouncement.title}</p>
+                      <p className="text-xs mt-1">
+                        Posted {new Date(latestAnnouncement.createdAt).toLocaleDateString()}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-medium">New classes added</p>
+                      <p className="text-xs mt-1">Posted 2 days ago</p>
+                    </>
+                  )}
+                </div>
+                <div className="mt-2">
+                  <button
+                    onClick={() => setCurrentTab('announcements')}
+                    className="text-xs text-amber-600 hover:text-amber-800 font-medium flex items-center"
+                  >
+                    View all announcements
+                    <ChevronRightIcon className="ml-1 h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured Products Section */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-gray-100">
+          <div className="bg-gradient-to-r from-indigo-700 to-purple-600 px-4 py-4 text-white">
+            <h2 className="font-bold flex items-center">
+              <ShoppingBagIcon className="h-5 w-5 mr-2" />
+              Featured Products
+            </h2>
+            <p className="text-sm text-indigo-100 mt-1">Special items curated just for you</p>
+          </div>
+          
+          <div className="p-4">
+            {shopLoading ? (
+              <div className="flex justify-center py-6">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : featuredProducts.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">No featured products available right now.</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {featuredProducts.slice(0, 4).map((product) => (
+                  <div 
+                    key={product._id} 
+                    className="group relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                    <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100 relative">
+                      <img
+                        src={product.images?.[0]?.url || "https://via.placeholder.com/150"}
+                        alt={product.name}
+                        className="h-full w-full object-cover object-center group-hover:opacity-90 transition-opacity duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      
+                      {/* Discount badge */}
+                      {product.discountPrice && product.discountPrice < product.price && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full transform rotate-3 animate-pulse">
+                          {Math.round((1 - product.discountPrice / product.price) * 100)}% OFF
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <h3 className="text-sm font-medium text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors duration-200">
+                        {product.name}
+                      </h3>
+                      {product.discountPrice && product.discountPrice < product.price ? (
+                        <div className="mt-1 flex flex-col">
+                          <p className="text-sm font-bold text-red-600">
+                            ₹{product.discountPrice.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-gray-500 line-through">
+                            ₹{product.price.toFixed(2)}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="mt-1 text-sm font-bold text-gray-900">
+                          ₹{product.price.toFixed(2)}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => {
+                          // Use CartContext functionality if available
+                          setCurrentTab('shop');
+                        }}
+                        className="mt-2 w-full text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-medium px-2 py-1.5 rounded-md transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transform group-hover:translate-y-0 translate-y-2"
+                      >
+                        <ShoppingCartIcon className="h-3.5 w-3.5 mr-1" />
+                        View Product
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="mt-3 text-center">
+              <button
+                onClick={() => setCurrentTab('shop')}
+                className="inline-flex items-center px-4 py-2 bg-transparent hover:bg-indigo-50 border border-indigo-600 text-indigo-600 text-sm font-medium rounded-md transition-colors duration-200"
+              >
+                <ShoppingBagIcon className="h-4 w-4 mr-2" />
+                Shop All Products
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Shop by Category */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-gray-100">
+          <div className="px-4 py-4 border-b border-gray-100">
+            <h2 className="font-bold text-gray-800 flex items-center">
+              <TagIcon className="h-5 w-5 mr-2 text-indigo-600" />
+              Shop by Category
+            </h2>
+          </div>
+          
+          <div className="p-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {['Supplements', 'Apparel', 'Equipment', 'Accessories'].map((category) => (
+                <button
+                  key={category}
+                  onClick={() => {
+                    setCurrentTab('shop');
+                    // Additional logic to filter by category if needed
+                  }}
+                  className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-indigo-50 rounded-lg transition-all duration-200 group border border-gray-100 hover:border-indigo-200"
+                >
+                  <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2 group-hover:bg-indigo-200 transition-colors duration-200">
+                    {category === 'Supplements' && <BeakerIcon className="h-6 w-6 text-indigo-600" />}
+                    {category === 'Apparel' && <ShoppingBagIcon className="h-6 w-6 text-indigo-600" />}
+                    {category === 'Equipment' && <AdjustmentsHorizontalIcon className="h-6 w-6 text-indigo-600" />}
+                    {category === 'Accessories' && <SquaresPlusIcon className="h-6 w-6 text-indigo-600" />}
+                  </div>
+                  <span className="text-sm font-medium text-gray-800 group-hover:text-indigo-700 transition-colors duration-200">{category}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Special Member Benefits */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-gray-100">
+          <div className="bg-gradient-to-r from-purple-700 to-pink-600 px-4 py-4 text-white">
+            <h2 className="font-bold flex items-center">
+              <GiftIcon className="h-5 w-5 mr-2" />
+              Member Benefits
+            </h2>
+            <p className="text-sm text-purple-100 mt-1">Special perks for our valued members</p>
+          </div>
+          
+          <div className="p-4">
+            <div className="space-y-3">
+              <div className="flex items-start p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200">
+                <ShieldCheckIcon className="h-5 w-5 text-purple-600 mt-0.5 mr-3" />
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Member Discount</h3>
+                  <p className="text-xs text-gray-600">Get 10% off on all products with your membership</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start p-3 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors duration-200">
+                <SparklesIcon className="h-5 w-5 text-pink-600 mt-0.5 mr-3" />
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Exclusive Access</h3>
+                  <p className="text-xs text-gray-600">Early access to new products and limited edition items</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors duration-200">
+                <TrophyIcon className="h-5 w-5 text-indigo-600 mt-0.5 mr-3" />
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Points Program</h3>
+                  <p className="text-xs text-gray-600">Earn points with every purchase to redeem for rewards</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => {
+                  // Handle navigation to benefits page or show benefits modal
+                }}
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-md transition-all duration-200 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105"
+              >
+                <GiftIcon className="h-4 w-4 mr-2" />
+                Explore Benefits
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null);
+  const [todaysWorkout, setTodaysWorkout] = useState<DailyWorkout | null>(null);
+  const [motivationalQuote, setMotivationalQuote] = useState<string>('');
+  const [activeDay, setActiveDay] = useState<string>('');
+  const [loadingWorkout, setLoadingWorkout] = useState<boolean>(false);
+  const [editingNotes, setEditingNotes] = useState<boolean>(false);
+  const [notes, setNotes] = useState<string>('');
+
+  // Fetch the workout plan
+  const fetchWorkoutPlan = async () => {
+    setLoadingWorkout(true);
+    try {
+      const { workoutPlan, motivationalQuote } = await getMemberWorkoutPlan();
+      setWorkoutPlan(workoutPlan);
+      setMotivationalQuote(motivationalQuote);
+      
+      // Set the active day to today or the first available day
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const today = days[new Date().getDay()];
+      
+      const todaysWorkoutExists = workoutPlan.dailyWorkouts.some(workout => workout.day === today);
+      setActiveDay(todaysWorkoutExists ? today : workoutPlan.dailyWorkouts[0]?.day || '');
+    } catch (error: any) {
+      console.error('Error fetching workout plan:', error);
+      // Set workout plan to null if it's a 404 (No active workout plan found)
+      if (error.response && error.response.status === 404) {
+        setWorkoutPlan(null);
+        // Don't show an error toast for "No active workout plan found"
+      } else {
+        // Show an error toast for other errors
+        toast.error('Failed to load workout plan. Please try again later.');
+      }
+    } finally {
+      setLoadingWorkout(false);
+    }
+  };
+
+  // Fetch today's workout
+  const fetchTodaysWorkout = async () => {
+    try {
+      const response = await getTodaysWorkout();
+      
+      // Update the states based on the response
+      setTodaysWorkout(response.todaysWorkout);
+      setMotivationalQuote(response.motivationalQuote);
+      
+      // Handle rest day case
+      if (response.restDay && workoutPlan) {
+        // If it's a rest day, we want to show this in the UI
+        // Find today's day of the week
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const today = days[new Date().getDay()];
+        
+        // Set the active day to today or the first day if there's no workout for today
+        setActiveDay(today);
+      }
+      
+      // Handle the case when there's no active workout plan
+      if (response.noWorkoutPlan) {
+        // We'll let the UI handle this case by showing the appropriate message
+        // The workoutPlan being null will trigger the "No Active Workout Plan" view
+        setWorkoutPlan(null);
+      }
+    } catch (error) {
+      console.error('Error fetching today\'s workout:', error);
+      // Don't show a toast since this might be normal (no workout scheduled)
+    }
+  };
+
+  // Handle exercise status update
+  const handleExerciseStatus = async (dayIndex: number, exerciseIndex: number, status: 'completed' | 'skipped' | 'rescheduled' | 'pending') => {
+    if (!workoutPlan) return;
+    
+    try {
+      const { workoutPlan: updatedPlan } = await updateExerciseStatus(
+        workoutPlan._id,
+        dayIndex,
+        exerciseIndex,
+        status
+      );
+      
+      setWorkoutPlan(updatedPlan);
+      
+      if (status === 'completed') {
+        toast.success('Exercise marked as completed!');
+      } else if (status === 'skipped') {
+        toast.success('Exercise marked as skipped.');
+      } else if (status === 'rescheduled') {
+        toast.success('Exercise rescheduled.');
+      }
+    } catch (error) {
+      console.error('Error updating exercise status:', error);
+      toast.error('Failed to update exercise status.');
+    }
+  };
+
+  // Handle adding notes to a workout day
+  const handleSaveNotes = async (dayIndex: number) => {
+    if (!workoutPlan || !notes) return;
+    
+    try {
+      const { workoutPlan: updatedPlan } = await addMemberNotes(
+        workoutPlan._id,
+        dayIndex,
+        notes
+      );
+      
+      setWorkoutPlan(updatedPlan);
+      setEditingNotes(false);
+      toast.success('Notes saved successfully!');
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      toast.error('Failed to save notes.');
+    }
+  };
+
+  // Use effect to fetch workout data when the tab changes
+  useEffect(() => {
+    if (currentTab === 'workout') {
+      fetchWorkoutPlan();
+      fetchTodaysWorkout();
+    }
+  }, [currentTab]);
+
+  // Get the active day's workout
+  const getActiveDayWorkout = () => {
+    if (!workoutPlan) return null;
+    return workoutPlan.dailyWorkouts.find(workout => workout.day === activeDay) || null;
+  };
+
+  // Get the index of the active day
+  const getActiveDayIndex = () => {
+    if (!workoutPlan) return -1;
+    return workoutPlan.dailyWorkouts.findIndex(workout => workout.day === activeDay);
+  };
+
+  // Function to render exercise status badge
+  const renderStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Completed
+          </span>
+        );
+      case 'skipped':
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            Skipped
+          </span>
+        );
+      case 'rescheduled':
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+            Rescheduled
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            Pending
+          </span>
+        );
+    }
+  };
+
+  const renderWorkoutTab = () => {
+    const activeDayWorkout = getActiveDayWorkout();
+    const activeDayIndex = getActiveDayIndex();
+    
+    // Show loading state if loading
+    if (loadingWorkout) {
+      return (
+        <div className="p-8 flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        </div>
+      );
+    }
+    
+    // Show message if no workout plan is found
+    if (!workoutPlan) {
+      return (
+        <div className="space-y-4 sm:space-y-6">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-5 sm:px-6 sm:py-6 text-white">
+              <h2 className="text-xl font-bold">No Active Workout Plan</h2>
+              <p className="mt-1 text-indigo-100">You don't have an active workout plan yet.</p>
+            </div>
+            <div className="px-4 py-5 sm:p-6">
+              <div className="text-center">
+                <p className="text-gray-500 mb-4">Contact your trainer to create a personalized workout plan for you.</p>
+                <button
+                  type="button"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={() => setCurrentTab('membership')}
+                >
+                  <CalendarIcon className="h-5 w-5 mr-2" aria-hidden="true" />
+                  Go to Membership
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        {/* Workout Plan Header */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-5 sm:px-6 sm:py-6 text-white">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-bold">{workoutPlan.name}</h2>
+                <p className="mt-1 text-indigo-100">
+                  {workoutPlan.goal.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} • 
+                  {workoutPlan.experienceLevel.charAt(0).toUpperCase() + workoutPlan.experienceLevel.slice(1)} Level
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/20">
+                  {new Date(workoutPlan.startDate).toLocaleDateString()} - {new Date(workoutPlan.endDate).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+            
+            {/* Motivational Quote */}
+            {motivationalQuote && (
+              <div className="mt-4 p-3 bg-white/10 backdrop-blur-sm rounded-lg">
+                <p className="text-sm italic text-white">"{motivationalQuote}"</p>
+              </div>
+            )}
+          </div>
+          
+          {/* Weekly Progress */}
+          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div className="flex justify-between items-center mb-1">
+              <h3 className="text-sm font-medium text-gray-700">Weekly Progress</h3>
+              <span className="text-xs text-gray-500">{workoutPlan.completedWorkouts} of {workoutPlan.dailyWorkouts.length} workouts completed</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div 
+                className="bg-indigo-600 h-2.5 rounded-full" 
+                style={{ width: `${workoutPlan.consistency}%` }}
+              ></div>
+            </div>
+          </div>
+          
+          {/* Day Selector */}
+          <div className="p-2 bg-white border-b border-gray-200 overflow-x-auto hide-scrollbar">
+            <div className="flex space-x-2">
+              {workoutPlan.dailyWorkouts.map((workout, index) => (
+                <button
+                  key={workout.day}
+                  onClick={() => setActiveDay(workout.day)}
+                  className={`flex flex-col items-center py-2 px-3 rounded-lg ${
+                    activeDay === workout.day
+                      ? 'bg-indigo-100 text-indigo-700'
+                      : 'text-gray-500 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="text-xs font-medium">{workout.day.substring(0, 3)}</span>
+                  <span className={`mt-1 h-2 w-2 rounded-full ${
+                    workout.completed 
+                      ? 'bg-green-500' 
+                      : 'bg-gray-300'
+                  }`}></span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Active Day Workout */}
+        {activeDayWorkout && (
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium text-gray-900">{activeDayWorkout.day} - {activeDayWorkout.focus}</h3>
+                {activeDayWorkout.completed ? (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <CheckCircleIcon className="h-4 w-4 mr-1" />
+                    Completed
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <ClockIcon className="h-4 w-4 mr-1" />
+                    {activeDayWorkout.day === new Date().toLocaleDateString('en-US', { weekday: 'long' }) ? 'Today' : 'Upcoming'}
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            <div className="px-4 py-5 sm:p-6">
+              <div className="space-y-6">
+                {/* Warm-up */}
+                <div>
+                  <h3 className="text-base font-medium text-gray-900">Warm-up (10 minutes)</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-gray-600">
+                    {activeDayWorkout.warmup.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Main Workout */}
+                <div>
+                  <h3 className="text-base font-medium text-gray-900">Main Workout</h3>
+                  <ul className="mt-2 space-y-4 text-sm text-gray-600">
+                    {activeDayWorkout.exercises.map((exercise, exerciseIndex) => (
+                      <li key={exerciseIndex} className="border-l-4 border-indigo-200 pl-3 py-2 rounded-r-md">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium text-gray-900">{exercise.name}</p>
+                            <p>{exercise.sets} sets of {exercise.reps} | Rest: {exercise.restTime} seconds</p>
+                            
+                            {/* Equipment */}
+                            {exercise.equipmentRequired.length > 0 && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                Equipment: {exercise.equipmentRequired.join(', ')}
+                              </p>
+                            )}
+                            
+                            {/* Alternative Exercise */}
+                            {exercise.alternativeExercise && (
+                              <p className="text-xs text-indigo-600 mt-1">
+                                Alternative: {exercise.alternativeExercise}
+                              </p>
+                            )}
+                          </div>
+                          
+                          {/* Status Badge */}
+                          <div className="ml-2 flex-shrink-0">
+                            {renderStatusBadge(exercise.completed)}
+                          </div>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="mt-2 flex space-x-2">
+                          <button
+                            onClick={() => handleExerciseStatus(activeDayIndex, exerciseIndex, 'completed')}
+                            className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
+                              exercise.completed === 'completed'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-800'
+                            }`}
+                          >
+                            <CheckIcon className="h-3 w-3 mr-1" />
+                            Complete
+                          </button>
+                          <button
+                            onClick={() => handleExerciseStatus(activeDayIndex, exerciseIndex, 'skipped')}
+                            className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
+                              exercise.completed === 'skipped'
+                                ? 'bg-gray-200 text-gray-800'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            <XMarkIcon className="h-3 w-3 mr-1" />
+                            Skip
+                          </button>
+                          <button
+                            onClick={() => handleExerciseStatus(activeDayIndex, exerciseIndex, 'rescheduled')}
+                            className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
+                              exercise.completed === 'rescheduled'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-gray-100 text-gray-700 hover:bg-amber-100 hover:text-amber-800'
+                            }`}
+                          >
+                            <ArrowPathIcon className="h-3 w-3 mr-1" />
+                            Reschedule
+                          </button>
+                        </div>
+                        
+                        {/* Notes */}
+                        {exercise.notes && (
+                          <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                            <p className="font-medium">Notes:</p>
+                            <p>{exercise.notes}</p>
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Cool Down */}
+                <div>
+                  <h3 className="text-base font-medium text-gray-900">Cool Down (10 minutes)</h3>
+                  <ul className="mt-2 space-y-2 text-sm text-gray-600">
+                    {activeDayWorkout.cooldown.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Member Notes */}
+                <div className="mt-8 border-t border-gray-200 pt-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-sm font-medium text-gray-900">Your Notes</h3>
+                    <button
+                      onClick={() => {
+                        setEditingNotes(!editingNotes);
+                        setNotes(activeDayWorkout.memberNotes || '');
+                      }}
+                      className="text-xs text-indigo-600 hover:text-indigo-800"
+                    >
+                      {editingNotes ? 'Cancel' : activeDayWorkout.memberNotes ? 'Edit' : 'Add Notes'}
+                    </button>
+                  </div>
+                  
+                  {editingNotes ? (
+                    <div>
+                      <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                        rows={3}
+                        placeholder="Add your notes about this workout day..."
+                      />
+                      <button
+                        onClick={() => handleSaveNotes(activeDayIndex)}
+                        className="mt-2 inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        <ArrowPathIcon className="h-4 w-4 mr-1" />
+                        Save Notes
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+                      {activeDayWorkout.memberNotes ? (
+                        activeDayWorkout.memberNotes
+                      ) : (
+                        <span className="text-gray-400 italic">No notes yet. Click 'Add Notes' to add your thoughts about this workout.</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Workout Statistics */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Your Progress</h3>
+          </div>
+          <div className="px-4 py-5 sm:p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-sm font-medium text-gray-500">Workouts Completed</p>
+                <p className="mt-2 text-3xl font-bold text-indigo-600">{workoutPlan.completedWorkouts}</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-sm font-medium text-gray-500">Consistency</p>
+                <p className="mt-2 text-3xl font-bold text-green-600">{workoutPlan.consistency}%</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-sm font-medium text-gray-500">Days Remaining</p>
+                <p className="mt-2 text-3xl font-bold text-amber-600">
+                  {Math.max(0, Math.ceil((new Date(workoutPlan.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}
+                </p>
+              </div>
+            </div>
+          </div>
+          </div>
+      </div>
+    );
+  };
 
   const renderTabContent = () => {
     switch (currentTab) {
@@ -1691,6 +2102,33 @@ const MemberProfile: React.FC = () => {
         return renderDashboardTab();
     }
   };
+
+  // Fetch latest announcements for the dashboard
+  const fetchLatestAnnouncements = async () => {
+    try {
+      // Get gym ID from the member object using type assertion
+      const gymId = (member as any)?.gymId;
+      if (!gymId) return;
+
+      // Use the public endpoint that doesn't require authentication, same as MemberAnnouncements component
+      const response = await axios.get(
+        `${API_URL}/public/announcements?gymId=${gymId}`
+      );
+      
+      // The response format is different, based on MemberAnnouncements
+      setAnnouncements(response.data.data || []);
+    } catch (error) {
+      console.error("Failed to fetch latest announcements:", error);
+      setAnnouncements([]);
+    }
+  };
+
+  // Fetch data when member changes
+  useEffect(() => {
+    if (member && (member as any).gymId) {
+      fetchLatestAnnouncements();
+    }
+  }, [member]);
 
   if (loading && !member) {
     return (
@@ -1739,16 +2177,16 @@ const MemberProfile: React.FC = () => {
                     id="profile-menu-button"
                   >
                     <div className="h-7 w-7 rounded-full overflow-hidden border-2 border-white/30">
-                      {member?.photo ? (
-                        <img 
-                          src={member.photo} 
+                {member?.photo ? (
+                  <img 
+                    src={member.photo} 
                           alt={member?.name || 'Profile'} 
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
                         <UserCircleIcon className="h-full w-full text-white" />
-                      )}
-                    </div>
+                )}
+              </div>
                   </button>
                   {/* Dropdown menu using React Portal */}
                   {profileMenuOpen && ReactDOM.createPortal(
@@ -1767,14 +2205,14 @@ const MemberProfile: React.FC = () => {
                       <div className="px-4 py-2 text-sm text-gray-800 border-b border-gray-100">
                         <p className="font-semibold">{member?.name}</p>
                         <p className="text-xs text-gray-500 truncate">{member?.email}</p>
-                      </div>
-                      <button 
+            </div>
+                <button
                         className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" 
                         onClick={() => handleProfileMenuClick('profile')}
                         role="menuitem"
-                      >
+                >
                         Profile Settings
-                      </button>
+                </button>
                       <button 
                         className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" 
                         onClick={() => handleProfileMenuClick('membership')}
@@ -1783,31 +2221,43 @@ const MemberProfile: React.FC = () => {
                         Membership
                       </button>
                       <button 
-                        className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer" 
+                        className="w-full text-left block px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 cursor-pointer" 
                         onClick={() => {
-                          handleSignOut();
+                          setIsSignOutModalOpen(true);
                           setProfileMenuOpen(false);
                         }}
                         role="menuitem"
                       >
-                        Sign Out
+                        <div className="flex items-center">
+                          <ArrowRightOnRectangleIcon className="h-4 w-4 mr-2 text-red-500" />
+                          Sign Out
+              </div>
                       </button>
                     </div>,
                     document.body
                   )}
-                </div>
-              </div>
             </div>
           </div>
         </div>
-        
-        {/* Member Profile Banner - Only shown on dashboard tab */}
-        {currentTab === 'dashboard' && (
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3">
-            <div className="flex flex-col sm:flex-row sm:items-end gap-2 sm:gap-4">
-              {/* Profile Picture */}
-              <div className="mx-auto sm:mx-0">
-                <div className="h-16 w-16 sm:h-24 sm:w-24 rounded-full overflow-hidden bg-white/20 ring-4 ring-white/30 shadow-lg">
+      </div>
+        </div>
+      </header>
+
+      {/* Member Profile Banner - Only shown on dashboard tab */}
+      {currentTab === 'dashboard' && (
+        <div className="bg-gradient-to-r from-indigo-700 to-purple-700 text-white shadow-md relative overflow-hidden">
+          {/* Add animated pattern background */}
+          <div className="absolute inset-0 bg-pattern opacity-10" style={{ backgroundImage: "url('/pattern.svg')" }}></div>
+          
+          {/* Add subtle glow effect */}
+          <div className="absolute -top-24 -left-24 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-pink-500 opacity-10 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-6">
+              {/* Profile Picture with hover effect */}
+              <div className="mx-auto sm:mx-0 group">
+                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden bg-white/20 ring-4 ring-white/30 shadow-lg group-hover:ring-white/50 transition-all duration-300 transform group-hover:scale-105">
                   {member?.photo ? (
                     <img 
                       src={member.photo} 
@@ -1820,10 +2270,10 @@ const MemberProfile: React.FC = () => {
                 </div>
               </div>
               
-              {/* Profile Info - Simplified for mobile */}
+              {/* Profile Info with improved typography */}
               <div className="flex-1 text-center sm:text-left">
-                <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-1">
-                  <h1 className="text-lg sm:text-2xl font-bold">{member?.name || 'Member'}</h1>
+                <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-2">
+                  <h1 className="text-xl sm:text-3xl font-bold tracking-tight">{member?.name || 'Member'}</h1>
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                     member?.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
@@ -1831,66 +2281,85 @@ const MemberProfile: React.FC = () => {
                   </span>
                 </div>
                 
-                <p className="text-white/80 mt-0.5 text-xs sm:text-sm">
+                <p className="text-white/80 mt-0.5 text-sm sm:text-base font-light">
                   Member since {member?.membershipStartDate ? new Date(member.membershipStartDate).toLocaleDateString() : '-'}
                 </p>
                 
-                {/* Only show these on tablet and larger screens */}
-                <div className="mt-2 hidden sm:flex flex-wrap justify-center sm:justify-start gap-1">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
-                    <CalendarIcon className="h-3 w-3 mr-1" />
+                {/* Only show these on tablet and larger screens with improved badges */}
+                <div className="mt-3 hidden sm:flex flex-wrap justify-center sm:justify-start gap-2">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200">
+                    <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
                     {member?.membershipEndDate ? 
                       `Expires: ${new Date(member.membershipEndDate).toLocaleDateString()}` : 
                       'No expiration date'}
                   </span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
-                    <TrophyIcon className="h-3 w-3 mr-1" />
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200">
+                    <TrophyIcon className="h-3.5 w-3.5 mr-1.5" />
                     {member?.durationMonths || 0} Month Plan
                   </span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
-                    <ClockIcon className="h-3 w-3 mr-1" />
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200">
+                    <ClockIcon className="h-3.5 w-3.5 mr-1.5" />
                     Slot: {member?.slot || 'Flexible'}
                   </span>
                 </div>
               </div>
               
-              {/* Quick Stats - Only visible on desktop */}
-              <div className="hidden lg:flex gap-2 relative z-10">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
-                  <p className="text-xl font-bold">12</p>
+              {/* Quick Stats with improved cards and hover effects */}
+              <div className="hidden lg:flex gap-3 relative z-10">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
+                  <p className="text-2xl font-bold">12</p>
                   <p className="text-xs text-white/80">Workouts</p>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
-                  <p className="text-xl font-bold">85%</p>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
+                  <p className="text-2xl font-bold">85%</p>
                   <p className="text-xs text-white/80">Attendance</p>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
-                  <p className="text-xl font-bold">{member?.fees ? Math.floor(member.fees / 100) : 0}</p>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
+                  <p className="text-2xl font-bold">{member?.fees ? Math.floor(member.fees / 100) : 0}</p>
                   <p className="text-xs text-white/80">Points</p>
                 </div>
               </div>
             </div>
           </div>
-        )}
-      </header>
+        </div>
+      )}
 
       {/* Main Navigation - Hide on mobile and show horizontal scroll */}
-      <div className="sticky top-0 z-20 bg-white shadow-sm border-b border-gray-200 hidden sm:block">
+      <div className="sticky top-14 z-20 bg-white shadow-sm border-b border-gray-200 hidden sm:block">
         <div className="max-w-7xl mx-auto">
           <nav className="flex justify-between overflow-x-auto hide-scrollbar">
             {tabs.map((tab) => (
-              <button
+            <button
                 key={tab.id}
                 onClick={() => setCurrentTab(tab.id)}
-                className={`flex flex-1 flex-col items-center py-2 px-1 sm:px-4 transition-all duration-200 ${
+                className={`flex flex-1 flex-col items-center py-3 px-1 sm:px-4 relative overflow-hidden transition-all duration-300 ${
                   currentTab === tab.id
                     ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    : 'text-gray-500 hover:text-indigo-500 border-b-2 border-transparent'
                 }`}
               >
-                <tab.icon className={`h-4 w-4 ${currentTab === tab.id ? 'text-indigo-600' : 'text-gray-400'}`} />
-                <span className="mt-0.5 text-xs font-medium">{tab.name}</span>
-              </button>
+                {/* Hover animation effect - sliding background */}
+                <div className={`absolute inset-0 bg-indigo-50 transform ${
+                  currentTab === tab.id 
+                    ? 'translate-y-0' 
+                    : 'translate-y-full'
+                } transition-transform duration-300 ease-in-out`}></div>
+                
+                {/* Icon with bounce effect on hover */}
+                <tab.icon 
+                  className={`h-5 w-5 relative z-10 transition-all duration-300 ease-in-out transform hover:scale-110 ${
+                    currentTab === tab.id ? 'text-indigo-600' : 'text-gray-400'
+                  }`} 
+                />
+                
+                {/* Text with sliding underline effect */}
+                <span className="mt-0.5 text-xs font-medium relative z-10 group">
+                  {tab.name}
+                  <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out ${
+                    currentTab === tab.id ? 'scale-x-100' : ''
+                  }`}></span>
+                </span>
+            </button>
             ))}
           </nav>
         </div>
@@ -1913,12 +2382,29 @@ const MemberProfile: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setCurrentTab(tab.id)}
-              className={`flex flex-col items-center justify-center py-1 ${
-                currentTab === tab.id ? 'text-indigo-600' : 'text-gray-500'
+              className={`flex flex-col items-center justify-center py-1 transition-all duration-300 ${
+                currentTab === tab.id ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-500'
               }`}
             >
-              <tab.icon className={`h-6 w-6 ${currentTab === tab.id ? 'text-indigo-600' : 'text-gray-400'}`} />
-              <span className="mt-1 text-[10px] font-medium">{tab.name}</span>
+              <div className="relative">
+                <tab.icon className={`h-6 w-6 transition-all duration-300 transform ${
+                  currentTab === tab.id 
+                    ? 'text-indigo-600 scale-110' 
+                    : 'text-gray-400 hover:scale-110'
+                }`} />
+                
+                {/* Animated dot indicator */}
+                {currentTab === tab.id && (
+                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-indigo-600 rounded-full animate-pulse"></span>
+                )}
+              </div>
+              <span className="mt-1 text-[10px] font-medium relative">
+                {tab.name}
+                {/* Sliding underline */}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 transform ${
+                  currentTab === tab.id ? 'scale-x-100' : 'scale-x-0 hover:scale-x-100'
+                } transition-transform duration-300 ease-in-out`}></span>
+              </span>
             </button>
           ))}
         </div>
@@ -1926,7 +2412,7 @@ const MemberProfile: React.FC = () => {
 
       {/* Menu button for additional tabs on mobile */}
       <div className="sm:hidden fixed bottom-[72px] right-4 z-30">
-        <button 
+            <button
           onClick={() => setShowMobileMenu(!showMobileMenu)}
           className="bg-indigo-600 text-white p-3 rounded-full shadow-lg"
         >
@@ -1935,13 +2421,13 @@ const MemberProfile: React.FC = () => {
           ) : (
             <Cog6ToothIcon className="h-6 w-6" />
           )}
-        </button>
-
+            </button>
+        
         {/* Additional tabs menu */}
         {showMobileMenu && (
           <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl w-48 overflow-hidden">
             {tabs.slice(5).map((tab) => (
-              <button
+            <button
                 key={tab.id}
                 onClick={() => {
                   setCurrentTab(tab.id);
@@ -1951,11 +2437,11 @@ const MemberProfile: React.FC = () => {
               >
                 <tab.icon className="h-5 w-5 mr-3 text-gray-400" />
                 <span>{tab.name}</span>
-              </button>
+            </button>
             ))}
           </div>
         )}
-      </div>
+        </div>
 
       {/* Footer - Hide on mobile for space efficiency */}
       <footer className="bg-gray-800 text-white mt-12 hidden sm:block">
@@ -1970,7 +2456,7 @@ const MemberProfile: React.FC = () => {
                 Your all-in-one fitness membership management platform. Track progress, 
                 manage attendance, and access exclusive member benefits.
               </p>
-            </div>
+      </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm text-gray-400">
@@ -2004,6 +2490,13 @@ const MemberProfile: React.FC = () => {
 
       {/* Include cart drawer */}
       <Cart />
+
+      {/* Sign Out Confirmation Modal */}
+      <SignOutConfirmation
+        open={isSignOutModalOpen}
+        onClose={() => setIsSignOutModalOpen(false)}
+        onConfirm={handleSignOut}
+      />
     </div>
   );
 };

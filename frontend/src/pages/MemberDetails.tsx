@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import MemberForm from "../components/MemberForm";
 import AttendanceHistoryModal from "../components/AttendenceHistoryModal";
 import ExtendMembershipModal from "../components/ExtendMemberShipModal";
+import WorkoutPlanModal from "../components/WorkoutPlanModal";
 import { Member } from "../types";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-hot-toast";
@@ -18,6 +19,7 @@ export default function MemberDetails() {
   const token = localStorage.getItem("token");
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
 
   // Fetch member details
   const { data: member, isLoading } = useQuery<Member>(["member", id], () =>
@@ -165,6 +167,7 @@ export default function MemberDetails() {
               </svg>
               Extend Membership
             </Button>
+            
             <Button
               color="green"
               className="flex items-center justify-center px-4 py-2 rounded-md text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
@@ -188,6 +191,30 @@ export default function MemberDetails() {
               </svg>
               View Attendance History
             </Button>
+            
+            <Button
+              color="purple"
+              className="flex items-center justify-center px-4 py-2 rounded-md text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+              onClick={() => setIsWorkoutModalOpen(true)}
+              aria-label="Manage Workout Plan" 
+              title="Manage Workout Plan"
+              id="create-workout-plan-btn"
+              {...({} as any)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Manage Workout Plan
+            </Button>
           </div>
         </div>
 
@@ -210,6 +237,14 @@ export default function MemberDetails() {
           onClose={() => setIsExtendModalOpen(false)}
           onExtend={handleExtendMembership}
           currentDuration={member?.durationMonths || 0}
+        />
+        
+        {/* Modal for Creating Workout Plan */}
+        <WorkoutPlanModal
+          isOpen={isWorkoutModalOpen}
+          onClose={() => setIsWorkoutModalOpen(false)}
+          memberId={id || ''}
+          memberName={member?.name || 'Member'}
         />
       </div>
     </div>
