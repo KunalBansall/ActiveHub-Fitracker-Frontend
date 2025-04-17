@@ -122,6 +122,12 @@ const MemberProfile = () => {
   // Handle clicking outside the profile menu
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      // Don't close if clicking on menu items - they'll handle their own closing
+      const target = event.target as HTMLElement;
+      if (target.closest('[role="menuitem"]')) {
+        return;
+      }
+      
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setProfileMenuOpen(false);
       }
@@ -302,6 +308,8 @@ const MemberProfile = () => {
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    setIsSignOutModalOpen(false); // Make sure to close the modal
+    setProfileMenuOpen(false); // Close profile dropdown
     toast.success("Signed out successfully");
     navigate("/memberlogin");
   };
@@ -452,6 +460,7 @@ const MemberProfile = () => {
     }
   };
 
+  // First, update the handleProfileMenuClick function to properly handle tab changes
   const handleProfileMenuClick = (tab: string) => {
     setCurrentTab(tab);
     setProfileMenuOpen(false);
@@ -886,20 +895,20 @@ const MemberProfile = () => {
           <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
           
           <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
-              <Link
-              to="/member-attendance"
-              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
+              <button
+              onClick={() => setCurrentTab('attendance')}   
+           className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
               >
               <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
               Check In
-              </Link>
-              <Link
-              to="/member-workout"
+              </button>
+              <button
+               onClick={() => setCurrentTab('workout')}
               className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
               >
               <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
               Today's Workout
-              </Link>
+              </button>
           </div>
         </div>
       </div>
@@ -1045,12 +1054,15 @@ const MemberProfile = () => {
                         </span>
                       </div>
                       <div className="mt-2 sm:mt-4">
-                        <Link
-                          to={`/member-shop/product/${product._id}`}
+                        <button
+                          onClick={() => {
+                            // Navigate to product detail page using navigate
+                            navigate(`/member-shop/product/${product._id}`);
+                          }}
                           className="w-full inline-flex justify-center items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           View Details
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1490,10 +1502,10 @@ const MemberProfile = () => {
                       )}
                       <button
                         onClick={() => {
-                          // Use CartContext functionality if available
-                          setCurrentTab('shop');
+                          // Navigate to product detail page using navigate
+                          navigate(`/member-shop/product/${product._id}`);
                         }}
-                        className="mt-2 w-full text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-medium px-2 py-1.5 rounded-md transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transform group-hover:translate-y-0 translate-y-2"
+                        className="mt-2 w-full text-xs bg-indigo-500 text-white hover:bg-indigo-700 font-medium px-2 py-1.5 rounded-md transition-all duration-200 flex items-center justify-center"
                       >
                         <ShoppingCartIcon className="h-3.5 w-3.5 mr-1" />
                         View Product
@@ -1506,7 +1518,10 @@ const MemberProfile = () => {
             
             <div className="mt-3 text-center">
               <button
-                onClick={() => setCurrentTab('shop')}
+                 onClick={() => {
+                  // Navigate to product detail page using navigate
+                  navigate(`/member-shop`);
+                }}
                 className="inline-flex items-center px-4 py-2 bg-transparent hover:bg-indigo-50 border border-indigo-600 text-indigo-600 text-sm font-medium rounded-md transition-colors duration-200"
               >
                 <ShoppingBagIcon className="h-4 w-4 mr-2" />
@@ -2151,12 +2166,12 @@ const MemberProfile = () => {
               {/* Brand Logo */}
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <span className="flex items-center">
+                  <Link to={`/member/${localStorage.getItem("userId")}`} className="flex items-center">
                     <HeartIcon className="h-5 w-5 text-pink-400 mr-2" />
                     <span className="text-white text-lg font-bold tracking-tight">
-                      ActiveHub<span className="text-pink-300 font-light hidden sm:inline">FlexTracker</span>
+                      ActiveHub<span className="text-pink-300 font-light">FlexTracker</span>
                     </span>
-                  </span>
+                  </Link>
                 </div>
               </div>
               
@@ -2168,7 +2183,7 @@ const MemberProfile = () => {
                   </span>
                 </div>
                 <MemberNavCart />
-                <div className="relative" ref={profileMenuRef}>
+                <div className="relative" ref={profileMenuRef} style={{ zIndex: 999 }}>
                   <button 
                     className="flex items-center focus:outline-none" 
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
@@ -2208,21 +2223,30 @@ const MemberProfile = () => {
             </div>
                 <button
                         className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" 
-                        onClick={() => handleProfileMenuClick('profile')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentTab('profile');
+                          setProfileMenuOpen(false);
+                        }}
                         role="menuitem"
                 >
                         Profile Settings
                 </button>
                       <button 
                         className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" 
-                        onClick={() => handleProfileMenuClick('membership')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentTab('membership');
+                          setProfileMenuOpen(false);
+                        }}
                         role="menuitem"
                       >
                         Membership
                       </button>
                       <button 
                         className="w-full text-left block px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 cursor-pointer" 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setIsSignOutModalOpen(true);
                           setProfileMenuOpen(false);
                         }}
@@ -2469,10 +2493,7 @@ const MemberProfile = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li className="flex items-center"><BellIcon className="h-4 w-4 mr-2" />support@activehub.com</li>
-                <li className="flex items-center"><PhoneIcon className="h-4 w-4 mr-2" />1-800-FITNESS</li>
-                <li className="flex items-center"><MapPinIcon className="h-4 w-4 mr-2" />123 Workout Street, Fitness City</li>
-              </ul>
+                <li className="flex items-center"><BellIcon className="h-4 w-4 mr-2" />activehubfitracker@gmail.com</li></ul>
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">

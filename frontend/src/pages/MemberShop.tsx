@@ -129,12 +129,12 @@ const MemberShop: React.FC = () => {
             {/* Brand Logo */}
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <span className="flex items-center">
+                <Link to={`/member/${localStorage.getItem("userId")}`} className="flex items-center">
                   <HeartIcon className="h-5 w-5 text-pink-400 mr-2" />
                   <span className="text-white text-lg font-bold tracking-tight">
                     ActiveHub<span className="text-pink-300 font-light hidden sm:inline">FlexTracker</span>
                   </span>
-                </span>
+                </Link>
               </div>
             </div>
             
@@ -147,18 +147,12 @@ const MemberShop: React.FC = () => {
             <div className="flex items-center space-x-2 sm:space-x-4">
               <MemberNavCart />
               <div className="flex gap-2">
-                <Link
-                  to="/member-orders"
-                  className="inline-flex items-center px-3 py-1.5 border border-white/20 rounded-md text-sm font-medium text-white hover:bg-white/10 transition-colors"
-                >
-                  <ClockIcon className="h-4 w-4 mr-1.5" />
-                  <span className="hidden sm:inline">Orders</span>
-                </Link>
+               
                 <Link
                   to={`/member/${localStorage.getItem("userId")}`}
                   className="inline-flex items-center px-3 py-1.5 border border-white/20 rounded-md text-sm font-medium text-white hover:bg-white/10 transition-colors"
                 >
-                  <ArrowLeftIcon className="h-4 w-4 mr-1.5" />
+                  <UserCircleIcon className="h-4 w-4 mr-1.5" />
                   <span className="hidden sm:inline">Profile</span>
                 </Link>
               </div>
@@ -357,7 +351,7 @@ const MemberShop: React.FC = () => {
                         to={`/member-shop/product/${product._id}`}
                         className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-sm transform transition-all duration-200 hover:shadow"
                       >
-                        View Details
+                        Buy Now
                       </Link>
                     </div>
                   </div>
