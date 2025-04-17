@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { Member, Product, Attendance } from "../types";
 import { useForm } from "react-hook-form";
+import ReactDOM from 'react-dom';
 import {
   ArrowRightOnRectangleIcon,
   PencilIcon,
@@ -22,6 +23,16 @@ import {
   ChevronRightIcon,
   CalendarDaysIcon,
   SpeakerWaveIcon,
+  Cog6ToothIcon,
+  HeartIcon,
+  TrophyIcon,
+  BookOpenIcon,
+  PhoneIcon,
+  MapPinIcon,
+  ClipboardDocumentListIcon,
+  IdentificationIcon,
+  CheckCircleIcon,
+  GiftIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/24/solid";
 import AttendanceHistoryModal from "../components/AttendenceHistoryModal";
@@ -34,11 +45,13 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
-// Tabs for the profile page - reordered as requested
+// Tabs for the profile page - expanded navigation for a complete dashboard
 const tabs = [
+  { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
+  { id: 'workout', name: 'Workouts', icon: FireIcon },
   { id: 'shop', name: 'Shop', icon: ShoppingBagIcon },
   { id: 'announcements', name: 'Announcements', icon: SpeakerWaveIcon },
-  { id: 'attendance', name: 'Attendance', icon: CalendarIcon },
+  { id: 'attendance', name: 'Attendance', icon: CalendarDaysIcon },
   { id: 'membership', name: 'Membership', icon: CreditCardIcon },
   { id: 'profile', name: 'Profile', icon: UserCircleIcon },
 ];
@@ -72,6 +85,25 @@ const MemberProfile: React.FC = () => {
   const [recentAttendance, setRecentAttendance] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
+
+  // Add a ref for the profile menu
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Handle clicking outside the profile menu
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [profileMenuRef]);
 
   const {
     register,
@@ -386,6 +418,11 @@ const MemberProfile: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleProfileMenuClick = (tab: string) => {
+    setCurrentTab(tab);
+    setProfileMenuOpen(false);
   };
 
   const renderProfileTab = () => (
@@ -809,31 +846,28 @@ const MemberProfile: React.FC = () => {
   );
 
   const renderShopTab = () => (
-    <div className="space-y-3 sm:space-y-6">
-      {/* Hero Banner for Shop */}
-      <div className="relative rounded-xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/90 to-purple-600/90 mix-blend-multiply"></div>
-        <div className="relative bg-cover bg-center h-40 sm:h-64" style={{ backgroundImage: "url('/Activehub04.jpeg')" }}>
-          <div className="px-3 sm:px-6 py-4 sm:py-10 h-full flex flex-col justify-between">
-            <div>
-              <h2 className="text-xl sm:text-3xl font-bold text-white">Welcome back, {member?.name || 'Member'}!</h2>
-              <p className="mt-1 sm:mt-2 text-sm sm:text-xl text-indigo-100">Discover products tailored to your fitness journey</p>
-            </div>
-            <div className="flex flex-wrap gap-2 sm:gap-3 mb-2">
-              <Link
-                to="/member-shop"
-                className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Browse All Products
-                <ChevronRightIcon className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                to={`/member-shop?category=supplements`}
-                className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-white/30 text-xs sm:text-sm font-medium rounded-md shadow-sm text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/50"
-              >
-                My Favorites
-              </Link>
-            </div>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Welcome Banner */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg overflow-hidden shadow-lg">
+        <div className="px-4 py-5 sm:p-6 text-white">
+          <h2 className="text-xl font-bold">Welcome back, {member?.name?.split(' ')[0] || 'Member'}!</h2>
+          <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
+          
+          <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
+            <Link
+              to="/member-attendance"
+              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
+            >
+              <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
+              Check In
+            </Link>
+            <Link
+              to="/member-workout"
+              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
+            >
+              <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
+              Today's Workout
+            </Link>
           </div>
         </div>
       </div>
@@ -935,7 +969,7 @@ const MemberProfile: React.FC = () => {
                         />
                       ) : (
                         <div className="w-full h-36 sm:h-48 flex items-center justify-center">
-                          <ShoppingBagIcon className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
+                          <ShoppingBagIcon className="h-8 w-8 sm:h-10 sm:w-10 " />
                         </div>
                       )}
                       {product.discountPrice && (
@@ -1228,22 +1262,433 @@ const MemberProfile: React.FC = () => {
     );
   };
 
+  const renderDashboardTab = () => (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Welcome Banner */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg overflow-hidden shadow-lg">
+        <div className="px-4 py-5 sm:p-6 text-white">
+          <h2 className="text-xl font-bold">Welcome back, {member?.name?.split(' ')[0] || 'Member'}!</h2>
+          <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
+          
+          <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
+            <button
+              onClick={() => setCurrentTab('attendance')}
+              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
+            >
+              <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
+              Check In
+            </button>
+            <button
+              onClick={() => setCurrentTab('workout')}
+              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
+            >
+              <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
+              Today's Workout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Info Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Next Workout Card */}
+        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-500">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <FireIcon className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-500" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-gray-900">Next Workout</h3>
+              <div className="mt-1 text-sm text-gray-600">
+                <p className="font-medium">Upper Body Strength</p>
+                <p className="text-xs mt-1">Today • {member?.slot || '5:00 PM'}</p>
+              </div>
+              <div className="mt-2">
+                <Link
+                  to="/member-workout"
+                  className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
+                >
+                  View details
+                  <ChevronRightIcon className="ml-1 h-3 w-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Membership Status Card */}
+        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <CreditCardIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-gray-900">Membership Status</h3>
+              <div className="mt-1 text-sm text-gray-600">
+                <p className="font-medium">{member?.status === 'active' ? 'Active' : 'Inactive'}</p>
+                <p className="text-xs mt-1">
+                  {member?.membershipEndDate ? 
+                    `Valid until ${new Date(member.membershipEndDate).toLocaleDateString()}` : 
+                    'No expiration date'}
+                </p>
+              </div>
+              <div className="mt-2">
+                <button
+                  onClick={() => setCurrentTab('membership')}
+                  className="text-xs text-green-600 hover:text-green-800 font-medium flex items-center"
+                >
+                  View details
+                  <ChevronRightIcon className="ml-1 h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Latest Announcements Card */}
+        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-amber-500">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <SpeakerWaveIcon className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-gray-900">Latest Announcements</h3>
+              <div className="mt-1 text-sm text-gray-600">
+                <p className="font-medium">New classes added</p>
+                <p className="text-xs mt-1">Posted 2 days ago</p>
+              </div>
+              <div className="mt-2">
+                <button
+                  onClick={() => setCurrentTab('announcements')}
+                  className="text-xs text-amber-600 hover:text-amber-800 font-medium flex items-center"
+                >
+                  View all announcements
+                  <ChevronRightIcon className="ml-1 h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Featured Products Section */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="p-4 sm:p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-medium text-gray-900">Featured Products</h2>
+            <Link
+              to="/member-shop"
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              View All
+            </Link>
+          </div>
+          
+          {shopLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-indigo-500"></div>
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <div className="text-center py-8">
+              <ShoppingBagIcon className="mx-auto h-10 w-10 text-gray-300" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No featured products</h3>
+              <p className="mt-1 text-sm text-gray-500">Check back soon for new featured products.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {featuredProducts.slice(0, 4).map((product) => (
+                <div key={product._id} className="bg-white border border-gray-200 rounded-md overflow-hidden group">
+                  <div className="aspect-w-1 aspect-h-1 bg-gray-200 overflow-hidden">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={product.images[0].url}
+                        alt={product.name}
+                        className="w-full h-48 object-cover object-center group-hover:opacity-75"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-48 bg-gray-100">
+                        <ShoppingBagIcon className="h-12 w-12 text-gray-300" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                    <div className="mt-1 flex justify-between items-center">
+                      <p className="text-sm font-medium text-gray-900">₹{product.price}</p>
+                      <div className="flex">
+                        {[0, 1, 2, 3, 4].map((rating) => (
+                          <StarIcon
+                            key={rating}
+                            className={`h-4 w-4 ${
+                              product.rating > rating ? 'text-yellow-400' : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <Link
+                        to={`/member-shop/product/${product._id}`}
+                        className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        Add to cart
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Shop by Category */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="p-4 sm:p-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Shop by Category</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {['Supplements', 'Apparel', 'Equipment', 'Accessories'].map((category, index) => (
+              <Link
+                key={category}
+                to={`/member-shop?category=${category.toLowerCase()}`}
+                className="group flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-indigo-50 transition-colors"
+              >
+                <ShoppingBagIcon className="h-8 w-8 text-gray-400 group-hover:text-indigo-500" />
+                <span className="mt-2 text-sm font-medium text-gray-900">{category}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Member Benefits */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="p-4 sm:p-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Member Benefits</h2>
+          <div className="bg-indigo-50 rounded-lg p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <GiftIcon className="h-6 w-6 text-indigo-600" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-md font-medium text-gray-900">Special Member Discounts</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Enjoy exclusive discounts on supplements, apparel, and personal training sessions.
+                </p>
+                <div className="mt-3">
+                  <Link
+                    to="/member-perks"
+                    className="inline-flex items-center px-3 py-1.5 border border-indigo-600 rounded-md text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+                  >
+                    Explore Benefits
+                    <ChevronRightIcon className="ml-1 h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderWorkoutTab = () => (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Today's Workout */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-5 sm:px-6 sm:py-6 text-white">
+          <h2 className="text-xl font-bold">Today's Workout Plan</h2>
+          <p className="mt-1 text-indigo-100">Upper Body Strength</p>
+        </div>
+        <div className="px-4 py-5 sm:p-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-base font-medium text-gray-900">Warm-up (10 minutes)</h3>
+              <ul className="mt-2 space-y-2 text-sm text-gray-600">
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                  <span>5 minutes light cardio (treadmill, bike, or elliptical)</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                  <span>Dynamic stretching for shoulders, chest, and arms</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                  <span>Arm circles and light resistance band exercises</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-base font-medium text-gray-900">Main Workout (40 minutes)</h3>
+              <ul className="mt-2 space-y-4 text-sm text-gray-600">
+                <li className="border-l-4 border-indigo-200 pl-3 py-1">
+                  <p className="font-medium text-gray-900">Bench Press</p>
+                  <p>4 sets of 8-10 reps | Rest: 90 seconds between sets</p>
+                </li>
+                <li className="border-l-4 border-indigo-200 pl-3 py-1">
+                  <p className="font-medium text-gray-900">Dumbbell Shoulder Press</p>
+                  <p>3 sets of 10-12 reps | Rest: 60 seconds between sets</p>
+                </li>
+                <li className="border-l-4 border-indigo-200 pl-3 py-1">
+                  <p className="font-medium text-gray-900">Lat Pulldowns</p>
+                  <p>4 sets of 10-12 reps | Rest: 60 seconds between sets</p>
+                </li>
+                <li className="border-l-4 border-indigo-200 pl-3 py-1">
+                  <p className="font-medium text-gray-900">Seated Cable Rows</p>
+                  <p>3 sets of 10-12 reps | Rest: 60 seconds between sets</p>
+                </li>
+                <li className="border-l-4 border-indigo-200 pl-3 py-1">
+                  <p className="font-medium text-gray-900">Bicep Curls</p>
+                  <p>3 sets of 12 reps | Rest: 45 seconds between sets</p>
+                </li>
+                <li className="border-l-4 border-indigo-200 pl-3 py-1">
+                  <p className="font-medium text-gray-900">Tricep Pushdowns</p>
+                  <p>3 sets of 12 reps | Rest: 45 seconds between sets</p>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-base font-medium text-gray-900">Cool Down (10 minutes)</h3>
+              <ul className="mt-2 space-y-2 text-sm text-gray-600">
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                  <span>Static stretching for chest, shoulders, back, and arms</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                  <span>Foam rolling for tight areas</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
+                  <span>5 minutes light walking or cycling</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="mt-8 flex justify-center">
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <CalendarIcon className="h-5 w-5 mr-2" aria-hidden="true" />
+              Log This Workout
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Workout Statistics */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Your Progress</h3>
+        </div>
+        <div className="px-4 py-5 sm:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-gray-50 rounded-lg p-4 text-center">
+              <p className="text-sm font-medium text-gray-500">Workouts This Month</p>
+              <p className="mt-2 text-3xl font-bold text-indigo-600">12</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4 text-center">
+              <p className="text-sm font-medium text-gray-500">Consistency</p>
+              <p className="mt-2 text-3xl font-bold text-green-600">85%</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4 text-center">
+              <p className="text-sm font-medium text-gray-500">Weight Lifted</p>
+              <p className="mt-2 text-3xl font-bold text-amber-600">3,540 kg</p>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <h4 className="text-base font-medium text-gray-900 mb-4">Recent Activity</h4>
+            <div className="space-y-4">
+              {[
+                { name: 'Full Body Workout', date: '2 days ago', duration: '65 min' },
+                { name: 'Cardio Session', date: '4 days ago', duration: '45 min' },
+                { name: 'Lower Body Strength', date: '1 week ago', duration: '70 min' }
+              ].map((workout, index) => (
+                <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                  <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                    <FireIcon className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{workout.name}</p>
+                    <p className="text-xs text-gray-500">{workout.date} • {workout.duration}</p>
+                  </div>
+                  <button className="text-sm text-indigo-600 hover:text-indigo-800">Details</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Upcoming Classes */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Upcoming Classes</h3>
+        </div>
+        <div className="px-4 py-5 sm:p-6">
+          <div className="divide-y divide-gray-200">
+            {[
+              { name: 'HIIT Circuit', time: 'Today, 6:00 PM', instructor: 'John D.', spots: 4 },
+              { name: 'Yoga Flow', time: 'Tomorrow, 9:00 AM', instructor: 'Sarah M.', spots: 7 },
+              { name: 'Spin Class', time: 'Wednesday, 5:30 PM', instructor: 'Mike T.', spots: 2 }
+            ].map((class_, index) => (
+              <div key={index} className="py-4 flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{class_.name}</p>
+                  <p className="text-xs text-gray-500">{class_.time} • Instructor: {class_.instructor}</p>
+                </div>
+                <div className="flex items-center">
+                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full mr-3">
+                    {class_.spots} spots left
+                  </span>
+                  <button className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    Reserve
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-6 text-center">
+            <Link
+              to="/member-classes"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              View All Classes
+              <ChevronRightIcon className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderTabContent = () => {
     switch (currentTab) {
-      case 'profile':
-        return renderProfileTab();
+      case 'dashboard':
+        return renderDashboardTab();
+      case 'shop':
+        return renderShopTab();
+      case 'workout':
+        return renderWorkoutTab();
+      case 'announcements':
+        return renderAnnouncementsTab();
       case 'attendance':
         return renderAttendanceTab();
       case 'membership':
         return renderMembershipTab();
-      case 'shop':
-        return renderShopTab();
-      case 'announcements':
-        return renderAnnouncementsTab();
+      case 'profile':
+        return renderProfileTab();
       case 'orders':
         return renderOrdersTab();
       default:
-        return renderShopTab(); // Default to Shop tab
+        return renderDashboardTab();
     }
   };
 
@@ -1256,118 +1701,306 @@ const MemberProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header with added cart icon */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
-            <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                {member?.photo ? (
-                  <img 
-                    src={member.photo} 
-                    alt={member.name || 'Profile'} 
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <UserCircleIcon className="h-full w-full text-gray-400" />
-                )}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 font-sans">
+      {/* Top Navigation Bar with Branding and Account Actions - Now Sticky */}
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-indigo-700 to-purple-700 text-white">
+        <div className="absolute inset-0 bg-pattern opacity-10" style={{ backgroundImage: "url('/pattern.svg')" }}></div>
+        
+        {/* Brand Navigation Bar */}
+        <div className="relative z-10 border-b border-white/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-14 relative">
+              {/* Brand Logo */}
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <span className="flex items-center">
+                    <HeartIcon className="h-5 w-5 text-pink-400 mr-2" />
+                    <span className="text-white text-lg font-bold tracking-tight">
+                      ActiveHub<span className="text-pink-300 font-light hidden sm:inline">FlexTracker</span>
+                    </span>
+                  </span>
+                </div>
               </div>
-              <h1 className="text-lg sm:text-2xl font-bold text-gray-900">{member?.name || 'Member Profile'}</h1>
-            </div>
-            <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto justify-between sm:justify-end">
-              <MemberNavCart />
-              <div className="sm:mt-0">
-                <button
-                  onClick={handleSignOut}
-                  className="inline-flex items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white focus:ring-offset-indigo-700 transition-colors"
-                >
-                  <ArrowRightOnRectangleIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Sign Out</span>
-                </button>
+              
+              {/* Account Actions */}
+              <div className="flex items-center space-x-2 sm:space-x-4 relative" style={{ zIndex: 200 }}>
+                <div className="hidden md:flex items-center space-x-1 text-white/80 text-sm">
+                  <span className="bg-white/10 px-2 py-0.5 rounded text-xs">
+                    {member?.status === 'active' ? 'Premium Member' : 'Basic Member'}
+                  </span>
+                </div>
+                <MemberNavCart />
+                <div className="relative" ref={profileMenuRef}>
+                  <button 
+                    className="flex items-center focus:outline-none" 
+                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                    aria-expanded={profileMenuOpen}
+                    aria-haspopup="true"
+                    id="profile-menu-button"
+                  >
+                    <div className="h-7 w-7 rounded-full overflow-hidden border-2 border-white/30">
+                      {member?.photo ? (
+                        <img 
+                          src={member.photo} 
+                          alt={member?.name || 'Profile'} 
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <UserCircleIcon className="h-full w-full text-white" />
+                      )}
+                    </div>
+                  </button>
+                  {/* Dropdown menu using React Portal */}
+                  {profileMenuOpen && ReactDOM.createPortal(
+                    <div 
+                      className="fixed rounded-md shadow-lg overflow-hidden bg-white z-[9999] w-48"
+                      style={{ 
+                        top: profileMenuRef.current ? profileMenuRef.current.getBoundingClientRect().bottom + window.scrollY + 10 : 0,
+                        right: window.innerWidth <= 640 ? '0.5rem' : '1rem',
+                        filter: 'drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1))',
+                        pointerEvents: 'auto'
+                      }}
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="profile-menu-button"
+                    >
+                      <div className="px-4 py-2 text-sm text-gray-800 border-b border-gray-100">
+                        <p className="font-semibold">{member?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{member?.email}</p>
+                      </div>
+                      <button 
+                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" 
+                        onClick={() => handleProfileMenuClick('profile')}
+                        role="menuitem"
+                      >
+                        Profile Settings
+                      </button>
+                      <button 
+                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" 
+                        onClick={() => handleProfileMenuClick('membership')}
+                        role="menuitem"
+                      >
+                        Membership
+                      </button>
+                      <button 
+                        className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer" 
+                        onClick={() => {
+                          handleSignOut();
+                          setProfileMenuOpen(false);
+                        }}
+                        role="menuitem"
+                      >
+                        Sign Out
+                      </button>
+                    </div>,
+                    document.body
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+        
+        {/* Member Profile Banner - Only shown on dashboard tab */}
+        {currentTab === 'dashboard' && (
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-2 sm:gap-4">
+              {/* Profile Picture */}
+              <div className="mx-auto sm:mx-0">
+                <div className="h-16 w-16 sm:h-24 sm:w-24 rounded-full overflow-hidden bg-white/20 ring-4 ring-white/30 shadow-lg">
+                  {member?.photo ? (
+                    <img 
+                      src={member.photo} 
+                      alt={member?.name || 'Profile'} 
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <UserCircleIcon className="h-full w-full text-white/70" />
+                  )}
+                </div>
+              </div>
+              
+              {/* Profile Info - Simplified for mobile */}
+              <div className="flex-1 text-center sm:text-left">
+                <div className="flex flex-col sm:flex-row items-center sm:items-baseline gap-1">
+                  <h1 className="text-lg sm:text-2xl font-bold">{member?.name || 'Member'}</h1>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    member?.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {member?.status?.toUpperCase() || 'INACTIVE'}
+                  </span>
+                </div>
+                
+                <p className="text-white/80 mt-0.5 text-xs sm:text-sm">
+                  Member since {member?.membershipStartDate ? new Date(member.membershipStartDate).toLocaleDateString() : '-'}
+                </p>
+                
+                {/* Only show these on tablet and larger screens */}
+                <div className="mt-2 hidden sm:flex flex-wrap justify-center sm:justify-start gap-1">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
+                    <CalendarIcon className="h-3 w-3 mr-1" />
+                    {member?.membershipEndDate ? 
+                      `Expires: ${new Date(member.membershipEndDate).toLocaleDateString()}` : 
+                      'No expiration date'}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
+                    <TrophyIcon className="h-3 w-3 mr-1" />
+                    {member?.durationMonths || 0} Month Plan
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
+                    <ClockIcon className="h-3 w-3 mr-1" />
+                    Slot: {member?.slot || 'Flexible'}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Quick Stats - Only visible on desktop */}
+              <div className="hidden lg:flex gap-2 relative z-10">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
+                  <p className="text-xl font-bold">12</p>
+                  <p className="text-xs text-white/80">Workouts</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
+                  <p className="text-xl font-bold">85%</p>
+                  <p className="text-xs text-white/80">Attendance</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
+                  <p className="text-xl font-bold">{member?.fees ? Math.floor(member.fees / 100) : 0}</p>
+                  <p className="text-xs text-white/80">Points</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
 
-      {/* Tabs and Content */}
-      <div className="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-8">
-        {/* Tab navigation - Make scrollable on mobile */}
-        <div className="border-b border-gray-200 mb-3 sm:mb-6">
-          <nav className="-mb-px flex overflow-x-auto hide-scrollbar">
-            <button
-              onClick={() => setCurrentTab('shop')}
-              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
-                currentTab === 'shop'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <ShoppingBagIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
-              <span>Shop</span>
-            </button>
-            <button
-              onClick={() => setCurrentTab('orders')}
-              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
-                currentTab === 'orders'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <ClockIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
-              <span>Orders</span>
-            </button>
-            <button
-              onClick={() => setCurrentTab('attendance')}
-              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
-                currentTab === 'attendance'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <CalendarDaysIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
-              <span>Attendance</span>
-            </button>
-            <button
-              onClick={() => setCurrentTab('profile')}
-              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
-                currentTab === 'profile'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <UserCircleIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
-              <span>Profile</span>
-            </button>
-            <button
-              onClick={() => setCurrentTab('membership')}
-              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
-                currentTab === 'membership'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <CreditCardIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
-              <span>Membership</span>
-            </button>
-            <button
-              onClick={() => setCurrentTab('announcements')}
-              className={`whitespace-nowrap py-2 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm flex-shrink-0 ${
-                currentTab === 'announcements'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <SpeakerWaveIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1" />
-              <span>Announcements</span>
-            </button>
+      {/* Main Navigation - Hide on mobile and show horizontal scroll */}
+      <div className="sticky top-0 z-20 bg-white shadow-sm border-b border-gray-200 hidden sm:block">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex justify-between overflow-x-auto hide-scrollbar">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setCurrentTab(tab.id)}
+                className={`flex flex-1 flex-col items-center py-2 px-1 sm:px-4 transition-all duration-200 ${
+                  currentTab === tab.id
+                    ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <tab.icon className={`h-4 w-4 ${currentTab === tab.id ? 'text-indigo-600' : 'text-gray-400'}`} />
+                <span className="mt-0.5 text-xs font-medium">{tab.name}</span>
+              </button>
+            ))}
           </nav>
         </div>
-
-        {/* Tab content */}
-        {renderTabContent()}
       </div>
+
+      {/* Main Content Area */}
+      <main className="py-2 sm:py-3 relative pb-20 sm:pb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Content Area with Animation */}
+          <div className="transition-all duration-300 ease-in-out relative z-10">
+            {renderTabContent()}
+          </div>
+        </div>
+      </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
+        <div className="grid grid-cols-5 h-16">
+          {tabs.slice(0, 5).map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setCurrentTab(tab.id)}
+              className={`flex flex-col items-center justify-center py-1 ${
+                currentTab === tab.id ? 'text-indigo-600' : 'text-gray-500'
+              }`}
+            >
+              <tab.icon className={`h-6 w-6 ${currentTab === tab.id ? 'text-indigo-600' : 'text-gray-400'}`} />
+              <span className="mt-1 text-[10px] font-medium">{tab.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Menu button for additional tabs on mobile */}
+      <div className="sm:hidden fixed bottom-[72px] right-4 z-30">
+        <button 
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          className="bg-indigo-600 text-white p-3 rounded-full shadow-lg"
+        >
+          {showMobileMenu ? (
+            <XMarkIcon className="h-6 w-6" />
+          ) : (
+            <Cog6ToothIcon className="h-6 w-6" />
+          )}
+        </button>
+
+        {/* Additional tabs menu */}
+        {showMobileMenu && (
+          <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl w-48 overflow-hidden">
+            {tabs.slice(5).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setCurrentTab(tab.id);
+                  setShowMobileMenu(false);
+                }}
+                className="flex items-center w-full px-4 py-3 text-left text-sm hover:bg-gray-50"
+              >
+                <tab.icon className="h-5 w-5 mr-3 text-gray-400" />
+                <span>{tab.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Footer - Hide on mobile for space efficiency */}
+      <footer className="bg-gray-800 text-white mt-12 hidden sm:block">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <HeartIcon className="h-5 w-5 text-pink-400 mr-2" />
+                <span>ActiveHub<span className="text-pink-300 font-light">FlexTracker</span></span>
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Your all-in-one fitness membership management platform. Track progress, 
+                manage attendance, and access exclusive member benefits.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><button onClick={() => setCurrentTab('dashboard')} className="hover:text-white transition-colors">Dashboard</button></li>
+                <li><button onClick={() => setCurrentTab('workout')} className="hover:text-white transition-colors">Workouts</button></li>
+                <li><button onClick={() => setCurrentTab('attendance')} className="hover:text-white transition-colors">Attendance</button></li>
+                <li><button onClick={() => setCurrentTab('announcements')} className="hover:text-white transition-colors">Announcements</button></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li className="flex items-center"><BellIcon className="h-4 w-4 mr-2" />support@activehub.com</li>
+                <li className="flex items-center"><PhoneIcon className="h-4 w-4 mr-2" />1-800-FITNESS</li>
+                <li className="flex items-center"><MapPinIcon className="h-4 w-4 mr-2" />123 Workout Street, Fitness City</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
+            <p>© {new Date().getFullYear()} ActiveHub FlexTracker. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Include modals */}
+      <AttendanceHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        memberId={id || ''}
+      />
 
       {/* Include cart drawer */}
       <Cart />

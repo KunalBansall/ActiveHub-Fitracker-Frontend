@@ -14,8 +14,8 @@ const MemberNavCart: React.FC = () => {
         to="/member-orders"
         className="relative p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100 flex items-center"
       >
-        <ClockIcon className="h-6 w-6" />
-        <span className="ml-1 text-sm hidden sm:inline">Order History</span>
+        <ClockIcon className="h-6 w-6 text-white" />
+        <span className="ml-1 text-sm hidden sm:inline text-white">Order History</span>
       </Link>
       
       <button
@@ -23,7 +23,7 @@ const MemberNavCart: React.FC = () => {
         className="relative p-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100"
         onClick={() => setShowCart(true)}
       >
-        <ShoppingBagIcon className="h-6 w-6" />
+        <ShoppingBagIcon className="h-6 w-6 text-white" />
         {totalItems > 0 && (
           <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
             {totalItems}
