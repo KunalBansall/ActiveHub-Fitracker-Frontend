@@ -27,7 +27,7 @@ const Cart: React.FC = () => {
   // Calculate total using discounted prices when available
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
-      const price = item.discountPrice || item.price;
+      const price = (item.discountPrice && item.discountPrice < item.price) ? item.discountPrice : item.price;
       return total + (price * item.quantity);
     }, 0);
   };
@@ -284,10 +284,10 @@ const Cart: React.FC = () => {
                     <div className="border-t border-gray-200 mt-2 pt-2 font-medium text-gray-900">
                       Total: ₹{(calculateTotal() + 50 + (calculateTotal() * 0.05)).toFixed(2)}
                     </div>
-                    {cartItems.some(item => item.discountPrice) && (
-                      <div className="mt-2 text-sm text-green-600">
+                    {cartItems.some(item => item.discountPrice && item.discountPrice < item.price) && (
+                      <div className="mt-2 text-sm text-green-600 font-medium">
                         You saved: ₹{cartItems.reduce((total, item) => {
-                          if (item.discountPrice) {
+                          if (item.discountPrice && item.discountPrice < item.price) {
                             return total + ((item.price - item.discountPrice) * item.quantity);
                           }
                           return total;
@@ -554,9 +554,9 @@ const Cart: React.FC = () => {
                                 </Link>
                               </h3>
                               <p className="ml-4">
-                                ₹{(item.discountPrice || item.price).toFixed(2)}
-                                {item.discountPrice && (
+                                {item.discountPrice && item.discountPrice < item.price ? (
                                   <>
+                                    <span className="text-base font-bold text-gray-900">₹{item.discountPrice.toFixed(2)}</span>
                                     <span className="ml-1 text-xs text-gray-500 line-through">
                                       ₹{item.price.toFixed(2)}
                                     </span>
@@ -564,6 +564,8 @@ const Cart: React.FC = () => {
                                       ({Math.round(((item.price - item.discountPrice) / item.price) * 100)}% off)
                                     </span>
                                   </>
+                                ) : (
+                                  <span className="text-base font-bold text-gray-900">₹{item.price.toFixed(2)}</span>
                                 )}
                               </p>
                             </div>
