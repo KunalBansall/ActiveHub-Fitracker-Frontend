@@ -115,6 +115,8 @@ const MemberProfile = () => {
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [completedWorkoutsCount, setCompletedWorkoutsCount] = useState<number>(0);
+  const [attendancePercentage, setAttendancePercentage] = useState<number>(0);
 
   // Add a ref for the profile menu
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -203,6 +205,13 @@ const MemberProfile = () => {
   }, [id, navigate, reset]);
 
   useEffect(() => {
+    // Fetch attendance data right after fetching member data
+    if (member) {
+      fetchRecentAttendance();
+    }
+  }, [member]);
+
+  useEffect(() => {
     // Always fetch featured products on initial load since Shop is the default tab
     fetchFeaturedProducts();
     
@@ -217,6 +226,68 @@ const MemberProfile = () => {
       fetchLatestAnnouncements();
     }
   }, [currentTab]);
+
+  // Calculate attendance percentage when recentAttendance changes
+  useEffect(() => {
+    if (member && member.membershipStartDate) {
+      // Calculate attendance percentage
+      calculateAttendancePercentage();
+    }
+  }, [recentAttendance, member]);
+  
+  // Function to calculate attendance percentage
+  const calculateAttendancePercentage = () => {
+    if (!recentAttendance || recentAttendance.length === 0) return;
+    
+    // Get current month and year
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Calculate total business days in the current month (excluding only Sundays)
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let businessDaysInMonth = 0;
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(currentYear, currentMonth, i);
+      const day = date.getDay(); // 0 is Sunday
+      
+      // Count Monday through Saturday (1-6) as business days
+      if (day !== 0) {
+        businessDaysInMonth++;
+      }
+    }
+    
+    // Get today's date
+    const currentDate = today.getDate();
+    
+    // Calculate business days so far this month
+    let businessDaysSoFar = 0;
+    for (let i = 1; i <= currentDate; i++) {
+      const date = new Date(currentYear, currentMonth, i);
+      const day = date.getDay();
+      
+      // Count all days except Sunday
+      if (day !== 0) {
+        businessDaysSoFar++;
+      }
+    }
+    
+    // Filter attendance records for the current month
+    const currentMonthAttendance = recentAttendance.filter(record => {
+      const attendanceDate = new Date(record.entryTime);
+      return (
+        attendanceDate.getMonth() === currentMonth &&
+        attendanceDate.getFullYear() === currentYear
+      );
+    });
+    
+    // Calculate attendance percentage for current month
+    // Use days so far as the denominator to avoid unfairly penalizing for future days
+    const percentage = Math.min(100, Math.round((currentMonthAttendance.length / businessDaysSoFar) * 100));
+    
+    setAttendancePercentage(percentage || 0);
+  };
 
   const fetchFeaturedProducts = async () => {
     const token = localStorage.getItem("token");
@@ -1634,6 +1705,22 @@ const MemberProfile = () => {
       setWorkoutPlan(workoutPlan);
       setMotivationalQuote(motivationalQuote);
       
+      // Calculate completed workouts
+      if (workoutPlan && workoutPlan.dailyWorkouts) {
+        let completedCount = 0;
+        
+        // Count completed exercises
+        workoutPlan.dailyWorkouts.forEach(workout => {
+          workout.exercises.forEach(exercise => {
+            if (exercise.completed === 'completed') {
+              completedCount++;
+            }
+          });
+        });
+        
+        setCompletedWorkoutsCount(completedCount);
+      }
+      
       // Set the active day to today or the first available day
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const today = days[new Date().getDay()];
@@ -2331,11 +2418,11 @@ const MemberProfile = () => {
               {/* Quick Stats with improved cards and hover effects */}
               <div className="hidden lg:flex gap-3 relative z-10">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
-                  <p className="text-2xl font-bold">12</p>
+                  <p className="text-2xl font-bold">{completedWorkoutsCount}</p>
                   <p className="text-xs text-white/80">Workouts</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
-                  <p className="text-2xl font-bold">85%</p>
+                  <p className="text-2xl font-bold">{attendancePercentage}%</p>
                   <p className="text-xs text-white/80">Attendance</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
