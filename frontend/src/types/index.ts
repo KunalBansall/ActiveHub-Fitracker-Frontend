@@ -15,6 +15,8 @@ export interface Member {
   status: 'active' | 'expired' | 'pending';
   slot: 'Morning' | 'Evening' | 'free pass';
   lastCheckIn?: string | null; 
+  lastVisit?: string | null;
+  lastNotificationSent?: string | null;
   createdAt :string;
   attendance:Attendance[];
   

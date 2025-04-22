@@ -31,6 +31,7 @@ const SetPassword = lazy(() => import("./pages/MemberSetPassword"));
 const OwnerLogs = lazy(() => import("./components/OwnerLogs"));
 const AdManager = lazy(() => import("./pages/AdManager"));
 const Announcements = lazy(() => import("./pages/Announcements"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 // Shop-related pages
 const Shop = lazy(() => import("./pages/Shop"));
@@ -163,6 +164,7 @@ export default function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/owner-logs" element={<OwnerLogs />} />
                     <Route path="/announcements" element={<Announcements />} />
+                    <Route path="/settings" element={<Settings />} />
                     {/* Owner-only route */}
                     <Route 
                       path="/ads" 

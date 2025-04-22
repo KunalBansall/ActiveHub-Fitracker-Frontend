@@ -19,6 +19,8 @@ export interface Member {
   gymId: string;
   createdAt?: string;
   updatedAt?: string;
+  lastVisit?: string;
+  lastNotificationSent?: string;
 }
 
 export interface Product {

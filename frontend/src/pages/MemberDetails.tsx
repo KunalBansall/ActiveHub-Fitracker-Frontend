@@ -10,7 +10,31 @@ import { Member } from "../types";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { formatDistanceToNow } from "date-fns";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+// Helper function to format time ago with a colored badge
+const formatTimeAgo = (date: string | Date | undefined) => {
+  if (!date) return { text: 'Never', color: 'bg-gray-100 text-gray-800' };
+  
+  const timeAgo = formatDistanceToNow(new Date(date), { addSuffix: true });
+  
+  // Determine badge color based on recency
+  let color;
+  const days = (new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24);
+  
+  if (days < 1) {
+    color = 'bg-green-100 text-green-800'; // Today
+  } else if (days < 2) {
+    color = 'bg-blue-100 text-blue-800'; // Yesterday
+  } else if (days < 7) {
+    color = 'bg-yellow-100 text-yellow-800'; // This week
+  } else {
+    color = 'bg-red-100 text-red-800'; // Longer
+  }
+  
+  return { text: timeAgo, color };
+};
 
 export default function MemberDetails() {
   const { id } = useParams<{ id: string }>();
@@ -217,6 +241,39 @@ export default function MemberDetails() {
             </Button>
           </div>
         </div>
+        
+        {/* Last Activity Information */}
+        {member && (
+          <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+            <div className="flex items-center">
+              <div className="mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">Member Activity</h3>
+                <div className="flex items-center mt-1">
+                  <span className="text-sm text-gray-600 mr-2">Last Activity:</span>
+                  {member.lastVisit ? (
+                    <>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${formatTimeAgo(member.lastVisit).color}`}>
+                        {formatTimeAgo(member.lastVisit).text}
+                      </span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        ({new Date(member.lastVisit).toLocaleString()})
+                      </span>
+                    </>
+                  ) : (
+                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      No activity recorded
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Member Form */}
         <div className="bg-white shadow-lg rounded-lg p-6">
