@@ -36,6 +36,7 @@
     "react-router-dom": "^6.28.0",
     "react-select": "^5.10.1",
     "react-toastify": "^10.0.6",
+    "recharts": "^2.15.3",
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {

@@ -6,6 +6,17 @@ import MemberList from "../components/MemberList";
 import { DashboardStatsData as DashboardStatsType, Member } from "../types";
 import React from "react";
 
+// Define revenue data type
+interface RevenueData {
+  totalCollectedRevenue: number;
+  collectedMembershipRevenue: number;
+  collectedShopRevenue: number;
+  remainingRevenue: number;
+  totalMembershipRevenue: number;
+  totalShopRevenue: number;
+  pendingMembershipRevenue: number;
+}
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function Dashboard() {
@@ -15,6 +26,17 @@ export default function Dashboard() {
   const { data: stats } = useQuery<DashboardStatsType>("dashboardStats", () =>
     axios
       .get(`${API_URL}/dashboard/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => res.data)
+  );
+
+  // Fetch revenue overview
+  const { data: revenueData } = useQuery<RevenueData>("revenueOverview", () =>
+    axios
+      .get(`${API_URL}/admin/revenue/overview`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -34,6 +56,18 @@ export default function Dashboard() {
   );
 
   if (!stats || !members) return null;
+
+  // Format currency
+  const formatCurrency = (amount: number | undefined) => {
+    // Make sure amount is a valid number
+    const validAmount = amount && !isNaN(Number(amount)) ? Number(amount) : 0;
+    
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(validAmount);
+  };
 
   // Sort members by membership end date (earliest first)
   const sortedMembers = members
@@ -58,7 +92,50 @@ export default function Dashboard() {
 
       <DashboardStats stats={stats} />
 
-      <div className="mt-4 sm:mt-8">
+      {/* Revenue Summary Section */}
+      {revenueData && (
+        <div className="mt-6 bg-white rounded-lg shadow overflow-hidden">
+          <div className="flex justify-between items-center p-4 border-b">
+            <h2 className="text-base sm:text-lg font-medium text-gray-900">
+              Revenue Overview
+            </h2>
+            <Link
+              to="/revenue"
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View Details →
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0">
+            {/* Total Collected Revenue */}
+            <div className="p-4">
+              <p className="text-sm text-gray-500 mb-1">Total Collected</p>
+              <p className="text-xl font-bold text-gray-900">{formatCurrency(revenueData.totalCollectedRevenue)}</p>
+            </div>
+            
+            {/* Membership Revenue */}
+            <div className="p-4">
+              <p className="text-sm text-gray-500 mb-1">From Memberships</p>
+              <p className="text-xl font-bold text-blue-600">{formatCurrency(revenueData.collectedMembershipRevenue)}</p>
+            </div>
+            
+            {/* Shop Revenue */}
+            <div className="p-4">
+              <p className="text-sm text-gray-500 mb-1">From Shop Sales</p>
+              <p className="text-xl font-bold text-purple-600">{formatCurrency(revenueData.collectedShopRevenue)}</p>
+            </div>
+            
+            {/* Pending Revenue */}
+            <div className="p-4">
+              <p className="text-sm text-gray-500 mb-1">Pending Collection</p>
+              <p className="text-xl font-bold text-amber-600">{formatCurrency(revenueData.remainingRevenue)}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6">
         <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">
           Expiring Soon Members ⬇️
         </h2>
