@@ -27,6 +27,12 @@ interface RevenueTrend {
   shopRevenue: number;
 }
 
+// Define a type for the pie chart data
+interface PieChartData {
+  name: string;
+  value: number;
+}
+
 // Colors for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -84,7 +90,7 @@ const RevenueDashboard: React.FC = () => {
   };
 
   // Prepare pie chart data
-  const preparePieData = (overview: RevenueOverview) => {
+  const preparePieData = (overview: RevenueOverview): PieChartData[] => {
     return [
       { name: 'Memberships', value: overview.collectedMembershipRevenue },
       { name: 'Shop Sales', value: overview.collectedShopRevenue },
@@ -237,13 +243,13 @@ const RevenueDashboard: React.FC = () => {
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({name, percent}: {name: string, percent: number}) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => formatCurrency(value as number)} />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -268,9 +274,9 @@ const RevenueDashboard: React.FC = () => {
                   height={70}
                 />
                 <YAxis 
-                  tickFormatter={(value) => `₹${value}`} 
+                  tickFormatter={(value: number) => `₹${value}`} 
                 />
-                <Tooltip formatter={(value) => formatCurrency(value as number)} />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
                 <Line
                   type="monotone"
