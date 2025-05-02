@@ -224,7 +224,7 @@ export default function Header() {
       const isInputFocused = document.activeElement === searchRef.current?.querySelector('input');
       if (isInputFocused) {
         showResults();
-      }
+    }
     } else {
       setShowSearchResults(false);
     }
@@ -261,7 +261,7 @@ export default function Header() {
                   className="h-8 w-8 sm:h-9 sm:w-9 rounded-full mr-2 object-cover"
                 />
                 <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hidden sm:inline">
-                  {user.gymName || "ActiveHub"}
+                {user.gymName || "ActiveHub"}
                 </span>
               </Link>
             </div>
@@ -303,18 +303,18 @@ export default function Header() {
                       >
                         <div 
                           className="px-4 py-3"
-                          onClick={() => {
-                            navigate(`/members/${member._id}`);
+                        onClick={() => {
+                          navigate(`/members/${member._id}`);
                             setShowSearchResults(false);
-                          }}
-                        >
+                        }}
+                      >
                           <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center">
-                              <img
-                                src={member.photo || defaultImage}
-                                alt={member.name}
+                        <div className="flex items-center">
+                          <img
+                            src={member.photo || defaultImage}
+                            alt={member.name}
                                 className="h-8 w-8 flex-shrink-0 rounded-full object-cover border border-gray-200"
-                              />
+                          />
                               <div className="ml-3">
                                 <p className="text-sm font-medium text-gray-900">{member.name}</p>
                                 <p className="text-xs text-gray-500">ID: {member._id.substring(0, 8)}...</p>
@@ -408,48 +408,55 @@ export default function Header() {
                   />
                 ) : (
                   <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-blue-100 flex items-center justify-center">
-                    <UserCircleIcon
+                  <UserCircleIcon
                       className="h-6 w-6 text-blue-500"
-                      aria-hidden="true"
-                    />
+                    aria-hidden="true"
+                  />
                   </div>
                 )}
               </button>
               
-              {isDropdownOpen && (
-                <div
+            {isDropdownOpen && (
+              <div
                   className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dropdown-menu z-50"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="user-menu"
-                >
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="user-menu"
+              >
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-sm font-medium text-gray-900">{user.name || "Admin User"}</p>
                     <p className="text-xs text-gray-500 truncate">{user.email || "admin@example.com"}</p>
                   </div>
-                  <Link
-                    to="/profile"
+                <Link
+                  to="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    role="menuitem"
-                  >
-                    Your Profile
-                  </Link>
-                  <Link
-                    to="/settings"
+                  role="menuitem"
+                >
+                  Your Profile
+                </Link>
+                <Link
+                  to="/subscription"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    role="menuitem"
-                  >
-                    Settings
-                  </Link>
-                  <button
-                    onClick={handleSignOut}
+                  role="menuitem"
+                >
+                  Subscription
+                </Link>
+                <Link
+                  to="/settings"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                  role="menuitem"
+                >
+                  Settings
+                </Link>
+                <button
+                  onClick={handleSignOut}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
-                    role="menuitem"
-                  >
-                    Sign out
-                  </button>
-                </div>
-              )}
+                  role="menuitem"
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
             </div>
           </div>
         </div>

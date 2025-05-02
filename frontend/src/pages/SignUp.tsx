@@ -4,6 +4,10 @@ import { useForm } from "react-hook-form"
 import axios from "axios"
 import { EyeIcon, EyeSlashIcon, UserIcon, EnvelopeIcon, LockClosedIcon, BuildingOfficeIcon, MapPinIcon, ArrowLeftIcon } from "@heroicons/react/24/outline"
 import { motion } from "framer-motion"
+import { AdProvider } from "../context/AdContext"
+import { useSubscription } from "../context/SubscriptionContext"
+import AuthPageAd from "../components/ads/AuthPageAd"
+import LoadingSpinner from '../components/LoadingSpinner'
 
 interface SignUpForm {
   username: string
@@ -27,6 +31,8 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const navigate = useNavigate()
+  const { updateSubscriptionInfo } = useSubscription()
+
   const {
     register,
     handleSubmit,
@@ -36,28 +42,40 @@ export default function SignUp() {
   } = useForm<SignUpForm>()
 
   const nextStep = async () => {
-    const fieldsToValidate = currentStep === 1 
-      ? ['username', 'email', 'password'] 
-      : ['gymName', 'gymType', 'gymAddress.street', 'gymAddress.city', 'gymAddress.state', 'gymAddress.zipCode', 'gymAddress.country']
-    
-    const isStepValid = await trigger(fieldsToValidate as any)
-    if (isStepValid) {
-      setCurrentStep(currentStep + 1)
+    const isValid = await trigger(["username", "email", "password"])
+    if (isValid) {
+      setCurrentStep(2)
     }
   }
 
   const prevStep = () => {
-    setCurrentStep(currentStep - 1)
+    setCurrentStep(1)
   }
 
   const onSubmit = async (data: SignUpForm) => {
     try {
       const response = await axios.post(`${API_URL}/auth/signup`, data)
+      
+      // Extract subscription data from response
+      const subscriptionData = {
+        subscriptionStatus: response.data.subscriptionStatus,
+        trialEndDate: response.data.trialEndDate,
+        graceEndDate: response.data.graceEndDate,
+        subscriptionEndDate: response.data.subscriptionEndDate
+      }
+      
+      // Update subscription context
+      updateSubscriptionInfo(subscriptionData)
+      
       localStorage.setItem("token", response.data.token)
       localStorage.setItem("user", JSON.stringify(response.data))
+      
+      // Set the justLoggedIn flag to trigger the full-screen ad
+      sessionStorage.setItem("justLoggedIn", "true")
+      
       navigate("/")
     } catch (err: any) {
-      setError(err.response?.data?.message || "An error occurred")
+      setError(err.response?.data?.message || "Registration failed")
     }
   }
 

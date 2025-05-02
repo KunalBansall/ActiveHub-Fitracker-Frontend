@@ -53,21 +53,50 @@ export default function MemberDetails() {
       })
       .then((res) => res.data)
   );
-
-  // Update member details
   const mutation = useMutation(
     (updatedMember: Partial<Member>) =>
       axios.patch(`${API_URL}/members/${id}`, updatedMember, {
         headers: { Authorization: `Bearer ${token}` },
       }),
     {
-      onSuccess: () => {
+      onSuccess: (response) => {
+        // Using the initial name from the member data for toast
+        const initialName = member?.name; // Use the member's initial name before update
+        const updatedMemberData = response.data?.data;
+        const updatedName = updatedMemberData?.name;
+        const successMsg = updatedName
+          ? `${updatedName}'s profile updated successfully`
+          : initialName
+          ? `${initialName}'s profile updated successfully`
+          : "Member profile updated successfully";
+  
+        toast.success(successMsg);
+  
         queryClient.invalidateQueries(["member", id]);
         queryClient.invalidateQueries("members");
-        // navigate("/members");
       },
+      onError: (error: any) => {
+        if (error.response) {
+          const errorMsg = error.response.data.message;
+  
+          if (errorMsg === "Member not found") {
+            toast.error("This member no longer exists.");
+          } else if (errorMsg === "Invalid membership end date") {
+            toast.error("Please enter a valid membership end date.");
+          } else if (errorMsg === "Invalid durationMonths value") {
+            toast.error("Duration must be a valid number greater than 0.");
+          } else {
+            toast.error(errorMsg || "Failed to update member.");
+          }
+        } else {
+          toast.error("Network error. Please try again.");
+        }
+      }
     }
   );
+  
+  
+  
 
   const handleSubmit = (data: Partial<Member>) => {
     const payload: Partial<Member> = {};

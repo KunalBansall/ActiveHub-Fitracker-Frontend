@@ -249,10 +249,10 @@ export default function Attendance() {
                         >
                           <div className="px-4 py-3">
                             <div className="flex items-center">
-                              {member.photo && (
-                                <img
-                                  src={member.photo}
-                                  alt={member.name}
+                      {member.photo && (
+                        <img
+                          src={member.photo}
+                          alt={member.name}
                                   className="h-10 w-10 flex-shrink-0 rounded-full object-cover border border-gray-200"
                                 />
                               )}
@@ -265,7 +265,7 @@ export default function Attendance() {
                         </li>
                       ))}
                     </ul>
-                  </div>
+                    </div>
                 )}
               </div>
               
@@ -325,12 +325,12 @@ export default function Attendance() {
                     <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200 flex items-start">
                       <XCircleIcon className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
                       <p>{errorMessage}</p>
-                    </div>
-                  )}
-                  
+              </div>
+            )}
+
                   {/* Entry/Exit Buttons */}
                   <div className="grid grid-cols-2 gap-4 pt-2">
-                    <button
+              <button
                       onClick={() => selectedMemberId && entryMutation.mutate(selectedMemberId)}
                       disabled={!selectedMemberId || entryMutation.isLoading}
                       className="flex items-center justify-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
@@ -340,9 +340,9 @@ export default function Attendance() {
                       ) : (
                         <CheckCircleIcon className="h-5 w-5 mr-2" />
                       )}
-                      Record Entry
-                    </button>
-                    
+                Record Entry
+              </button>
+
                     <button
                       onClick={() => selectedMemberId && exitMutation.mutate(selectedMemberId)}
                       disabled={!selectedMemberId || exitMutation.isLoading}
@@ -394,7 +394,7 @@ export default function Attendance() {
               </p>
             </div>
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={() => queryClient.invalidateQueries("todayAttendance")} 
                 className="flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors"
               >
@@ -415,22 +415,22 @@ export default function Attendance() {
               <p className="text-gray-500 max-w-md mx-auto">
                 Attendance records will appear here once members check in or out of the gym today.
               </p>
-            </div>
+        </div>
           ) : (
             <div className="overflow-hidden shadow-sm border border-gray-200 rounded-lg">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
+              <thead className="bg-gray-50">
+                <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Member
-                      </th>
+                    Member
+                  </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Entry Time
-                      </th>
+                    Entry Time
+                  </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Exit Time
-                      </th>
+                    Exit Time
+                  </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Duration
                       </th>
@@ -438,10 +438,10 @@ export default function Attendance() {
                         Status
                       </th>
                       <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {sortedAttendance.map((record: any) => {
                       const entryTime = new Date(record.entryTime);
@@ -460,21 +460,21 @@ export default function Attendance() {
                       return (
                         <tr key={record._id} className={!record.exitTime ? "bg-green-50" : ""}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
+                      <div className="flex items-center">
                               {record.memberId.photo ? (
-                                <img
-                                  src={record.memberId.photo}
-                                  alt=""
+                          <img
+                            src={record.memberId.photo}
+                            alt=""
                                   className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                />
+                          />
                               ) : (
                                 <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                                   <UserGroupIcon className="h-6 w-6 text-gray-400" />
                                 </div>
-                              )}
+                        )}
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-900">
-                                  {record.memberId.name}
+                        {record.memberId.name}
                                 </div>
                                 <div className="text-xs text-gray-500">
                                   ID: {record.memberId._id.substring(0, 8)}...
@@ -498,15 +498,15 @@ export default function Attendance() {
                               ) : (
                                 <span className="text-gray-400">-</span>
                               )}
-                            </div>
-                          </td>
+                      </div>
+                    </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-700">
                               {duration || (
                                 <span className="text-sm italic text-gray-400">In Progress</span>
                               )}
                             </div>
-                          </td>
+                    </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {!record.exitTime ? (
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -517,10 +517,10 @@ export default function Attendance() {
                                 Completed
                               </span>
                             )}
-                          </td>
+                    </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            {record.entryTime && !record.exitTime && (
-                              <button
+                      {record.entryTime && !record.exitTime && (
+                        <button
                                 onClick={() => exitMutation.mutate(record.memberId._id)}
                                 disabled={exitMutation.isLoading}
                                 className="text-white bg-red-500 hover:bg-red-600 rounded-md px-3 py-1.5 text-xs font-medium inline-flex items-center transition-colors"
@@ -528,16 +528,16 @@ export default function Attendance() {
                                 {exitMutation.isLoading && exitMutation.variables === record.memberId._id ? (
                                   <span className="inline-block animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full mr-1"></span>
                                 ) : null}
-                                Mark Exit
-                              </button>
-                            )}
-                          </td>
-                        </tr>
+                          Mark Exit
+                        </button>
+                      )}
+                    </td>
+                  </tr>
                       );
                     })}
-                  </tbody>
-                </table>
-              </div>
+              </tbody>
+            </table>
+          </div>
             </div>
           )}
         </div>

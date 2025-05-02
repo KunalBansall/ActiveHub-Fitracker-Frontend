@@ -95,12 +95,9 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
         membershipEndDate: membershipEndDate, // Use the selected date instead of calculating from duration
       });
 
-      if (initialData) {
-        toast.success(`${initialData.name}'s Profile updated successfully!`);
-      } else {
-        toast.success("New member added successfully!");
-      }
-    } catch (error) {
+    
+    }
+     catch (error) {
       toast.error("There was an error while submitting the form.");
     } finally {
       setIsSubmitting(false);

@@ -802,8 +802,8 @@ const MemberProfile = () => {
             </div>
           )}
         </div>
-      </div>
-      
+              </div>
+
       <AttendanceHistoryModal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
@@ -966,20 +966,20 @@ const MemberProfile = () => {
           <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
           
           <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
-              <button
+                    <button
               onClick={() => setCurrentTab('attendance')}   
            className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
-              >
+                    >
               <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
               Check In
-              </button>
-              <button
+                    </button>
+                    <button
                onClick={() => setCurrentTab('workout')}
               className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
               >
               <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
               Today's Workout
-              </button>
+                    </button>
           </div>
         </div>
       </div>
@@ -1115,8 +1115,8 @@ const MemberProfile = () => {
                             <span className="ml-1 text-xs text-gray-500 line-through">
                                 ₹{product.price.toFixed(2)}
                             </span>
-                            </>
-                          ) : (
+                  </>
+                ) : (
                             <>₹{product.price.toFixed(2)}</>
                           )}
                         </p>
@@ -1125,7 +1125,7 @@ const MemberProfile = () => {
                         </span>
                       </div>
                       <div className="mt-2 sm:mt-4">
-                        <button
+                  <button
                           onClick={() => {
                             // Navigate to product detail page using navigate
                             navigate(`/member-shop/product/${product._id}`);
@@ -1133,7 +1133,7 @@ const MemberProfile = () => {
                           className="w-full inline-flex justify-center items-center px-2 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           View Details
-                        </button>
+                  </button>
                       </div>
                     </div>
                   </div>
@@ -1150,8 +1150,8 @@ const MemberProfile = () => {
                 </Link>
               </div>
             </div>
-          )}
-        </div>
+                )}
+              </div>
       </div>
       
       {/* Featured Categories */}
@@ -1170,7 +1170,7 @@ const MemberProfile = () => {
                   <div className="p-2 sm:p-4 flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-50 to-purple-50 group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
                     <ShoppingBagIcon className="h-5 w-5 sm:h-8 sm:w-8 text-indigo-500 mb-1 sm:mb-3" />
                     <span className="text-xs sm:text-sm font-medium text-gray-900">{category}</span>
-                  </div>
+              </div>
                 </div>
               </Link>
             ))}
@@ -1228,7 +1228,7 @@ const MemberProfile = () => {
 
   const renderOrdersTab = () => {
     if (ordersLoading) {
-      return (
+                      return (
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
         </div>
@@ -1276,7 +1276,7 @@ const MemberProfile = () => {
             return (
               <div key={order._id} className="bg-white rounded-lg shadow overflow-hidden">
                 <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-base font-medium text-gray-900">
                         Order #{order._id.substring(order._id.length - 8)}
@@ -1339,7 +1339,7 @@ const MemberProfile = () => {
                         +{remainingCount} more item{remainingCount > 1 ? 's' : ''}
                       </p>
                     )}
-                  </div>
+                            </div>
               </div>
 
                 <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6">
@@ -1373,11 +1373,11 @@ const MemberProfile = () => {
           </h2>
           <p className="text-gray-500 mt-1">
             Stay updated with the latest news and events at your gym
-          </p>
-        </div>
+                              </p>
+                            </div>
         
         <MemberAnnouncements gymId={gymIdentifier} />
-      </div>
+                          </div>
     );
   };
 
@@ -2008,7 +2008,7 @@ const MemberProfile = () => {
                       <li key={index} className="flex items-start">
                         <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
                         <span>{item}</span>
-                      </li>
+                    </li>
                     ))}
                   </ul>
                 </div>
@@ -2091,9 +2091,9 @@ const MemberProfile = () => {
                         )}
                       </li>
                     ))}
-                  </ul>
-                </div>
-                
+                </ul>
+              </div>
+
                 {/* Cool Down */}
                 <div>
                   <h3 className="text-base font-medium text-gray-900">Cool Down (10 minutes)</h3>
@@ -2111,7 +2111,7 @@ const MemberProfile = () => {
                 <div className="mt-8 border-t border-gray-200 pt-4">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-sm font-medium text-gray-900">Your Notes</h3>
-                    <button
+                <button
                       onClick={() => {
                         setEditingNotes(!editingNotes);
                         setNotes(activeDayWorkout.memberNotes || '');
@@ -2119,8 +2119,8 @@ const MemberProfile = () => {
                       className="text-xs text-indigo-600 hover:text-indigo-800"
                     >
                       {editingNotes ? 'Cancel' : activeDayWorkout.memberNotes ? 'Edit' : 'Add Notes'}
-                    </button>
-                  </div>
+                </button>
+              </div>
                   
                   {editingNotes ? (
                     <div>
@@ -2138,7 +2138,7 @@ const MemberProfile = () => {
                         <ArrowPathIcon className="h-4 w-4 mr-1" />
                         Save Notes
                       </button>
-                    </div>
+            </div>
                   ) : (
                     <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-600">
                       {activeDayWorkout.memberNotes ? (
@@ -2146,9 +2146,9 @@ const MemberProfile = () => {
                       ) : (
                         <span className="text-gray-400 italic">No notes yet. Click 'Add Notes' to add your thoughts about this workout.</span>
                       )}
-                    </div>
-                  )}
-                </div>
+          </div>
+        )}
+      </div>
               </div>
             </div>
           </div>
@@ -2590,9 +2590,9 @@ const MemberProfile = () => {
       </footer>
 
       {/* Include modals */}
-      <AttendanceHistoryModal
-        isOpen={isHistoryModalOpen}
-        onClose={() => setIsHistoryModalOpen(false)}
+        <AttendanceHistoryModal
+          isOpen={isHistoryModalOpen}
+          onClose={() => setIsHistoryModalOpen(false)}
         memberId={id || ''}
       />
 

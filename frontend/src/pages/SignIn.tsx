@@ -15,6 +15,7 @@ import { jwtDecode } from "jwt-decode";
 import { CustomJwtPayload } from "../types/index";
 import AuthPageAd from "../components/ads/AuthPageAd";
 import { AdProvider, useAds } from "../context/AdContext";
+import { useSubscription } from "../context/SubscriptionContext";
 import LoadingSpinner from '../components/LoadingSpinner';
 
 interface SignInForm {
@@ -39,6 +40,7 @@ const SignInContent = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { ads, loading } = useAds();
+  const { updateSubscriptionInfo } = useSubscription();
   
   const {
     register,
@@ -49,6 +51,18 @@ const SignInContent = () => {
   const onSubmit = async (data: SignInForm) => {
     try {
       const response = await axios.post(`${API_URL}/auth/signin`, data);
+      
+      // Extract subscription data from response
+      const subscriptionData = {
+        subscriptionStatus: response.data.subscriptionStatus,
+        trialEndDate: response.data.trialEndDate,
+        graceEndDate: response.data.graceEndDate, 
+        subscriptionEndDate: response.data.subscriptionEndDate
+      };
+
+      // Update subscription context
+      updateSubscriptionInfo(subscriptionData);
+      
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data));
       

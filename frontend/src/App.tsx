@@ -7,10 +7,13 @@ import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import { CartProvider } from "./context/CartContext";
 import { AdProvider } from "./context/AdContext";
+import { SubscriptionProvider } from "./context/SubscriptionContext";
+import SubscriptionBanner from "./components/SubscriptionBanner";
 import TopOverlayAdContainer from "./components/TopOverlayAdContainer";
 import TopFullScreenAdContainer from "./components/TopFullScreenAdContainer";
 import "./index.css";
 import LoadingSpinner from './components/LoadingSpinner';
+import { useSubscription } from "./context/SubscriptionContext";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +36,7 @@ const AdManager = lazy(() => import("./pages/AdManager"));
 const Announcements = lazy(() => import("./pages/Announcements"));
 const Settings = lazy(() => import("./pages/Settings"));
 const RevenueDashboard = lazy(() => import("./pages/RevenueDashboard"));
+const Subscription = lazy(() => import("./pages/Subscription"));
 
 // Shop-related pages
 const Shop = lazy(() => import("./pages/Shop"));
@@ -76,6 +80,20 @@ const MemberLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   );
 };
 
+// Subscription banner component with context
+const AdminSubscriptionBanner = () => {
+  const { subscriptionStatus, trialEndDate, graceEndDate, subscriptionEndDate } = useSubscription();
+  
+  return (
+    <SubscriptionBanner 
+      subscriptionStatus={subscriptionStatus}
+      trialEndDate={trialEndDate || undefined}
+      graceEndDate={graceEndDate || undefined}
+      subscriptionEndDate={subscriptionEndDate || undefined}
+    />
+  );
+};
+
 // Admin layout with sidebar and header
 const AdminLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   return (
@@ -86,7 +104,10 @@ const AdminLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         <Header />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
-          <main className="flex-1 overflow-auto p-4">{children}</main>
+          <main className="flex-1 overflow-auto p-4">
+            <AdminSubscriptionBanner />
+            {children}
+          </main>
         </div>
       </div>
     </AdProvider>
@@ -96,100 +117,103 @@ const AdminLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster position="top-right" />
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <LoadingSpinner size="xl" />
-          </div>
-        }
-      >
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="/reset-password/:id/:token"
-            element={<ResetPassword />}
-          />
+      <SubscriptionProvider>
+        <Toaster position="top-right" />
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center min-h-screen bg-gray-100">
+              <LoadingSpinner size="xl" />
+            </div>
+          }
+        >
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="/reset-password/:id/:token"
+              element={<ResetPassword />}
+            />
 
-          {/* Member-specific routes */}
-          <Route path="/memberlogin" element={<MemberLoginPage />} />
-          <Route path="/set-password/:id/:token" element={<SetPassword />} />
-          <Route
-            path="/member/:id"
-            element={
-              <MemberLayout>
-                <MemberProfile />
-              </MemberLayout>
-            }
-          />
-          <Route
-            path="/member-shop"
-            element={
-              <MemberLayout>
-                <MemberShop />
-              </MemberLayout>
-            }
-          />
-          <Route
-            path="/member-shop/product/:id"
-            element={
-              <MemberLayout>
-                <MemberProductDetail />
-              </MemberLayout>
-            }
-          />
-          <Route
-            path="/member-orders"
-            element={
-              <MemberLayout>
-                <MemberOrders />
-              </MemberLayout>
-            }
-          />
+            {/* Member-specific routes */}
+            <Route path="/memberlogin" element={<MemberLoginPage />} />
+            <Route path="/set-password/:id/:token" element={<SetPassword />} />
+            <Route
+              path="/member/:id"
+              element={
+                <MemberLayout>
+                  <MemberProfile />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-shop"
+              element={
+                <MemberLayout>
+                  <MemberShop />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-shop/product/:id"
+              element={
+                <MemberLayout>
+                  <MemberProductDetail />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-orders"
+              element={
+                <MemberLayout>
+                  <MemberOrders />
+                </MemberLayout>
+              }
+            />
 
-          {/* Admin-specific routes (protected by PrivateRoute) */}
-          <Route
-            path="/*"
-            element={
-              <PrivateRoute>
-                <AdminLayout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/members" element={<Members />} />
-                    <Route path="/members/add" element={<AddMember />} />
-                    <Route path="/members/:id" element={<MemberDetails />} />
-                    <Route path="/attendance" element={<Attendance />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/owner-logs" element={<OwnerLogs />} />
-                    <Route path="/announcements" element={<Announcements />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/revenue" element={<RevenueDashboard />} />
-                    {/* Owner-only route */}
-                    <Route 
-                      path="/ads" 
-                      element={
-                        <OwnerRoute>
-                          <AdManager />
-                        </OwnerRoute>
-                      } 
-                    />
-                    
-                    {/* Shop Routes */}
-                    <Route path="/shop" element={<Shop />} />
-                    <Route path="/shop/add-product" element={<AddEditProduct />} />
-                    <Route path="/shop/products/:id" element={<ProductDetail />} />
-                    <Route path="/shop/products/:id/edit" element={<AddEditProduct />} />
-                    <Route path="/orders" element={<AdminOrders />} />
-                  </Routes>
-                </AdminLayout>
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </Suspense>
+            {/* Admin-specific routes (protected by PrivateRoute) */}
+            <Route
+              path="/*"
+              element={
+                <PrivateRoute>
+                  <AdminLayout>
+                    <Routes>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/members" element={<Members />} />
+                      <Route path="/members/add" element={<AddMember />} />
+                      <Route path="/members/:id" element={<MemberDetails />} />
+                      <Route path="/attendance" element={<Attendance />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/owner-logs" element={<OwnerLogs />} />
+                      <Route path="/announcements" element={<Announcements />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/revenue" element={<RevenueDashboard />} />
+                      <Route path="/subscription" element={<Subscription />} />
+                      {/* Owner-only route */}
+                      <Route 
+                        path="/ads" 
+                        element={
+                          <OwnerRoute>
+                            <AdManager />
+                          </OwnerRoute>
+                        } 
+                      />
+                      
+                      {/* Shop Routes */}
+                      <Route path="/shop" element={<Shop />} />
+                      <Route path="/shop/add-product" element={<AddEditProduct />} />
+                      <Route path="/shop/products/:id" element={<ProductDetail />} />
+                      <Route path="/shop/products/:id/edit" element={<AddEditProduct />} />
+                      <Route path="/orders" element={<AdminOrders />} />
+                    </Routes>
+                  </AdminLayout>
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </Suspense>
+      </SubscriptionProvider>
     </QueryClientProvider>
   );
 }

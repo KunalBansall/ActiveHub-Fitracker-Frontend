@@ -16,5 +16,5 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "types": ["react", "react-dom"]
   },
-  "include": ["src"]
+  "include": ["src", "src/types/razorpay.d.ts"]
 }

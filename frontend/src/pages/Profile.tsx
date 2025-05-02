@@ -64,7 +64,7 @@ export default function ProfilePage() {
       const response = await axios.get(`${API_URL}/admin/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      // console.log('API Profile Response:', response.data)
+      console.log('API Profile Response:', response.data)
       return response.data
     },
     {
@@ -81,9 +81,19 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (isEditing && profile && !formData) {
-      setFormData(JSON.parse(JSON.stringify(profile)))
+      setFormData({
+        username: profile.username || "",
+        email: profile.email || "",
+        gymName: profile.gymName || "",
+        gymType: profile.gymType || "",
+        gymAddress: profile.gymAddress || { street: "", city: "", state: "", zipCode: "", country: "" },
+        photos: profile.photos || [],
+        profilePhotoId: profile.profilePhotoId || undefined,
+        profilePhotoUrl: profile.profilePhotoUrl || undefined,
+      })
     }
   }, [isEditing, profile, formData])
+  
 
   // Add effect to verify photos persist after reload
   useEffect(() => {
@@ -120,18 +130,18 @@ export default function ProfilePage() {
         profilePhotoId: updatedProfile.profilePhotoId || profile?.profilePhotoId
       }
       
-      // console.log('Sending complete profile update:', completeProfile)
+      console.log('Sending complete profile update:', completeProfile)
       
       try {
         const response = await axios.put(`${API_URL}/admin/profile`, completeProfile, {
           headers: { Authorization: `Bearer ${token}` },
         })
         toast.dismiss(loadingToastId)
-        // console.log('Profile update response:', response.data)
+        console.log('Profile update response:', response.data)
         return response.data
       } catch (error) {
         toast.dismiss(loadingToastId)
-        // console.error('Error updating profile:', error)  
+        console.error('Error updating profile:', error)  
         throw error
       }
     },

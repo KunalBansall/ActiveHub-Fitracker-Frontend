@@ -12,6 +12,7 @@ import {
   MegaphoneIcon,
   SpeakerWaveIcon,
   BanknotesIcon,
+  CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
@@ -24,7 +25,6 @@ export const regularNavigation = [
   { name: "Members", href: "/members", icon: UsersIcon },
   { name: "Attendance", href: "/attendance", icon: ClockIcon },
   { name: "Revenue", href: "/revenue", icon: BanknotesIcon },
-  { name: "Announcements", href: "/announcements", icon: SpeakerWaveIcon },
   { name: "Shop", href: "/shop", icon: ShoppingBagIcon },
   { name: "Orders", href: "/orders", icon: TruckIcon },
   { name: "Profile", href: "/profile", icon: UserIcon },
