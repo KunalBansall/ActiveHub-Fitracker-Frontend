@@ -445,329 +445,331 @@ export default function ProfilePage() {
 
       {/* Main Content */}
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="space-y-8">
-          {/* Photo Gallery Section */}
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <PhotoIcon className="h-6 w-6 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Gym Photos</h2>
-              </div>
-              {isEditing && (
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
-                    <input
-                      type="file"
-                      id="photo-upload"
-                      multiple
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handlePhotoUpload}
-                      disabled={isUploading}
-                    />
-                    <label
-                      htmlFor="photo-upload"
-                      className="inline-flex items-center rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {isUploading ? (
-                        <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <PhotoIcon className="mr-2 h-4 w-4" />
-                      )}
-                      Upload Photos
-                    </label>
-                  </div>
-                  {photos.length > 0 && (
-                    <button
-                      onClick={savePhotosDirectly}
-                      className="inline-flex items-center rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                      Save Photos
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Photo Carousel */}
-            <div className="relative h-64 w-full overflow-hidden rounded-xl bg-gray-50">
-              {photos.length > 0 ? (
-                <>
-                  {photos.map((photo, index) => (
-                    <div
-                      key={photo.publicId}
-                      className={`absolute h-full w-full transition-all duration-500 ${
-                        index === currentPhotoIndex
-                          ? 'translate-x-0 opacity-100'
-                          : index < currentPhotoIndex
-                          ? '-translate-x-full opacity-0'
-                          : 'translate-x-full opacity-0'
-                      }`}
-                    >
-                      <img
-                        src={photo.url}
-                        alt={`Gym photo ${index + 1}`}
-                        className={`h-full w-full object-cover ${
-                          isEditing && formData?.profilePhotoId === photo.publicId
-                            ? 'ring-4 ring-blue-500'
-                            : ''
-                        }`}
-                        onClick={() => isEditing && handlePhotoSelect(photo)}
-                      />
-                      {isEditing && (
-                        <div className="absolute bottom-4 right-4 rounded-lg bg-black/70 px-4 py-2 text-sm text-white backdrop-blur-sm">
-                          {formData?.profilePhotoId === photo.publicId
-                            ? 'Current Profile Photo'
-                            : 'Click to set as profile photo'}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Navigation Controls */}
-                  {photos.length > 1 && (
-                    <>
-                      <button
-                        onClick={prevSlide}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm hover:bg-black/70"
-                      >
-                        <ChevronLeftIcon className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={nextSlide}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm hover:bg-black/70"
-                      >
-                        <ChevronRightIcon className="h-5 w-5" />
-                      </button>
-                    </>
-                  )}
-
-                  {/* Indicator Dots */}
-                  <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 space-x-2">
-                    {photos.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentPhotoIndex(index)}
-                        className={`h-2 w-2 rounded-full transition-all ${
-                          index === currentPhotoIndex
-                            ? 'scale-125 bg-white'
-                            : 'bg-white/50 hover:bg-white/75'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center">
-                  <PhotoIcon className="h-12 w-12 text-gray-300" />
-                  <p className="mt-2 text-sm text-gray-500">No photos available</p>
-                  {isEditing && (
-                    <p className="mt-1 text-xs text-gray-400">
-                      Upload photos to showcase your gym
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Form Sections */}
+        <form onSubmit={handleSubmit}>
           <div className="space-y-8">
-            {/* Basic Information */}
+            {/* Photo Gallery Section */}
             <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-center space-x-3">
-                <UserCircleIcon className="h-6 w-6 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Basic Information</h2>
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <PhotoIcon className="h-6 w-6 text-blue-500" />
+                  <h2 className="text-xl font-semibold text-gray-900">Gym Photos</h2>
+                </div>
+                {isEditing && (
+                  <div className="flex items-center space-x-3">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        id="photo-upload"
+                        multiple
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handlePhotoUpload}
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="photo-upload"
+                        className="inline-flex items-center rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {isUploading ? (
+                          <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <PhotoIcon className="mr-2 h-4 w-4" />
+                        )}
+                        Upload Photos
+                      </label>
+                    </div>
+                    {photos.length > 0 && (
+                      <button
+                        onClick={savePhotosDirectly}
+                        className="inline-flex items-center rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        Save Photos
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                    Username
-                  </label>
-                  <div className="relative">
+              {/* Photo Carousel */}
+              <div className="relative h-64 w-full overflow-hidden rounded-xl bg-gray-50">
+                {photos.length > 0 ? (
+                  <>
+                    {photos.map((photo, index) => (
+                      <div
+                        key={photo.publicId}
+                        className={`absolute h-full w-full transition-all duration-500 ${
+                          index === currentPhotoIndex
+                            ? 'translate-x-0 opacity-100'
+                            : index < currentPhotoIndex
+                            ? '-translate-x-full opacity-0'
+                            : 'translate-x-full opacity-0'
+                        }`}
+                      >
+                        <img
+                          src={photo.url}
+                          alt={`Gym photo ${index + 1}`}
+                          className={`h-full w-full object-cover ${
+                            isEditing && formData?.profilePhotoId === photo.publicId
+                              ? 'ring-4 ring-blue-500'
+                              : ''
+                          }`}
+                          onClick={() => isEditing && handlePhotoSelect(photo)}
+                        />
+                        {isEditing && (
+                          <div className="absolute bottom-4 right-4 rounded-lg bg-black/70 px-4 py-2 text-sm text-white backdrop-blur-sm">
+                            {formData?.profilePhotoId === photo.publicId
+                              ? 'Current Profile Photo'
+                              : 'Click to set as profile photo'}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Navigation Controls */}
+                    {photos.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevSlide}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm hover:bg-black/70"
+                        >
+                          <ChevronLeftIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={nextSlide}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm hover:bg-black/70"
+                        >
+                          <ChevronRightIcon className="h-5 w-5" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Indicator Dots */}
+                    <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 space-x-2">
+                      {photos.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentPhotoIndex(index)}
+                          className={`h-2 w-2 rounded-full transition-all ${
+                            index === currentPhotoIndex
+                              ? 'scale-125 bg-white'
+                              : 'bg-white/50 hover:bg-white/75'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center">
+                    <PhotoIcon className="h-12 w-12 text-gray-300" />
+                    <p className="mt-2 text-sm text-gray-500">No photos available</p>
+                    {isEditing && (
+                      <p className="mt-1 text-xs text-gray-400">
+                        Upload photos to showcase your gym
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Form Sections */}
+            <div className="space-y-8">
+              {/* Basic Information */}
+              <div className="rounded-2xl bg-white p-6 shadow-sm">
+                <div className="mb-6 flex items-center space-x-3">
+                  <UserCircleIcon className="h-6 w-6 text-blue-500" />
+                  <h2 className="text-xl font-semibold text-gray-900">Basic Information</h2>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                      Username
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        value={isEditing ? formData?.username : profile.username}
+                        onChange={(e) => handleChange(e.target.name, e.target.value)}
+                        disabled={!isEditing}
+                        className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <EnvelopeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={isEditing ? formData?.email : profile.email}
+                        onChange={(e) => handleChange(e.target.name, e.target.value)}
+                        disabled={!isEditing}
+                        className="block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="gymName" className="block text-sm font-medium text-gray-700">
+                      Gym Name
+                    </label>
+                    <div className="relative">
+                      <BuildingOfficeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <input
+                        id="gymName"
+                        name="gymName"
+                        type="text"
+                        value={isEditing ? formData?.gymName : profile.gymName}
+                        onChange={(e) => handleChange(e.target.name, e.target.value)}
+                        disabled={!isEditing}
+                        className="block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="gymType" className="block text-sm font-medium text-gray-700">
+                      Gym Type
+                    </label>
+                    <select
+                      id="gymType"
+                      name="gymType"
+                      value={isEditing ? formData?.gymType : profile.gymType}
+                      onChange={(e) => handleChange(e.target.name, e.target.value)}
+                      disabled={!isEditing}
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    >
+                      <option value="CrossFit">CrossFit</option>
+                      <option value="Yoga">Yoga</option>
+                      <option value="Weightlifting">Weightlifting</option>
+                      <option value="Cardio">Cardio</option>
+                      <option value="Mixed">Mixed</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Address Section */}
+              <div className="rounded-2xl bg-white p-6 shadow-sm">
+                <div className="mb-6 flex items-center space-x-3">
+                  <MapPinIcon className="h-6 w-6 text-blue-500" />
+                  <h2 className="text-xl font-semibold text-gray-900">Gym Address</h2>
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <label htmlFor="street" className="block text-sm font-medium text-gray-700">
+                      Street
+                    </label>
                     <input
-                      id="username"
-                      name="username"
+                      id="street"
+                      name="gymAddress.street"
                       type="text"
-                      value={isEditing ? formData?.username : profile.username}
+                      value={isEditing ? formData?.gymAddress?.street : profile.gymAddress.street}
+                      onChange={(e) => handleChange(e.target.name, e.target.value)}
+                      disabled={!isEditing}
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                      City
+                    </label>
+                    <input
+                      id="city"
+                      name="gymAddress.city"
+                      type="text"
+                      value={isEditing ? formData?.gymAddress?.city : profile.gymAddress.city}
+                      onChange={(e) => handleChange(e.target.name, e.target.value)}
+                      disabled={!isEditing}
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                      State
+                    </label>
+                    <input
+                      id="state"
+                      name="gymAddress.state"
+                      type="text"
+                      value={isEditing ? formData?.gymAddress?.state : profile.gymAddress.state}
+                      onChange={(e) => handleChange(e.target.name, e.target.value)}
+                      disabled={!isEditing}
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                      Zip Code
+                    </label>
+                    <input
+                      id="zipCode"
+                      name="gymAddress.zipCode"
+                      type="text"
+                      value={isEditing ? formData?.gymAddress?.zipCode : profile.gymAddress.zipCode}
+                      onChange={(e) => handleChange(e.target.name, e.target.value)}
+                      disabled={!isEditing}
+                      className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                      Country
+                    </label>
+                    <input
+                      id="country"
+                      name="gymAddress.country"
+                      type="text"
+                      value={isEditing ? formData?.gymAddress?.country : profile.gymAddress.country}
                       onChange={(e) => handleChange(e.target.name, e.target.value)}
                       disabled={!isEditing}
                       className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
                     />
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <EnvelopeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={isEditing ? formData?.email : profile.email}
-                      onChange={(e) => handleChange(e.target.name, e.target.value)}
-                      disabled={!isEditing}
-                      className="block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="gymName" className="block text-sm font-medium text-gray-700">
-                    Gym Name
-                  </label>
-                  <div className="relative">
-                    <BuildingOfficeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <input
-                      id="gymName"
-                      name="gymName"
-                      type="text"
-                      value={isEditing ? formData?.gymName : profile.gymName}
-                      onChange={(e) => handleChange(e.target.name, e.target.value)}
-                      disabled={!isEditing}
-                      className="block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="gymType" className="block text-sm font-medium text-gray-700">
-                    Gym Type
-                  </label>
-                  <select
-                    id="gymType"
-                    name="gymType"
-                    value={isEditing ? formData?.gymType : profile.gymType}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    disabled={!isEditing}
-                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  >
-                    <option value="CrossFit">CrossFit</option>
-                    <option value="Yoga">Yoga</option>
-                    <option value="Weightlifting">Weightlifting</option>
-                    <option value="Cardio">Cardio</option>
-                    <option value="Mixed">Mixed</option>
-                  </select>
-                </div>
               </div>
             </div>
 
-            {/* Address Section */}
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-center space-x-3">
-                <MapPinIcon className="h-6 w-6 text-blue-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Gym Address</h2>
+            {/* Action Buttons */}
+            {isEditing && (
+              <div className="flex flex-col space-y-3 sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <XMarkIcon className="mr-2 h-4 w-4" />
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={mutation.isLoading}
+                  className="inline-flex items-center justify-center rounded-full border border-transparent bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                >
+                  {mutation.isLoading ? (
+                    <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckIcon className="mr-2 h-4 w-4" />
+                  )}
+                  Save Changes
+                </button>
               </div>
-
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="space-y-2">
-                  <label htmlFor="street" className="block text-sm font-medium text-gray-700">
-                    Street
-                  </label>
-                  <input
-                    id="street"
-                    name="gymAddress.street"
-                    type="text"
-                    value={isEditing ? formData?.gymAddress?.street : profile.gymAddress.street}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    disabled={!isEditing}
-                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                    City
-                  </label>
-                  <input
-                    id="city"
-                    name="gymAddress.city"
-                    type="text"
-                    value={isEditing ? formData?.gymAddress?.city : profile.gymAddress.city}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    disabled={!isEditing}
-                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-                    State
-                  </label>
-                  <input
-                    id="state"
-                    name="gymAddress.state"
-                    type="text"
-                    value={isEditing ? formData?.gymAddress?.state : profile.gymAddress.state}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    disabled={!isEditing}
-                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
-                    Zip Code
-                  </label>
-                  <input
-                    id="zipCode"
-                    name="gymAddress.zipCode"
-                    type="text"
-                    value={isEditing ? formData?.gymAddress?.zipCode : profile.gymAddress.zipCode}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    disabled={!isEditing}
-                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                    Country
-                  </label>
-                  <input
-                    id="country"
-                    name="gymAddress.country"
-                    type="text"
-                    value={isEditing ? formData?.gymAddress?.country : profile.gymAddress.country}
-                    onChange={(e) => handleChange(e.target.name, e.target.value)}
-                    disabled={!isEditing}
-                    className="block w-full rounded-lg border border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-              </div>
-            </div>
+            )}
           </div>
-
-          {/* Action Buttons */}
-          {isEditing && (
-            <div className="flex flex-col space-y-3 sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <XMarkIcon className="mr-2 h-4 w-4" />
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={mutation.isLoading}
-                className="inline-flex items-center justify-center rounded-full border border-transparent bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                {mutation.isLoading ? (
-                  <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckIcon className="mr-2 h-4 w-4" />
-                )}
-                Save Changes
-              </button>
-            </div>
-          )}
-        </div>
+        </form>
       </div>
       
       {/* Add the ProfileFooterAd component at the bottom */}

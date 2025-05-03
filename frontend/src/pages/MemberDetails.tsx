@@ -144,13 +144,19 @@ export default function MemberDetails() {
 
     // Send payload only if there are changes
     if (Object.keys(payload).length > 0) {
-      mutation.mutate(payload);
+      return new Promise<void>((resolve, reject) => {
+        mutation.mutate(payload, {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error)
+        });
+      });
     } else {
       console.log("No changes detected. Update skipped.");
+      return Promise.resolve();
     }
   };
 
-  const handleExtendMembership = (extensionMonths: number) => {
+  const handleExtendMembership = async (extensionMonths: number) => {
     if (member) {
       const updatedDuration = (member.durationMonths || 0) + extensionMonths;
 
@@ -166,13 +172,18 @@ export default function MemberDetails() {
       const options = { year: "numeric", month: "long" } as const;
       const formattedDate = newEndDate.toLocaleDateString(undefined, options);
 
-      // Show toast notification
-      toast.success(
-        `${member.name}'s membership extended till ${formattedDate}!`
-      );
-
-      // Update member details
-      handleSubmit({ durationMonths: updatedDuration });
+      try {
+        // Update member details and wait for it to complete
+        await handleSubmit({ durationMonths: updatedDuration });
+        
+        // Show toast notification only after successful update
+        toast.success(
+          `${member.name}'s membership extended till ${formattedDate}!`
+        );
+      } catch (error) {
+        console.error("Error extending membership:", error);
+        toast.error("Failed to extend membership. Please try again.");
+      }
     }
 
     setIsExtendModalOpen(false);

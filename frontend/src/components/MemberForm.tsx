@@ -94,10 +94,8 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
         photo: photoPreview,
         membershipEndDate: membershipEndDate, // Use the selected date instead of calculating from duration
       });
-
-    
-    }
-     catch (error) {
+    } catch (error) {
+      console.error("Form submission error:", error);
       toast.error("There was an error while submitting the form.");
     } finally {
       setIsSubmitting(false);
@@ -431,14 +429,16 @@ export default function MemberForm({ onSubmit, initialData }: Props) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-6 py-2 rounded-md text-white ${
+            className={`px-6 py-2 rounded-md text-white transition-all duration-200 ${
               isSubmitting
-                ? "bg-gray-500 opacity-50"
+                ? "bg-gray-500 opacity-70 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"
             }`}
           >
             {isSubmitting
-              ? "Processing..."
+              ? initialData 
+                ? "Updating Member..." 
+                : "Adding Member..."
               : initialData
               ? "Update Member"
               : "Add Member"}

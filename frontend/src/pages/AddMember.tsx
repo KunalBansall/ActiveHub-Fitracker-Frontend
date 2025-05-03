@@ -56,7 +56,12 @@ export default function AddMember() {
   );
 
   const handleSubmit = (data: Partial<Member>) => {
-    mutation.mutate(data);
+    return new Promise<void>((resolve, reject) => {
+      mutation.mutate(data, {
+        onSuccess: () => resolve(),
+        onError: (error) => reject(error)
+      });
+    });
   };
 
   return (
