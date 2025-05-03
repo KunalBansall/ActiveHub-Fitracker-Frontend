@@ -42,7 +42,30 @@ const SubscriptionBanner: React.FC<SubscriptionBannerProps> = ({
     return null;
   }
 
-  // Handle trial period
+  // Always prioritize active subscription status - only show expiration warning if needed
+  if (subscriptionStatus === 'active') {
+    // For active subscription - only show banner if 3 days or less remaining
+    if (subscriptionDaysRemaining <= 3) {
+      return (
+        <div className="w-full mb-4">
+          <div className="flex items-center bg-amber-50 border-l-4 border-amber-500 py-2 px-3 rounded-md shadow-sm">
+            <FaExclamationCircle className="text-amber-500 mr-2" />
+            <span className="text-sm font-medium text-amber-800">
+              {subscriptionDaysRemaining === 0 
+                ? "Your subscription expires today." 
+                : `Your subscription expires in ${subscriptionDaysRemaining} ${subscriptionDaysRemaining === 1 ? 'day' : 'days'} (${formatDate(subscriptionEndDate)})`
+              }
+              <a href="/subscription" className="ml-2 underline hover:text-amber-900">Renew now</a>
+            </span>
+          </div>
+        </div>
+      );
+    }
+    // Active subscription with more than 3 days - don't show any banner
+    return null;
+  }
+
+  // Handle trial period - only if not active
   if (subscriptionStatus === 'trial') {
     // Trial expired
     if (trialDaysRemaining === 0) {
@@ -76,7 +99,7 @@ const SubscriptionBanner: React.FC<SubscriptionBannerProps> = ({
     );
   }
 
-  // Handle grace period
+  // Handle grace period - only if not active
   if (subscriptionStatus === 'grace') {
     // Grace period expired
     if (graceDaysRemaining === 0) {
@@ -110,24 +133,6 @@ const SubscriptionBanner: React.FC<SubscriptionBannerProps> = ({
     );
   }
 
-  // For active subscription - only show banner if 3 days or less remaining
-  if (subscriptionStatus === 'active' && subscriptionDaysRemaining <= 3) {
-    return (
-      <div className="w-full mb-4">
-        <div className="flex items-center bg-amber-50 border-l-4 border-amber-500 py-2 px-3 rounded-md shadow-sm">
-          <FaExclamationCircle className="text-amber-500 mr-2" />
-          <span className="text-sm font-medium text-amber-800">
-            {subscriptionDaysRemaining === 0 
-              ? "Your subscription expires today." 
-              : `Your subscription expires in ${subscriptionDaysRemaining} ${subscriptionDaysRemaining === 1 ? 'day' : 'days'} (${formatDate(subscriptionEndDate)})`
-            }
-            <a href="/subscription" className="ml-2 underline hover:text-amber-900">Renew now</a>
-          </span>
-        </div>
-      </div>
-    );
-  }
-
   // Expired or cancelled subscription
   if (subscriptionStatus === 'expired' || subscriptionStatus === 'cancelled') {
     return (
@@ -143,7 +148,7 @@ const SubscriptionBanner: React.FC<SubscriptionBannerProps> = ({
     );
   }
 
-  // Default - don't show banner for active subscription with more than 3 days remaining
+  // Default - don't show banner
   return null;
 };
 

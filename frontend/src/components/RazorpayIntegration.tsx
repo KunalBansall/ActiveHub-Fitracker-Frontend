@@ -1,8 +1,41 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { useSubscription } from '../context/SubscriptionContext';
+import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+interface RazorpayResponse {
+  subscriptionId: string;
+  planId: string;
+  calculatedStartDate: string;
+  calculatedEndDate: string;
+  trialPeriodDays: number;
+  nextDueOn: string;
+}
+
+interface RazorpayPaymentResponse {
+  razorpay_payment_id: string;
+  razorpay_subscription_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayOptions {
+  key: string;
+  subscription_id: string;
+  name: string;
+  description: string;
+  handler: (response: RazorpayPaymentResponse) => void;
+  theme: {
+    color: string;
+  };
+}
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 const loadRazorpayScript = () => {
   const script = document.createElement("script");
@@ -11,15 +44,29 @@ const loadRazorpayScript = () => {
   document.body.appendChild(script);
 };
 
-const RazorpayIntegration = () => {
+interface RazorpayIntegrationProps {
+  buttonLabel?: string;
+}
+
+const RazorpayIntegration = ({ buttonLabel = "Subscribe Now" }: RazorpayIntegrationProps) => {
+  const { subscriptionStatus, trialEndDate } = useSubscription();
+  const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
     loadRazorpayScript();
   }, []);
 
   const openRazorpayCheckout = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.post(
+      if (!token) {
+        toast.error("Authentication token not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+      
+      const res = await axios.post<RazorpayResponse>(
         `${API_URL}/payment/create-subscription`,
         {},
         {
@@ -29,18 +76,26 @@ const RazorpayIntegration = () => {
         }
       );
 
-      const { subscriptionId } = res.data;
+      const { subscriptionId, calculatedStartDate, calculatedEndDate, trialPeriodDays } = res.data;
+      
+      // Show information to the user about their subscription dates
+      if (subscriptionStatus === 'trial' && trialPeriodDays > 0) {
+        toast.success(
+          `Your Pro Plan will begin on ${new Date(calculatedStartDate).toLocaleDateString()} after your trial ends. You won't be billed again until ${new Date(calculatedEndDate).toLocaleDateString()}.`,
+          { duration: 6000 }
+        );
+      }
 
       const options: RazorpayOptions = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID || "", // Required key
         subscription_id: subscriptionId,
         name: "ActiveHub Subscription",
-        description: "Gym Management Software",
-        handler:async function (response: RazorpayPaymentResponse) {
-          alert("✅ Payment successful! ID: " + response.razorpay_payment_id);
-          // You can also send response.razorpay_subscription_id and signature to backend here
+        description: trialPeriodDays > 0 
+          ? `Pro Plan (Starts after trial on ${new Date(calculatedStartDate).toLocaleDateString()})` 
+          : "Pro Plan (Starts today)",
+        handler: async function (response: RazorpayPaymentResponse) {
           try {
-            await axios.post(
+            const verifyResponse = await axios.post(
               `${API_URL}/payment/verify-subscription`,
               {
                 ...response,
@@ -51,12 +106,30 @@ const RazorpayIntegration = () => {
                 },
               }
             );
-            alert("🛡️ Payment verified on server");
+            
+            toast.success("Payment successful! Your subscription is now active.");
+            
+            // Notify user about their subscription dates
+            if (subscriptionStatus === 'trial' && trialPeriodDays > 0) {
+              toast.success(
+                `Your existing trial continues until ${new Date(calculatedStartDate).toLocaleDateString()}, after which your paid subscription begins.`,
+                { duration: 5000 }
+              );
+            } else {
+              toast.success(
+                `Your subscription is active until ${new Date(calculatedEndDate).toLocaleDateString()}.`,
+                { duration: 5000 }
+              );
+            }
+            
+            // Reload the page after subscription to update UI
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
           } catch (error) {
-            alert("❌ Payment verification failed on server.");
+            toast.error("Payment verification failed. Please contact support.");
             console.error("Verification error:", error);
           }
-
         },
         theme: {
           color: "#1F2937",
@@ -67,7 +140,9 @@ const RazorpayIntegration = () => {
       rzp.open();
     } catch (error) {
       console.error("Razorpay subscription error:", error);
-      alert("❌ Failed to create subscription. Try again.");
+      toast.error("Failed to create subscription. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,9 +150,10 @@ const RazorpayIntegration = () => {
     <div>
       <button
         onClick={openRazorpayCheckout}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-md"
+        disabled={loading}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
       >
-        Subscribe Now
+        {loading ? "Processing..." : buttonLabel}
       </button>
     </div>
   );
