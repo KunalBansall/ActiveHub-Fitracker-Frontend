@@ -17,9 +17,10 @@ interface Gym {
 
 interface CreateAdFormProps {
   onSuccess?: () => void;
+  onAdCreated?: () => void;
 }
 
-const CreateAdForm: React.FC<CreateAdFormProps> = ({ onSuccess }) => {
+const CreateAdForm: React.FC<CreateAdFormProps> = ({ onSuccess, onAdCreated }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [contentType, setContentType] = useState<'image' | 'video'>('image');
@@ -194,6 +195,8 @@ const CreateAdForm: React.FC<CreateAdFormProps> = ({ onSuccess }) => {
       
       // Call success callback if provided
       if (onSuccess) onSuccess();
+      // Call onAdCreated callback if provided
+      if (onAdCreated) onAdCreated();
     } catch (error) {
       console.error('Error creating ad:', error);
       toast.error('Failed to create ad');

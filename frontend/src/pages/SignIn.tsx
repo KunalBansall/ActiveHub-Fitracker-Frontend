@@ -74,7 +74,7 @@ const SignInContent = () => {
       const role = decodedToken.role;
 
       if (role === "owner") {
-        navigate("/owner-logs"); // Redirect to owner-specific route
+        navigate("/owner-dashboard"); // Redirect to owner-specific route
       } else {
         navigate("/"); // Redirect to the default route
       }
