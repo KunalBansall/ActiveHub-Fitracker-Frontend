@@ -64,7 +64,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="hidden lg:flex h-full w-64 flex-col bg-gray-900">
+    <div className="hidden lg:flex h-full w-64 flex-col bg-gray-900" data-tour="sidebar">
       <nav className="flex-1 space-y-1 px-2 py-4">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href || 

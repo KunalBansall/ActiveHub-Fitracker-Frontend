@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import DashboardStats from "../components/DashboardStats";
 import MemberList from "../components/MemberList";
 import { DashboardStatsData as DashboardStatsType, Member } from "../types";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AdminTour from "../components/AdminTour";
 
 // Define revenue data type
 interface RevenueData {
@@ -21,6 +22,32 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function Dashboard() {
   const token = localStorage.getItem("token");
+  const [shouldRunTour, setShouldRunTour] = useState(false);
+  const [adminId, setAdminId] = useState("");
+  
+  // Fetch admin data to check if tour should run
+  const { data: adminData } = useQuery("adminData", () =>
+    axios
+      .get(`${API_URL}/admin/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        // Set the admin ID for the tour
+        if (res.data && res.data._id) {
+          setAdminId(res.data._id);
+        }
+        return res.data;
+      })
+  );
+  
+  // Determine if the tour should run based on admin data
+  useEffect(() => {
+    if (adminData && adminData.hasCompletedTour === false) {
+      setShouldRunTour(true);
+    }
+  }, [adminData]);
 
   // Fetch dashboard stats
   const { data: stats } = useQuery<DashboardStatsType>("dashboardStats", () =>
@@ -78,23 +105,40 @@ export default function Dashboard() {
         new Date(b.membershipEndDate!).getTime()
     );
 
+  // Handle tour completion
+  const handleTourComplete = () => {
+    console.log("Tour completed");
+    // You could update local state here if needed
+  };
+
   return (
     <div className="flex-1 p-4 sm:p-8">
+      {/* Admin Tour Component */}
+      {shouldRunTour && adminId && (
+        <AdminTour 
+          shouldRun={shouldRunTour} 
+          adminId={adminId}
+          onComplete={handleTourComplete}
+        />
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-8">
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Dashboard</h1>
         <Link
           to="/members/add"
+          data-tour="add-member"
           className="w-full sm:w-auto inline-flex justify-center items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           Add New Member
         </Link>
       </div>
 
-      <DashboardStats stats={stats} />
+      <div data-tour="dashboard-stats">
+        <DashboardStats stats={stats} />
+      </div>
 
       {/* Revenue Summary Section */}
       {revenueData && (
-        <div className="mt-6 bg-white rounded-lg shadow overflow-hidden">
+        <div data-tour="revenue-overview" className="mt-6 bg-white rounded-lg shadow overflow-hidden">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-base sm:text-lg font-medium text-gray-900">
               Revenue Overview
@@ -135,7 +179,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6" data-tour="member-management">
         <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">
           Expiring Soon Members ⬇️
         </h2>
