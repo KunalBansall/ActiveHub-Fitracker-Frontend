@@ -381,13 +381,13 @@ export default function Header() {
             </nav>
             
             {/* Notifications */}
-            <button
+            {/* <button
               type="button"
               className="relative p-1.5 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100 focus:outline-none transition-colors duration-200"
             >
               <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">3</span>
               <BellIcon className="h-5 w-5" />
-            </button>
+            </button> */}
 
             {/* User profile */}
             <div className="relative flex-shrink-0">
