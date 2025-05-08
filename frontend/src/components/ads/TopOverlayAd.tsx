@@ -80,6 +80,7 @@ const TopOverlayAd: React.FC<TopOverlayAdProps> = ({ ad: providedAd, onClose }) 
 
   return (
     <div 
+      data-testid="overlay-ad"
       className="fixed inset-x-0 top-0 z-50 bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg transform transition-all duration-500 ease-in-out"
       style={{
         opacity: isAnimated ? 1 : 0,

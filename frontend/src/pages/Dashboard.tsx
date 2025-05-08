@@ -44,8 +44,14 @@ export default function Dashboard() {
   
   // Determine if the tour should run based on admin data
   useEffect(() => {
-    if (adminData && adminData.hasCompletedTour === false) {
+    // Check localStorage first as a fallback to prevent tour restart
+    const tourCompletedLocally = localStorage.getItem('adminTourCompleted') === 'true';
+    
+    // Only run the tour if admin exists, hasn't completed the tour, and it's not marked as completed locally
+    if (adminData && adminData.hasCompletedTour === false && !tourCompletedLocally) {
       setShouldRunTour(true);
+    } else {
+      setShouldRunTour(false);
     }
   }, [adminData]);
 
@@ -108,7 +114,10 @@ export default function Dashboard() {
   // Handle tour completion
   const handleTourComplete = () => {
     console.log("Tour completed");
-    // You could update local state here if needed
+    // Update local state to prevent tour from showing again
+    setShouldRunTour(false);
+    // Store completion in localStorage as a fallback
+    localStorage.setItem('adminTourCompleted', 'true');
   };
 
   return (

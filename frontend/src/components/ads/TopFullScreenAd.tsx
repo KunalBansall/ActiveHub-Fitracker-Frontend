@@ -94,6 +94,7 @@ const TopFullScreenAd: React.FC<TopFullScreenAdProps> = ({ ad: providedAd, onClo
 
   return (
     <div 
+      data-testid="fullscreen-ad"
       className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm transform transition-all duration-700 ease-in-out overflow-hidden"
       style={{
         opacity: isAnimated ? 1 : 0,
