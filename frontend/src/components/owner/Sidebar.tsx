@@ -10,7 +10,8 @@ import {
   Cog6ToothIcon,
   ClockIcon,
   DocumentTextIcon,
-  BellAlertIcon
+  BellAlertIcon,
+  MegaphoneIcon
 } from '@heroicons/react/24/outline';
 
 const Sidebar: React.FC = () => {
@@ -41,6 +42,7 @@ const Sidebar: React.FC = () => {
     { name: 'Subscriptions', icon: CreditCardIcon, path: '/owner-dashboard/subscriptions' },
     { name: 'Webhooks', icon: BellAlertIcon, path: '/owner-dashboard/webhooks' },
     { name: 'Products', icon: ShoppingBagIcon, path: '/owner-dashboard/products' },
+    { name: 'Announcements', icon: MegaphoneIcon, path: '/owner-dashboard/announcements' },
     { name: 'Reports', icon: DocumentChartBarIcon, path: '/owner-dashboard/reports' },
     { name: 'Settings', icon: Cog6ToothIcon, path: '/owner-dashboard/settings' },
     { name: 'Activity Log', icon: ClockIcon, path: '/owner-dashboard/activity' },

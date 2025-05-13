@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import DashboardStats from "../components/DashboardStats";
 import MemberList from "../components/MemberList";
+import DeveloperMessages from "../components/admin/DeveloperMessages";
 import { DashboardStatsData as DashboardStatsType, Member } from "../types";
 import React, { useState, useEffect } from "react";
 import AdminTour from "../components/AdminTour";
@@ -193,6 +194,11 @@ export default function Dashboard() {
           Expiring Soon Members ⬇️
         </h2>
         <MemberList members={sortedMembers.slice(0, 5)} />
+      </div>
+
+      {/* Developer Messages Section */}
+      <div className="mt-6 bg-white rounded-lg shadow overflow-hidden">
+        <DeveloperMessages />
       </div>
     </div>
   );

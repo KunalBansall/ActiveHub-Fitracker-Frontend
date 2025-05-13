@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Toaster } from "react-hot-toast";
+import { BellIcon } from "@heroicons/react/24/outline";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import OwnerLayout from "./components/owner/Layout";
@@ -44,6 +45,7 @@ const OwnerDashboardPage = lazy(() => import("./pages/owner/DashboardPage"));
 const OwnerGymsPage = lazy(() => import("./pages/owner/GymsPage"));
 const OwnerActivityPage = lazy(() => import("./pages/owner/ActivityPage"));
 const OwnerSubscriptionsPage = lazy(() => import("./pages/owner/SubscriptionsPage"));
+const DeveloperAnnouncementsPage = lazy(() => import("./pages/owner/DeveloperAnnouncementsPage"));
 
 const Announcements = lazy(() => import("./pages/Announcements"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -211,6 +213,7 @@ const App: React.FC = () => {
                           <Route path="/webhooks" element={<WebhookViewerPage />} />
                           <Route path="/webhooks/analytics" element={<WebhookAnalyticsDashboard />} />
                           <Route path="/products" element={<div className="p-4 bg-white rounded-lg shadow">Products Management Page (Coming Soon)</div>} />
+                          <Route path="/announcements" element={<DeveloperAnnouncementsPage />} />
                           <Route path="/reports" element={<div className="p-4 bg-white rounded-lg shadow">Reports Page (Coming Soon)</div>} />
                           <Route path="/settings" element={<div className="p-4 bg-white rounded-lg shadow">Owner Settings Page (Coming Soon)</div>} />
                           <Route path="/activity" element={<OwnerActivityPage />} />
