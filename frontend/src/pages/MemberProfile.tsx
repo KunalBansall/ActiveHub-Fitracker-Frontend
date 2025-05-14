@@ -117,6 +117,8 @@ const MemberProfile = () => {
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [completedWorkoutsCount, setCompletedWorkoutsCount] = useState<number>(0);
   const [attendancePercentage, setAttendancePercentage] = useState<number>(0);
+  const [monthlyVisitCount, setMonthlyVisitCount] = useState<number>(0);
+  const [currentStreak, setCurrentStreak] = useState<number>(0);
 
   // Add a ref for the profile menu
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -227,11 +229,15 @@ const MemberProfile = () => {
     }
   }, [currentTab]);
 
-  // Calculate attendance percentage when recentAttendance changes
+  // Calculate attendance percentage, monthly visits, and fitness streaks when recentAttendance changes
   useEffect(() => {
     if (member && member.membershipStartDate) {
       // Calculate attendance percentage
       calculateAttendancePercentage();
+      // Calculate monthly visit count
+      calculateMonthlyVisits();
+      // Calculate fitness streak
+      calculateFitnessStreak();
     }
   }, [recentAttendance, member]);
   
@@ -287,6 +293,82 @@ const MemberProfile = () => {
     const percentage = Math.min(100, Math.round((currentMonthAttendance.length / businessDaysSoFar) * 100));
     
     setAttendancePercentage(percentage || 0);
+  };
+  
+  // Function to calculate monthly visits
+  const calculateMonthlyVisits = () => {
+    if (!recentAttendance || recentAttendance.length === 0) return;
+    
+    // Get current month and year
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Filter attendance records for the current month
+    const currentMonthAttendance = recentAttendance.filter(record => {
+      const attendanceDate = new Date(record.entryTime);
+      return (
+        attendanceDate.getMonth() === currentMonth &&
+        attendanceDate.getFullYear() === currentYear
+      );
+    });
+    
+    // Set the monthly visit count
+    setMonthlyVisitCount(currentMonthAttendance.length);
+  };
+  
+  // Function to calculate fitness streak (consecutive days)
+  const calculateFitnessStreak = () => {
+    if (!recentAttendance || recentAttendance.length === 0) return;
+    
+    // Sort attendance records by date (newest first)
+    const sortedAttendance = [...recentAttendance].sort((a, b) => {
+      return new Date(b.entryTime).getTime() - new Date(a.entryTime).getTime();
+    });
+    
+    // Get today's date (without time)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Check if there's an attendance record for today
+    const todayAttendance = sortedAttendance.find(record => {
+      const recordDate = new Date(record.entryTime);
+      recordDate.setHours(0, 0, 0, 0);
+      return recordDate.getTime() === today.getTime();
+    });
+    
+    // If no attendance today, start checking from yesterday
+    let currentDate = new Date(today);
+    if (!todayAttendance) {
+      currentDate.setDate(currentDate.getDate() - 1);
+    }
+    
+    let streak = todayAttendance ? 1 : 0;
+    let checkDate = new Date(currentDate);
+    
+    // Check consecutive days backwards
+    while (true) {
+      // If we're checking before today, look for attendance on this date
+      const dateAttendance = sortedAttendance.find(record => {
+        const recordDate = new Date(record.entryTime);
+        recordDate.setHours(0, 0, 0, 0);
+        return recordDate.getTime() === checkDate.getTime();
+      });
+      
+      // If no attendance on this date, break the streak
+      if (!dateAttendance) break;
+      
+      // Move to the previous day
+      checkDate.setDate(checkDate.getDate() - 1);
+      
+      // If we found attendance for today, increment streak
+      if (dateAttendance) streak++;
+    }
+    
+    // Adjust streak if we didn't have attendance today
+    if (!todayAttendance && streak > 0) streak--;
+    
+    setCurrentStreak(streak);
   };
 
   const fetchFeaturedProducts = async () => {
@@ -1046,6 +1128,68 @@ const MemberProfile = () => {
         </div>
       </div>
       
+      {/* Fitness Achievements */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+        {/* Visit Milestones */}
+        <div className="bg-teal-50 rounded-xl p-3 sm:p-4 shadow-sm">
+          <div className="flex items-start space-x-2 sm:space-x-3">
+            <div className="flex-shrink-0 rounded-md bg-teal-100 p-2 sm:p-3">
+              <CheckBadgeIcon className="h-4 w-4 sm:h-6 sm:w-6 text-teal-600" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm text-teal-700">Visit Milestones</p>
+              <p className="text-sm sm:text-lg font-semibold text-gray-900 mt-0.5 sm:mt-1">
+                {monthlyVisitCount > 0 ? (
+                  <span>
+                    You've completed {monthlyVisitCount} visit{monthlyVisitCount !== 1 ? 's' : ''} this month
+                    {monthlyVisitCount >= 10 ? ' 🎉' : ''}
+                  </span>
+                ) : (
+                  <span>No visits recorded this month</span>
+                )}
+              </p>
+              <div className="mt-0.5 sm:mt-2">
+                <span className="text-xs inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">
+                  {monthlyVisitCount >= 20 ? 'Superstar Status!' : 
+                   monthlyVisitCount >= 15 ? 'Elite Status!' : 
+                   monthlyVisitCount >= 10 ? 'Gold Status!' : 
+                   monthlyVisitCount >= 5 ? 'Silver Status!' : 'Keep going!'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Fitness Streaks */}
+        <div className="bg-rose-50 rounded-xl p-3 sm:p-4 shadow-sm">
+          <div className="flex items-start space-x-2 sm:space-x-3">
+            <div className="flex-shrink-0 rounded-md bg-rose-100 p-2 sm:p-3">
+              <FireIcon className="h-4 w-4 sm:h-6 sm:w-6 text-rose-600" />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm text-rose-700">Fitness Streak</p>
+              <p className="text-sm sm:text-lg font-semibold text-gray-900 mt-0.5 sm:mt-1">
+                {currentStreak > 0 ? (
+                  <span>
+                    {currentStreak} day{currentStreak !== 1 ? 's' : ''} in a row—keep it up!
+                  </span>
+                ) : (
+                  <span>Start your streak today!</span>
+                )}
+              </p>
+              <div className="mt-0.5 sm:mt-2">
+                <span className="text-xs inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                  {currentStreak >= 7 ? 'On fire! 🔥' : 
+                   currentStreak >= 5 ? 'Excellent streak!' : 
+                   currentStreak >= 3 ? 'Great progress!' : 
+                   currentStreak >= 1 ? 'Good start!' : 'Visit today!'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       {/* Personalized Recommendations */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="p-3 sm:p-6">
@@ -1508,6 +1652,107 @@ const MemberProfile = () => {
                     View all announcements
                     <ChevronRightIcon className="ml-1 h-3 w-3" />
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fitness Achievements */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Visit Milestones */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-teal-200">
+            <div className="bg-teal-50 px-4 py-3 border-b border-teal-100">
+              <h2 className="font-bold text-gray-800 flex items-center">
+                <CheckBadgeIcon className="h-5 w-5 mr-2 text-teal-600" />
+                Visit Milestones
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-teal-100 rounded-full p-3 mr-4">
+                  <CheckBadgeIcon className="h-6 w-6 text-teal-600" />
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {monthlyVisitCount > 0 ? (
+                      <span>
+                        You've completed {monthlyVisitCount} visit{monthlyVisitCount !== 1 ? 's' : ''} this month
+                        {monthlyVisitCount >= 10 ? ' 🎉' : ''}
+                      </span>
+                    ) : (
+                      <span>No visits recorded this month</span>
+                    )}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {monthlyVisitCount >= 20 ? 'Superstar Status!' : 
+                     monthlyVisitCount >= 15 ? 'Elite Status!' : 
+                     monthlyVisitCount >= 10 ? 'Gold Status!' : 
+                     monthlyVisitCount >= 5 ? 'Silver Status!' : 'Keep going!'}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-teal-600 h-2.5 rounded-full" 
+                    style={{ width: `${Math.min(100, (monthlyVisitCount / 20) * 100)}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0</span>
+                  <span>5</span>
+                  <span>10</span>
+                  <span>15</span>
+                  <span>20+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Fitness Streaks */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-rose-200">
+            <div className="bg-rose-50 px-4 py-3 border-b border-rose-100">
+              <h2 className="font-bold text-gray-800 flex items-center">
+                <FireIcon className="h-5 w-5 mr-2 text-rose-600" />
+                Fitness Streak
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-rose-100 rounded-full p-3 mr-4">
+                  <FireIcon className="h-6 w-6 text-rose-600" />
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {currentStreak > 0 ? (
+                      <span>
+                        {currentStreak} day{currentStreak !== 1 ? 's' : ''} in a row—keep it up!
+                      </span>
+                    ) : (
+                      <span>Start your streak today!</span>
+                    )}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {currentStreak >= 7 ? 'On fire! 🔥' : 
+                     currentStreak >= 5 ? 'Excellent streak!' : 
+                     currentStreak >= 3 ? 'Great progress!' : 
+                     currentStreak >= 1 ? 'Good start!' : 'Visit today!'}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-rose-600 h-2.5 rounded-full" 
+                    style={{ width: `${Math.min(100, (currentStreak / 7) * 100)}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0</span>
+                  <span>3</span>
+                  <span>5</span>
+                  <span>7+</span>
                 </div>
               </div>
             </div>
@@ -2354,8 +2599,8 @@ const MemberProfile = () => {
         </div>
       </header>
 
-      {/* Member Profile Banner - Only shown on dashboard tab */}
-      {currentTab === 'dashboard' && (
+      {/* Member Profile Banner - Shown on dashboard and attendance tabs */}
+      {(currentTab === 'dashboard' || currentTab === 'attendance') && (
         <div className="bg-gradient-to-r from-indigo-700 to-purple-700 text-white shadow-md relative overflow-hidden">
           {/* Add animated pattern background */}
           <div className="absolute inset-0 bg-pattern opacity-10" style={{ backgroundImage: "url('/pattern.svg')" }}></div>
@@ -2396,7 +2641,7 @@ const MemberProfile = () => {
                   Member since {member?.membershipStartDate ? new Date(member.membershipStartDate).toLocaleDateString() : '-'}
                 </p>
                 
-                {/* Only show these on tablet and larger screens with improved badges */}
+                {/* Badges for tablet and larger screens */}
                 <div className="mt-3 hidden sm:flex flex-wrap justify-center sm:justify-start gap-2">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200">
                     <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
@@ -2412,6 +2657,26 @@ const MemberProfile = () => {
                     <ClockIcon className="h-3.5 w-3.5 mr-1.5" />
                     Slot: {member?.slot || 'Flexible'}
                   </span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200">
+                    <CheckBadgeIcon className="h-3.5 w-3.5 mr-1.5" />
+                    {monthlyVisitCount} Visits {monthlyVisitCount >= 10 ? '🎉' : ''}
+                  </span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200">
+                    <FireIcon className="h-3.5 w-3.5 mr-1.5" />
+                    {currentStreak} Day Streak {currentStreak >= 7 ? '🔥' : ''}
+                  </span>
+                </div>
+                
+                {/* Mobile view stats */}
+                <div className="mt-3 flex sm:hidden flex-wrap justify-center gap-2">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
+                    <CheckBadgeIcon className="h-3.5 w-3.5 mr-1.5" />
+                    {monthlyVisitCount} Visits {monthlyVisitCount >= 10 ? '🎉' : ''}
+                  </span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-sm">
+                    <FireIcon className="h-3.5 w-3.5 mr-1.5" />
+                    {currentStreak} Day Streak {currentStreak >= 7 ? '🔥' : ''}
+                  </span>
                 </div>
               </div>
               
@@ -2426,8 +2691,12 @@ const MemberProfile = () => {
                   <p className="text-xs text-white/80">Attendance</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
-                  <p className="text-2xl font-bold">{member?.fees ? Math.floor(member.fees / 100) : 0}</p>
-                  <p className="text-xs text-white/80">Points</p>
+                  <p className="text-2xl font-bold">{monthlyVisitCount}</p>
+                  <p className="text-xs text-white/80">Monthly Visits {monthlyVisitCount >= 10 ? '🎉' : ''}</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center transform transition-all duration-300 hover:bg-white/20 hover:scale-105">
+                  <p className="text-2xl font-bold">{currentStreak}</p>
+                  <p className="text-xs text-white/80">Day Streak {currentStreak >= 7 ? '🔥' : ''}</p>
                 </div>
               </div>
             </div>
