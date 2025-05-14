@@ -49,6 +49,7 @@ export default function SignUp() {
   }
 
   const prevStep = () => {
+    // Ensure we can always go back to step 1 regardless of form state
     setCurrentStep(1)
   }
 
@@ -133,9 +134,29 @@ export default function SignUp() {
             </button>
             
             <div className="flex items-center">
-              <span className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${currentStep === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>1</span>
+              <button 
+                type="button"
+                onClick={() => setCurrentStep(1)}
+                className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-pointer transition-colors ${currentStep === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+              >
+                1
+              </button>
               <div className={`w-8 h-1 ${currentStep === 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-              <span className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${currentStep === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>2</span>
+              <button 
+                type="button"
+                onClick={async () => {
+                  // Only allow going to step 2 if step 1 fields are valid
+                  if (currentStep === 1) {
+                    const isValid = await trigger(["username", "email", "password"])
+                    if (isValid) setCurrentStep(2)
+                  } else {
+                    setCurrentStep(2)
+                  }
+                }}
+                className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium cursor-pointer transition-colors ${currentStep === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+              >
+                2
+              </button>
             </div>
           </div>
           
@@ -361,7 +382,10 @@ export default function SignUp() {
                 <div className="flex space-x-4">
                   <button
                     type="button"
-                    onClick={prevStep}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      prevStep();
+                    }}
                     className="w-1/3 flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     Back

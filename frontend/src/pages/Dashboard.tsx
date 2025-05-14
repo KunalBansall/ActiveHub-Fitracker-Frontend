@@ -196,10 +196,7 @@ export default function Dashboard() {
         <MemberList members={sortedMembers.slice(0, 5)} />
       </div>
 
-      {/* Developer Messages Section */}
-      <div className="mt-6 bg-white rounded-lg shadow overflow-hidden">
-        <DeveloperMessages />
-      </div>
+     
     </div>
   );
 }
