@@ -31,6 +31,7 @@ const OwnerSidebar: React.FC = () => {
     { name: 'Subscriptions', href: '/owner-dashboard/subscriptions', icon: CurrencyDollarIcon },
     { name: 'Products', href: '/owner-dashboard/products', icon: ShoppingBagIcon },
     { name: 'Ads', href: '/owner-dashboard/ads', icon: DocumentTextIcon },
+    { name: 'Ad Analytics', href: '/owner-dashboard/ad-analytics', icon: ChartBarIcon },
     { name: 'Reports', href: '/owner-dashboard/reports', icon: DocumentTextIcon },
     { name: 'Settings', href: '/owner-dashboard/settings', icon: CogIcon },
   ];

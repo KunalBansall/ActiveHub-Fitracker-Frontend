@@ -343,10 +343,12 @@ const GymsPage: React.FC = () => {
                     </th>
                     <th 
                       scope="col" 
-                      className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 sm:w-auto"
+                      className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 sm:w-auto cursor-pointer"
+                      onClick={() => handleSort('memberCount')}
                     >
                       <div className="flex items-center">
                         Members
+                        {renderSortIcon('memberCount')}
                       </div>
                     </th>
                     <th 

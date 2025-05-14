@@ -28,7 +28,7 @@ interface AdContextType {
   error: string | null;
   refreshAds: () => Promise<void>;
   recordView: (adId: string) => Promise<void>;
-  recordClick: (adId: string) => Promise<void>;
+  recordClick: (adId: string, clickType?: 'cta' | 'learn_more' | 'image' | 'video' | 'close' | 'other') => Promise<void>;
   getAdsByPlacement: (placement: string) => Ad[];
 }
 
@@ -83,7 +83,15 @@ export const AdProvider: React.FC<AdProviderProps> = ({ children, role }) => {
       const token = localStorage.getItem('token');
       if (!token) return;
       
-      await axios.post(`${API_URL}/ads/view/${adId}`, {}, {
+      // Get device info
+      const deviceInfo = {
+        userAgent: navigator.userAgent,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        path: location.pathname
+      };
+      
+      await axios.post(`${API_URL}/ads/view/${adId}`, { deviceInfo }, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (err) {
@@ -91,16 +99,27 @@ export const AdProvider: React.FC<AdProviderProps> = ({ children, role }) => {
     }
   };
 
-  const recordClick = async (adId: string) => {
+  const recordClick = async (adId: string, clickType: 'cta' | 'learn_more' | 'image' | 'video' | 'close' | 'other' = 'cta') => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
       
-      await axios.post(`${API_URL}/ads/click/${adId}`, {}, {
+      // Get device info
+      const deviceInfo = {
+        userAgent: navigator.userAgent,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        path: location.pathname
+      };
+      
+      await axios.post(`${API_URL}/ads/click/${adId}`, { 
+        clickType,
+        deviceInfo
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (err) {
-      console.error('Error recording ad click:', err);
+      console.error(`Error recording ad click (${clickType}):`, err);
     }
   };
 

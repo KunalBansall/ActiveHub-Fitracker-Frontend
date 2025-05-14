@@ -24,6 +24,7 @@ interface Gym {
   createdAt: string;
   totalRevenue: number;
   paymentCount: number;
+  memberCount: number; // Add memberCount at the gym level
   subscription: {
     status: string;
     memberCount: number;
@@ -107,6 +108,14 @@ const DashboardPage: React.FC = () => {
           link: '/owner-dashboard/gyms'
         },
         { 
+          title: 'Total Members', 
+          value: '0', 
+          change: '0%', 
+          icon: UserGroupIcon, 
+          color: 'bg-indigo-500',
+          link: '/owner-dashboard/gyms'
+        },
+        { 
           title: 'Active Subscriptions', 
           value: '0', 
           change: '0%', 
@@ -143,6 +152,12 @@ const DashboardPage: React.FC = () => {
       0
     );
     const avgRevenuePerGym = totalGyms > 0 ? totalRevenue / totalGyms : 0;
+    
+    // Calculate total member count across all gyms
+    const totalMembers = gymsData.gyms.reduce(
+      (sum, gym) => sum + (gym.memberCount || 0),
+      0
+    );
 
     return [
       { 
@@ -151,6 +166,14 @@ const DashboardPage: React.FC = () => {
         change: '+' + Math.round(totalGyms * 0.1) + '%', // Placeholder growth rate
         icon: UserGroupIcon, 
         color: 'bg-blue-500',
+        link: '/owner-dashboard/gyms'
+      },
+      { 
+        title: 'Total Members', 
+        value: totalMembers.toString(), 
+        change: '+' + Math.round(totalMembers * 0.08) + '%', // Placeholder growth rate
+        icon: UserGroupIcon, 
+        color: 'bg-indigo-500',
         link: '/owner-dashboard/gyms'
       },
       { 

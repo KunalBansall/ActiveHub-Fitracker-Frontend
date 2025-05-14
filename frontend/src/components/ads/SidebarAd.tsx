@@ -33,9 +33,9 @@ const SidebarAd: React.FC<SidebarAdProps> = ({ ad: providedAd }) => {
     }
   }, [ad, recordView]);
 
-  const handleClick = () => {
+  const handleClick = (clickType: 'cta' | 'learn_more' | 'image' | 'video' = 'cta') => {
     if (ad) {
-      recordClick(ad._id);
+      recordClick(ad._id, clickType);
       if (ad.ctaUrl) {
         if (ad.ctaUrl.startsWith('http')) {
           window.open(ad.ctaUrl, '_blank', 'noopener,noreferrer');
@@ -44,6 +44,14 @@ const SidebarAd: React.FC<SidebarAdProps> = ({ ad: providedAd }) => {
         }
       }
     }
+  };
+
+  const handleImageClick = () => {
+    handleClick('image');
+  };
+
+  const handleLearnMoreClick = () => {
+    handleClick('learn_more');
   };
 
   if (!ad) return null;
@@ -56,7 +64,7 @@ const SidebarAd: React.FC<SidebarAdProps> = ({ ad: providedAd }) => {
       </div>
       <div 
         className="w-full overflow-hidden rounded-lg bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300"
-        onClick={handleClick}
+        onClick={() => handleClick('cta')}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         role="button"
@@ -71,6 +79,7 @@ const SidebarAd: React.FC<SidebarAdProps> = ({ ad: providedAd }) => {
                 alt={ad.title}
                 className="w-full h-full object-cover transform transition-transform duration-700"
                 style={{ transform: isHovered ? 'scale(1.05)' : 'scale(1)' }}
+                onClick={handleImageClick}
               />
             ) : (
               <video 
@@ -81,6 +90,7 @@ const SidebarAd: React.FC<SidebarAdProps> = ({ ad: providedAd }) => {
                 muted
                 loop
                 playsInline
+                onClick={() => handleClick('video')}
               />
             )}
             <div 
@@ -104,6 +114,7 @@ const SidebarAd: React.FC<SidebarAdProps> = ({ ad: providedAd }) => {
             <div 
               className="mt-2 overflow-hidden transition-all duration-300 flex items-center"
               style={{ height: isHovered ? '20px' : '0px', opacity: isHovered ? 1 : 0 }}
+              onClick={handleLearnMoreClick}
             >
               <span className="text-xs text-blue-400 font-medium mr-1">Learn More</span>
               <svg className="h-3 w-3 text-blue-400 transform transition-transform duration-300"

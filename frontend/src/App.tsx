@@ -46,6 +46,7 @@ const OwnerGymsPage = lazy(() => import("./pages/owner/GymsPage"));
 const OwnerActivityPage = lazy(() => import("./pages/owner/ActivityPage"));
 const OwnerSubscriptionsPage = lazy(() => import("./pages/owner/SubscriptionsPage"));
 const DeveloperAnnouncementsPage = lazy(() => import("./pages/owner/DeveloperAnnouncementsPage"));
+const AdAnalyticsDashboard = lazy(() => import("./pages/owner/AdAnalyticsDashboard"));
 
 const Announcements = lazy(() => import("./pages/Announcements"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -218,6 +219,7 @@ const App: React.FC = () => {
                           <Route path="/settings" element={<div className="p-4 bg-white rounded-lg shadow">Owner Settings Page (Coming Soon)</div>} />
                           <Route path="/activity" element={<OwnerActivityPage />} />
                           <Route path="/ads" element={<AdManager />} />
+                          <Route path="/ad-analytics" element={<AdAnalyticsDashboard />} />
                         </Routes>
                       </OwnerLayout>
                     </Suspense>

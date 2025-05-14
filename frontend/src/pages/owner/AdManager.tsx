@@ -3,6 +3,7 @@ import { Tab } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
 import CreateAdForm from '../../components/ads/CreateAdForm';
 import AdList from '../../components/ads/AdList';
+import AdAnalytics from '../../components/ads/AdAnalytics';
 import { 
   ChartBarIcon, 
   PlusIcon, 
@@ -115,16 +116,7 @@ const AdManager: React.FC = () => {
               <AdList refreshTrigger={refreshTrigger} />
             </Tab.Panel>
             <Tab.Panel className={classNames('rounded-xl p-3')}>
-              <div className="bg-gray-50 rounded-lg p-8 text-center">
-                <div className="flex flex-col items-center justify-center">
-                  <ChartBarIcon className="w-16 h-16 text-indigo-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Ad Analytics Coming Soon</h3>
-                  <p className="text-gray-500 max-w-md">
-                    We're working on comprehensive analytics for your ads. 
-                    You'll soon be able to track impressions, clicks, and conversion rates.
-                  </p>
-                </div>
-              </div>
+              <AdAnalytics />
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
