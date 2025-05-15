@@ -81,7 +81,17 @@ export const AdProvider: React.FC<AdProviderProps> = ({ children, role }) => {
   const recordView = async (adId: string) => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      if (!token) {
+        console.warn('Ad view not recorded: No authentication token found');
+        return;
+      }
+      
+      if (!adId) {
+        console.warn('Ad view not recorded: Invalid ad ID');
+        return;
+      }
+      
+      console.log(`Recording ad view - ID: ${adId}`);
       
       // Get device info
       const deviceInfo = {
@@ -91,18 +101,32 @@ export const AdProvider: React.FC<AdProviderProps> = ({ children, role }) => {
         path: location.pathname
       };
       
-      await axios.post(`${API_URL}/ads/view/${adId}`, { deviceInfo }, {
+      const response = await axios.post(`${API_URL}/ads/view/${adId}`, { deviceInfo }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-    } catch (err) {
+      
+      console.log('Ad view successfully recorded:', response.data);
+      return response.data;
+    } catch (err: any) {
       console.error('Error recording ad view:', err);
+      console.error('Error details:', err.response?.data || err.message);
     }
   };
 
   const recordClick = async (adId: string, clickType: 'cta' | 'learn_more' | 'image' | 'video' | 'close' | 'other' = 'cta') => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      if (!token) {
+        console.warn('Ad click not recorded: No authentication token found');
+        return;
+      }
+      
+      if (!adId) {
+        console.warn('Ad click not recorded: Invalid ad ID');
+        return;
+      }
+      
+      console.log(`Recording ad click - ID: ${adId}, Type: ${clickType}`);
       
       // Get device info
       const deviceInfo = {
@@ -112,14 +136,18 @@ export const AdProvider: React.FC<AdProviderProps> = ({ children, role }) => {
         path: location.pathname
       };
       
-      await axios.post(`${API_URL}/ads/click/${adId}`, { 
+      const response = await axios.post(`${API_URL}/ads/click/${adId}`, { 
         clickType,
         deviceInfo
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-    } catch (err) {
+      
+      console.log('Ad click successfully recorded:', response.data);
+      return response.data;
+    } catch (err: any) {
       console.error(`Error recording ad click (${clickType}):`, err);
+      console.error('Error details:', err.response?.data || err.message);
     }
   };
 

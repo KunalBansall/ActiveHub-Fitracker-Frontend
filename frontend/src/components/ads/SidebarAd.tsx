@@ -26,10 +26,14 @@ const SidebarAd: React.FC<SidebarAdProps> = ({ ad: providedAd }) => {
     }
   }, [providedAd, getAdsByPlacement]);
 
-  // Record a view when the ad is shown
+  // Record a view when the ad is shown - using a ref to prevent duplicate recordings
+  const viewRecorded = React.useRef<{[key: string]: boolean}>({});
+  
   useEffect(() => {
-    if (ad) {
+    if (ad && !viewRecorded.current[ad._id]) {
+      // Only record view if we haven't already recorded it for this ad
       recordView(ad._id);
+      viewRecorded.current[ad._id] = true;
     }
   }, [ad, recordView]);
 

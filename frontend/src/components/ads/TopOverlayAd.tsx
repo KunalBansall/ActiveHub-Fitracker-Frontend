@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Ad, useAds } from '../../context/AdContext';
@@ -38,10 +38,14 @@ const TopOverlayAd: React.FC<TopOverlayAdProps> = ({ ad: providedAd, onClose }) 
     }
   }, [providedAd, getAdsByPlacement]);
 
-  // Record a view when the ad is shown
+  // Record a view when the ad is shown - using a ref to prevent duplicate recordings
+  const viewRecorded = useRef<{[key: string]: boolean}>({});
+  
   useEffect(() => {
-    if (ad && isVisible) {
+    if (ad && isVisible && !viewRecorded.current[ad._id]) {
+      // Only record view if we haven't already recorded it for this ad
       recordView(ad._id);
+      viewRecorded.current[ad._id] = true;
       // Mark that the user has seen the ad
       localStorage.setItem('hasSeenTopOverlayAd', 'true');
     }
