@@ -51,7 +51,12 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/auth/reset-password/${id}/${token}`, {
+      // Use different endpoints based on whether it's a member or admin reset
+      const endpoint = isMemberReset 
+        ? `/member-auth/set-password/${id}/${token}` 
+        : `/auth/reset-password/${id}/${token}`;
+      
+      const response = await axios.post(`${API_URL}${endpoint}`, {
         password: newPassword,
       });
 
@@ -60,6 +65,7 @@ const ResetPassword: React.FC = () => {
         setIsSuccess(true);
       }
     } catch (error: any) {
+      console.error('Password reset error:', error);
       toast.error(error.response?.data.message || "Error resetting password");
     } finally {
       setLoading(false);

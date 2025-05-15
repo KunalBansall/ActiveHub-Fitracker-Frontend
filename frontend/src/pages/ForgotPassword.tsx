@@ -40,11 +40,13 @@ const ForgotPassword: React.FC = () => {
     setLoading(true)
 
     try {
-      const response = await axios.post(`${API_URL}/auth/forgot-password`, { email })
+      // Use different endpoints based on whether it's a member or admin request
+      const endpoint = isMemberReset ? '/member-auth/forgot-password' : '/auth/forgot-password'
+      const response = await axios.post(`${API_URL}${endpoint}`, { email })
       toast.success(response.data.message || 'Reset link sent to your email')
       setIsSubmitted(true)
     } catch (error: any) {
-      if (error.response?.data?.message === 'user not exists') {
+      if (error.response?.data?.message === 'user not exists' || error.response?.data?.message === 'Member does not exist') {
         toast.error('User does not exist')
       } else {
         toast.error(error.response?.data.message || 'Error sending reset email')

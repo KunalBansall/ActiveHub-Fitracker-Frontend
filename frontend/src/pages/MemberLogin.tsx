@@ -139,7 +139,7 @@ const MemberLoginPage: React.FC = () => {
                   </label>
                   <button
                     type="button"
-                    onClick={() => navigate("/reset-password?member=true")}
+                    onClick={() => navigate("/forgot-password?member=true")}
                     className="text-xs font-medium text-green-600 hover:text-green-500"
                   >
                     Forgot password?
@@ -191,17 +191,6 @@ const MemberLoginPage: React.FC = () => {
               </div>
             </form>
 
-            {/* <div className="mt-8 text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <Link
-                  to="/signup"
-                  className="font-medium text-green-600 hover:text-green-500 transition-colors duration-200"
-                >
-                  Sign up
-                </Link>
-              </p>
-            </div> */}
           </motion.div>
         </div>
       </div>
