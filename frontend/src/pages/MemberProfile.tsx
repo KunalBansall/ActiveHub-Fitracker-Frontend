@@ -105,7 +105,7 @@ const MemberProfile = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
-  const [currentTab, setCurrentTab] = useState<string>('shop'); // Set Shop as the default tab
+  const [currentTab, setCurrentTab] = useState<string>('dashboard'); // Set Dashboard as the default tab
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [shopLoading, setShopLoading] = useState<boolean>(false);
   const [recentAttendance, setRecentAttendance] = useState<any[]>([]);
@@ -1041,30 +1041,6 @@ const MemberProfile = () => {
 
   const renderShopTab = () => (
     <div className="space-y-4 sm:space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg overflow-hidden shadow-lg">
-        <div className="px-4 py-5 sm:p-6 text-white">
-          <h2 className="text-xl font-bold">Welcome back, {member?.name?.split(' ')[0] || 'Member'}!</h2>
-          <p className="mt-1 text-indigo-100">Track your fitness journey and manage your membership</p>
-          
-          <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
-                    <button
-              onClick={() => setCurrentTab('attendance')}   
-           className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50"
-                    >
-              <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
-              Check In
-                    </button>
-                    <button
-               onClick={() => setCurrentTab('workout')}
-              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-white/30 rounded-md text-sm font-medium text-white hover:bg-white/20"
-              >
-              <FireIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5" aria-hidden="true" />
-              Today's Workout
-                    </button>
-          </div>
-        </div>
-      </div>
       
       {/* Member Stats and Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
@@ -1128,67 +1104,8 @@ const MemberProfile = () => {
         </div>
       </div>
       
-      {/* Fitness Achievements */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-        {/* Visit Milestones */}
-        <div className="bg-teal-50 rounded-xl p-3 sm:p-4 shadow-sm">
-          <div className="flex items-start space-x-2 sm:space-x-3">
-            <div className="flex-shrink-0 rounded-md bg-teal-100 p-2 sm:p-3">
-              <CheckBadgeIcon className="h-4 w-4 sm:h-6 sm:w-6 text-teal-600" />
-            </div>
-            <div>
-              <p className="text-xs sm:text-sm text-teal-700">Visit Milestones</p>
-              <p className="text-sm sm:text-lg font-semibold text-gray-900 mt-0.5 sm:mt-1">
-                {monthlyVisitCount > 0 ? (
-                  <span>
-                    You've completed {monthlyVisitCount} visit{monthlyVisitCount !== 1 ? 's' : ''} this month
-                    {monthlyVisitCount >= 10 ? ' 🎉' : ''}
-                  </span>
-                ) : (
-                  <span>No visits recorded this month</span>
-                )}
-              </p>
-              <div className="mt-0.5 sm:mt-2">
-                <span className="text-xs inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">
-                  {monthlyVisitCount >= 20 ? 'Superstar Status!' : 
-                   monthlyVisitCount >= 15 ? 'Elite Status!' : 
-                   monthlyVisitCount >= 10 ? 'Gold Status!' : 
-                   monthlyVisitCount >= 5 ? 'Silver Status!' : 'Keep going!'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Fitness Streaks */}
-        <div className="bg-rose-50 rounded-xl p-3 sm:p-4 shadow-sm">
-          <div className="flex items-start space-x-2 sm:space-x-3">
-            <div className="flex-shrink-0 rounded-md bg-rose-100 p-2 sm:p-3">
-              <FireIcon className="h-4 w-4 sm:h-6 sm:w-6 text-rose-600" />
-            </div>
-            <div>
-              <p className="text-xs sm:text-sm text-rose-700">Fitness Streak</p>
-              <p className="text-sm sm:text-lg font-semibold text-gray-900 mt-0.5 sm:mt-1">
-                {currentStreak > 0 ? (
-                  <span>
-                    {currentStreak} day{currentStreak !== 1 ? 's' : ''} in a row—keep it up!
-                  </span>
-                ) : (
-                  <span>Start your streak today!</span>
-                )}
-              </p>
-              <div className="mt-0.5 sm:mt-2">
-                <span className="text-xs inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
-                  {currentStreak >= 7 ? 'On fire! 🔥' : 
-                   currentStreak >= 5 ? 'Excellent streak!' : 
-                   currentStreak >= 3 ? 'Great progress!' : 
-                   currentStreak >= 1 ? 'Good start!' : 'Visit today!'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Spacing element to maintain layout */}
+      
       
       {/* Personalized Recommendations */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -2501,7 +2418,7 @@ const MemberProfile = () => {
                   <Link to={`/member/${localStorage.getItem("userId")}`} className="flex items-center">
                     <HeartIcon className="h-5 w-5 text-pink-400 mr-2" />
                     <span className="text-white text-lg font-bold tracking-tight">
-                      ActiveHub<span className="text-pink-300 font-light">FlexTracker</span>
+                      ActiveHub<span className="text-pink-300 font-light">FitTracker</span>
                     </span>
                   </Link>
                 </div>
@@ -2830,7 +2747,7 @@ const MemberProfile = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <HeartIcon className="h-5 w-5 text-pink-400 mr-2" />
-                <span>ActiveHub<span className="text-pink-300 font-light">FlexTracker</span></span>
+                <span>ActiveHub<span className="text-pink-300 font-light">FitTracker</span></span>
               </h3>
               <p className="text-gray-400 text-sm">
                 Your all-in-one fitness membership management platform. Track progress, 
