@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Member } from '../types';
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
@@ -20,11 +21,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 // Define the member type, including the photo field
-interface Member {
-  _id: string;
-  name: string;
-  photo: string;
-}
+// Using the Member interface from types
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -101,12 +98,12 @@ export default function Header() {
     }
   );
 
-  const { data: searchResults } = useQuery(
+  const { data: searchResults } = useQuery<Member[]>(
     ["memberSearch", searchQuery],
     async () => {
       if (!searchQuery) return [];
 
-      const response = await axios.get(
+      const response = await axios.get<Member[]>(
         `${API_URL}/members/search?query=${searchQuery}`,
         {
           headers: {
@@ -297,7 +294,7 @@ export default function Header() {
                     </p>
                   </div>
                   <ul className="max-h-80 overflow-auto py-1">
-                    {searchResults.map((member: Member) => (
+                    {searchResults?.map((member: Member) => (
                       <li
                         key={member._id}
                         className="cursor-pointer hover:bg-gray-50 transition-colors duration-150"
@@ -318,7 +315,7 @@ export default function Header() {
                           />
                               <div className="ml-3">
                                 <p className="text-sm font-medium text-gray-900">{member.name}</p>
-                                <p className="text-xs text-gray-500">ID: {member._id.substring(0, 8)}...</p>
+                                <p className="text-xs text-gray-500">ID: {member.email}</p>
                               </div>
                             </div>
                           </div>
