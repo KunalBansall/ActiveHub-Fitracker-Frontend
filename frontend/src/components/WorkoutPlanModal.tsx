@@ -103,7 +103,7 @@ const WorkoutPlanModal: React.FC<WorkoutPlanModalProps> = ({ isOpen, onClose, me
     if (!template) return;
     
     // Update plan name to indicate it's a copy
-    setPlanName(`${template.name} - ${memberName}'s Copy`);
+    setPlanName(`${template.name} - ${memberName}`);
     setGoal(template.goal);
     setExperienceLevel(template.experienceLevel);
     setAccessType(template.accessType);
