@@ -25,6 +25,32 @@ export default function Dashboard() {
   const token = localStorage.getItem("token");
   const [shouldRunTour, setShouldRunTour] = useState(false);
   const [adminId, setAdminId] = useState("");
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format date and time in IST
+  const formattedDate = currentTime.toLocaleDateString('en-IN', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'Asia/Kolkata'
+  });
+
+  const formattedTime = currentTime.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata'
+  });
   
   // Fetch admin data to check if tour should run
   const { data: adminData } = useQuery("adminData", () =>
@@ -132,7 +158,21 @@ export default function Dashboard() {
         />
       )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Dashboard</h1>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <div className="flex items-center mt-1">
+            <span className="text-sm text-gray-500">
+              {formattedDate}
+              <span className="mx-2">•</span>
+              <span className="inline-flex items-center">
+                <svg className="mr-1 h-2 w-2 text-green-500" fill="currentColor" viewBox="0 0 8 8">
+                  <circle cx="4" cy="4" r="3" />
+                </svg>
+                {formattedTime} IST
+              </span>
+            </span>
+          </div>
+        </div>
         <Link
           to="/members/add"
           data-tour="add-member"

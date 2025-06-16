@@ -263,6 +263,7 @@ const Subscription: React.FC = () => {
                              (subscriptionStatus === 'trial' && !isSubscribedDuringTrial) || 
                              subscriptionStatus === 'grace' || 
                              subscriptionStatus === 'expired' || 
+                             subscriptionStatus === 'cancelled' || 
                              (subscriptionStatus === 'active' && hasCancelled && hasDatePassed(subscriptionEndDate));
   
   // Show the resubscribe button only when we're close to end date
