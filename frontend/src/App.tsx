@@ -263,6 +263,9 @@ const App: React.FC = () => {
                         <Route path="/revenue" element={<RevenueDashboard />} />
                         <Route path="/subscription" element={<Subscription />} />
                         <Route path="/shop" element={<Shop />} />
+                        <Route path="/shop/add-product" element={<AddEditProduct />} />
+                        <Route path="/shop/products/:id" element={<ProductDetail />} />
+                        <Route path="/shop/products/:id/edit" element={<AddEditProduct />} />
                         <Route path="/orders" element={<AdminOrders />} />
                         {/* Owner-only route */}
                         <Route 
