@@ -14,7 +14,7 @@
       "@/*": ["*"]  // Add path alias for @ to resolve to src/
     },
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["react", "react-dom"]
+    "types": ["react", "react-dom","jest", "node"]
   },
   "include": ["src", "src/types/razorpay.d.ts"]
 }

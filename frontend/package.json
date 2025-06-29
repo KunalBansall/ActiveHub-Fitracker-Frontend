@@ -14,7 +14,10 @@
     "build:force": "npm run clean && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "vite preview --port 3000"
+    "start": "vite preview --port 3000",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
@@ -46,8 +49,15 @@
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/jwt-decode": "^3.1.0",
-    "@types/node": "^22.10.1",
+    "@types/node": "^22.15.32",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/recharts": "^2.0.1",
@@ -55,13 +65,19 @@
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.20",
+    "babel-jest": "^30.0.2",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.0.2",
+    "jest-environment-jsdom": "^30.0.2",
     "lucide-react": "^0.468.0",
     "postcss": "^8.4.49",
     "rimraf": "^5.0.10",
     "tailwindcss": "^3.4.15",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "vite": "^4.5.13",
     "vite-plugin-rewrite-all": "^1.0.2"

@@ -16,6 +16,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CameraIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline"
 import toast from "react-hot-toast"
 import ProfileFooterAd from "../components/ads/ProfileFooterAd"
@@ -159,12 +160,47 @@ export default function ProfilePage() {
         setFormData(null)
         toast.success('Profile updated successfully')
       },
-      onError: (error) => {
-        // console.error('Profile update error:', error)
-        toast.error('Failed to update profile. Please try again.')
+      onError: (error: any) => {
+        console.error('Profile update error:', error)
+        if (error.response?.data?.error?.includes('E11000 duplicate key error') && error.response?.data?.error?.includes('email')) {
+          toast.error('This email is already in use. Please use a different email address.')
+        } else {
+          toast.error(error.response?.data?.message || 'Failed to update profile. Please try again.')
+        }
       },
     }
   )
+
+  /**
+   * Handles removing a photo from the form data
+   * @param photoId The public ID of the photo to remove
+   */
+  const handleRemovePhoto = (photoId: string) => {
+    if (!formData) return
+    
+    // Don't allow removing the last photo
+    if (formData.photos.length <= 1) {
+      toast.error('You must have at least one photo')
+      return
+    }
+
+    const updatedPhotos = formData.photos.filter(photo => photo.publicId !== photoId)
+    
+    // If the deleted photo was the profile photo, set a new one
+    let newProfilePhotoId = formData.profilePhotoId
+    if (photoId === formData.profilePhotoId) {
+      newProfilePhotoId = updatedPhotos[0]?.publicId
+      if (newProfilePhotoId) {
+        toast.success('Profile photo updated to the next available photo')
+      }
+    }
+
+    setFormData({
+      ...formData,
+      photos: updatedPhotos,
+      profilePhotoId: newProfilePhotoId
+    })
+  }
 
   /**
    * Handles uploading one or more photos to Cloudinary.
@@ -238,6 +274,11 @@ export default function ProfilePage() {
   const prevSlide = () => {
     const photos = (isEditing ? formData?.photos : profile?.photos) || []
     setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length)
+  }
+
+  // Get current photos based on edit mode
+  const getCurrentPhotos = () => {
+    return (isEditing ? formData?.photos : profile?.photos) || []
   }
 
   const handleChange = (name: string, value: string) => {
@@ -456,35 +497,21 @@ export default function ProfilePage() {
                 </div>
                 {isEditing && (
                   <div className="flex items-center space-x-3">
-                    <div className="relative">
+                    <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">
                       <input
                         type="file"
-                        id="photo-upload"
-                        multiple
                         accept="image/*"
+                        multiple
                         className="hidden"
                         onChange={handlePhotoUpload}
                         disabled={isUploading}
                       />
-                      <label
-                        htmlFor="photo-upload"
-                        className="inline-flex items-center rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {isUploading ? (
-                          <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <PhotoIcon className="mr-2 h-4 w-4" />
-                        )}
-                        Upload Photos
-                      </label>
-                    </div>
-                    {photos.length > 0 && (
-                      <button
-                        onClick={savePhotosDirectly}
-                        className="inline-flex items-center rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      >
-                        Save Photos
-                      </button>
+                      <PlusIcon className="w-6 h-6 text-gray-400" />
+                    </label>
+                    {getCurrentPhotos().length > 1 && (
+                      <div className="text-xs text-gray-500 mt-2 text-center">
+                        Click on the X to remove a photo
+                      </div>
                     )}
                   </div>
                 )}
@@ -505,23 +532,53 @@ export default function ProfilePage() {
                             : 'translate-x-full opacity-0'
                         }`}
                       >
-                        <img
-                          src={photo.url}
-                          alt={`Gym photo ${index + 1}`}
-                          className={`h-full w-full object-cover ${
-                            isEditing && formData?.profilePhotoId === photo.publicId
-                              ? 'ring-4 ring-blue-500'
-                              : ''
-                          }`}
-                          onClick={() => isEditing && handlePhotoSelect(photo)}
-                        />
-                        {isEditing && (
-                          <div className="absolute bottom-4 right-4 rounded-lg bg-black/70 px-4 py-2 text-sm text-white backdrop-blur-sm">
-                            {formData?.profilePhotoId === photo.publicId
-                              ? 'Current Profile Photo'
-                              : 'Click to set as profile photo'}
+                        <div className="relative group">
+                          <div className="relative h-full w-full">
+                            <img
+                              src={photo.url}
+                              alt={`Gym photo ${index + 1}`}
+                              className={`h-full w-full object-cover ${
+                                (isEditing ? formData?.profilePhotoId : profile?.profilePhotoId) === photo.publicId
+                                  ? 'ring-4 ring-blue-500'
+                                  : ''
+                              }`}
+                              onClick={() => isEditing && handlePhotoSelect(photo)}
+                            />
+                            {isEditing && (
+                              <div className="absolute bottom-4 right-4 rounded-lg bg-black/70 px-4 py-2 text-sm text-white backdrop-blur-sm">
+                                {(isEditing ? formData?.profilePhotoId : profile?.profilePhotoId) === photo.publicId
+                                  ? 'Current Profile Photo'
+                                  : 'Click to set as profile photo'}
+                              </div>
+                            )}
+                            {isEditing && getCurrentPhotos().length > 1 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleRemovePhoto(photo.publicId)
+                                }}
+                                className="absolute top-4 right-4 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                aria-label="Remove photo"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                              </button>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     ))}
 

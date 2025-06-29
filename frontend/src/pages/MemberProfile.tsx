@@ -1859,7 +1859,7 @@ const MemberProfile = () => {
   const [editingNotes, setEditingNotes] = useState<boolean>(false);
   const [notes, setNotes] = useState<string>('');
 
-  // Fetch the workout plan
+  // Fetch the workout plan@
   const fetchWorkoutPlan = async () => {
     setLoadingWorkout(true);
     try {
