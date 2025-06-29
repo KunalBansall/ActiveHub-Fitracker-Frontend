@@ -33,7 +33,8 @@ export default function Header() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchResultsRef = useRef<HTMLDivElement>(null);
-  const mouseTimeoutRef = useRef<number | null>(null);
+  // Use any type for timeout to handle both Node.js and browser environments
+  const mouseTimeoutRef = useRef<any>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
