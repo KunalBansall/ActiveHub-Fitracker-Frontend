@@ -50,33 +50,53 @@ const SignInContent = () => {
 
   const onSubmit = async (data: SignInForm) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/signin`, data);
-      
-      // Extract subscription data from response
-      const subscriptionData = {
-        subscriptionStatus: response.data.subscriptionStatus,
-        trialEndDate: response.data.trialEndDate,
-        graceEndDate: response.data.graceEndDate, 
-        subscriptionEndDate: response.data.subscriptionEndDate
-      };
+      // First try admin login
+      try {
+        const response = await axios.post(`${API_URL}/auth/signin`, {
+          email: data.email,
+          password: data.password
+        });
 
-      // Update subscription context
-      updateSubscriptionInfo(subscriptionData);
-      
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      
-      // Set the justLoggedIn flag to trigger the full-screen ad
-      sessionStorage.setItem("justLoggedIn", "true");
+        const subscriptionData = {
+          subscriptionStatus: response.data.subscriptionStatus,
+          trialEndDate: response.data.trialEndDate,
+          graceEndDate: response.data.graceEndDate, 
+          subscriptionEndDate: response.data.subscriptionEndDate
+        };
+        updateSubscriptionInfo(subscriptionData);
+        
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data));
+        
+        // Set the justLoggedIn flag to trigger the full-screen ad
+        sessionStorage.setItem("justLoggedIn", "true");
 
-      // Decode the JWT token using the custom type
-      const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
-      const role = decodedToken.role;
+        // Decode the JWT token using the custom type
+        const decodedToken = jwtDecode<CustomJwtPayload>(response.data.token);
+        const role = decodedToken.role;
 
-      if (role === "owner") {
-        navigate("/owner-dashboard"); // Redirect to owner-specific route
-      } else {
-        navigate("/"); // Redirect to the default route
+        if (role === "owner") {
+          navigate("/owner-dashboard");
+        } else {
+          navigate("/");
+        }
+        return; // Exit if admin login succeeds
+      } catch (error: any) {
+        // If admin login fails, try trainer login
+        if (error.response?.status === 401) {
+          const trainerResponse = await axios.post(`${API_URL}/trainers/login`, {
+            email: data.email,
+            password: data.password
+          });
+          
+          // For trainer login
+          localStorage.setItem("trainerToken", trainerResponse.data.token);
+          localStorage.setItem("trainer", JSON.stringify(trainerResponse.data.data.trainer));
+          navigate("/trainer/dashboard");
+        } else {
+          // If it's not a 401 error, rethrow it
+          throw error;
+        }
       }
     } catch (err: any) {
       setError(err.response?.data?.message || "An error occurred");
@@ -89,13 +109,15 @@ const SignInContent = () => {
       <div className="fixed top-0 left-0 right-0 z-10 flex justify-center p-3 bg-gray-50 shadow-md">
         <div className="inline-flex rounded-lg">
           <button
-            className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium text-white transition-all duration-200 ease-in-out bg-blue-600 rounded-l-lg focus:outline-none hover:bg-blue-700"
+            type="button"
+            className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none rounded-l-lg transition-all duration-200"
           >
             <span className="relative text-sm">Admin Access</span>
           </button>
           <button
+            type="button"
             onClick={() => navigate('/memberlogin')}
-            className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium text-gray-700 bg-gray-200 rounded-r-lg hover:bg-gray-300 focus:outline-none transition-all duration-200 ease-in-out"
+            className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none transition-all duration-200"
           >
             <span className="relative text-sm">Member Access</span>
           </button>
@@ -133,12 +155,13 @@ const SignInContent = () => {
             )}
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
               <div>
                 <label
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Email address
+                  Email Address
                 </label>
                 <div className="relative">
                   <EnvelopeIcon className="h-5 w-5 text-gray-400 absolute top-1/2 -translate-y-1/2 left-3" />

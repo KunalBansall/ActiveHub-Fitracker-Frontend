@@ -18,11 +18,13 @@ import LoadingSpinner from './components/LoadingSpinner';
 import { useSubscription } from "./context/SubscriptionContext";
 // import { AuthProvider } from './context/AuthContext';
 
-
 const queryClient = new QueryClient();
 
 // Lazy load pages for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const TrainerSetPassword = lazy(() => import("./pages/TrainerSetPassword"));
+const TrainerDashboard = lazy(() => import('./pages/trainer/TrainerDashboard'));
+const TrainerMembers = lazy(() => import('./pages/trainer/TrainerMembers'));
 const Members = lazy(() => import("./pages/Members"));
 const AddMember = lazy(() => import("./pages/AddMember"));
 const MemberDetails = lazy(() => import("./pages/MemberDetails"));
@@ -46,6 +48,7 @@ const OwnerGymsPage = lazy(() => import("./pages/owner/GymsPage"));
 const OwnerActivityPage = lazy(() => import("./pages/owner/ActivityPage"));
 const OwnerSubscriptionsPage = lazy(() => import("./pages/owner/SubscriptionsPage"));
 const DeveloperAnnouncementsPage = lazy(() => import("./pages/owner/DeveloperAnnouncementsPage"));
+const Trainers = lazy(() => import("./pages/admin/Trainers"));
 const AdAnalyticsDashboard = lazy(() => import("./pages/owner/AdAnalyticsDashboard"));
 
 const Announcements = lazy(() => import("./pages/Announcements"));
@@ -139,62 +142,87 @@ const AdminLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
 
 const App: React.FC = () => {
   return (
-    // <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <SubscriptionProvider>
-          <Toaster position="top-right" />
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center min-h-screen bg-gray-100">
-                <LoadingSpinner size="xl" />
-              </div>
-            }
-          >
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route
-                path="/reset-password/:id/:token"
-                element={<ResetPassword />}
-              />
+    <QueryClientProvider client={queryClient}>
+      <SubscriptionProvider>
+        <Toaster position="top-right" />
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center min-h-screen bg-gray-100">
+              <LoadingSpinner size="xl" />
+            </div>
+          }
+        >
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+            
+            {/* Trainer Routes */}
+            <Route path="/trainer/set-password/:token" element={<TrainerSetPassword />} />
+            <Route path="/trainer/dashboard" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+                <TrainerDashboard />
+              </Suspense>
+            } />
+            <Route path="/trainer/members" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+                <TrainerMembers />
+              </Suspense>
+            } />
 
-              {/* Member-specific routes */}
-              <Route path="/memberlogin" element={<MemberLoginPage />} />
-              <Route path="/set-password/:id/:token" element={<SetPassword />} />
-              <Route
-                path="/member/:id"
-                element={
-                  <MemberLayout>
-                    <MemberProfile />
-                  </MemberLayout>
-                }
-              />
-              <Route
-                path="/member-shop"
-                element={
-                  <MemberLayout>
-                    <MemberShop />
-                  </MemberLayout>
-                }
-              />
-              <Route
-                path="/member-shop/product/:id"
-                element={
-                  <MemberLayout>
-                    <MemberProductDetail />
-                  </MemberLayout>
-                }
-              />
-              <Route
-                path="/member-orders"
-                element={
-                  <MemberLayout>
-                    <MemberOrders />
-                  </MemberLayout>
-                }
-              />
+            {/* Member-specific routes */}
+            <Route path="/memberlogin" element={<MemberLoginPage />} />
+            <Route path="/set-password/:id/:token" element={<SetPassword />} />
+            <Route
+              path="/member/:id"
+              element={
+                <MemberLayout>
+                  <MemberProfile />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-shop"
+              element={
+                <MemberLayout>
+                  <MemberShop />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-shop/product/:id"
+              element={
+                <MemberLayout>
+                  <MemberProductDetail />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-orders"
+              element={
+                <MemberLayout>
+                  <MemberOrders />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-shop"
+              element={
+                <MemberLayout>
+                  <MemberShop />
+                </MemberLayout>
+              }
+            />
+            <Route
+              path="/member-shop/product/:id"
+              element={
+                <MemberLayout>
+                  <MemberProductDetail />
+                </MemberLayout>
+              }
+            />
 
               {/* Owner Dashboard Routes - Completely separate from admin routes */}
               <Route
@@ -210,14 +238,15 @@ const App: React.FC = () => {
                         <Routes>
                           <Route path="/" element={<OwnerDashboardPage />} />
                           <Route path="/gyms" element={<OwnerGymsPage />} />
+                          <Route path="/activity" element={<OwnerActivityPage />} />
                           <Route path="/subscriptions" element={<OwnerSubscriptionsPage />} />
-                          <Route path="/webhooks" element={<WebhookViewerPage />} />
+                          <Route path="/announcements" element={<DeveloperAnnouncementsPage />} />
+                          <Route path="/trainers" element={<Trainers />} />
                           <Route path="/webhooks/analytics" element={<WebhookAnalyticsDashboard />} />
                           <Route path="/products" element={<div className="p-4 bg-white rounded-lg shadow">Products Management Page (Coming Soon)</div>} />
                           <Route path="/announcements" element={<DeveloperAnnouncementsPage />} />
                           <Route path="/reports" element={<div className="p-4 bg-white rounded-lg shadow">Reports Page (Coming Soon)</div>} />
                           <Route path="/settings" element={<div className="p-4 bg-white rounded-lg shadow">Owner Settings Page (Coming Soon)</div>} />
-                          <Route path="/activity" element={<OwnerActivityPage />} />
                           <Route path="/ads" element={<AdManager />} />
                           <Route path="/ad-analytics" element={<AdAnalyticsDashboard />} />
                         </Routes>
@@ -267,6 +296,7 @@ const App: React.FC = () => {
                         <Route path="/shop/products/:id" element={<ProductDetail />} />
                         <Route path="/shop/products/:id/edit" element={<AddEditProduct />} />
                         <Route path="/orders" element={<AdminOrders />} />
+                        <Route path="/admin/trainers" element={<Trainers />} />
                         {/* Owner-only route */}
                         <Route 
                           path="/ads" 

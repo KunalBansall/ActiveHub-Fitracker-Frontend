@@ -1,106 +1,84 @@
 import { Link, useLocation } from "react-router-dom";
 import {
+  HomeIcon,
   UsersIcon,
   ClockIcon,
-  CreditCardIcon,
-  ChartBarIcon,
-  BellIcon,
-  Cog6ToothIcon,
-  UserIcon,
+  BanknotesIcon,
   ShoppingBagIcon,
   TruckIcon,
-  MegaphoneIcon,
-  SpeakerWaveIcon,
-  BanknotesIcon,
-  CurrencyDollarIcon,
+  UserIcon,
+  UserGroupIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import SidebarAd from "./ads/SidebarAd";
 import { useAds } from "../context/AdContext";
-import { jwtDecode } from "jwt-decode";
 
-// Create regular navigation items without the Ads entry
-export const regularNavigation = [
+// Admin navigation items
+export const navigation = [
+  // { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   { name: "Members", href: "/members", icon: UsersIcon },
   { name: "Attendance", href: "/attendance", icon: ClockIcon },
   { name: "Revenue", href: "/revenue", icon: BanknotesIcon },
   { name: "Shop", href: "/shop", icon: ShoppingBagIcon },
   { name: "Orders", href: "/orders", icon: TruckIcon },
+  { name: "Trainers", href: "/admin/trainers", icon: UserGroupIcon },
+  // { name: "Settings", href: "/settings", icon: Cog6ToothIcon },
   { name: "Profile", href: "/profile", icon: UserIcon },
 ];
 
-// The Ads navigation item
-const adsNavItem = { name: "Ads", href: "/ads", icon: MegaphoneIcon };
-
-export default function Sidebar() {
+const Sidebar = () => {
   const location = useLocation();
   const { ads, loading } = useAds();
-  const [isOwner, setIsOwner] = useState(false);
-  const [navigation, setNavigation] = useState(regularNavigation);
-
-  // Check if the current user is the owner
-  useEffect(() => {
-    const checkIfOwner = () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        
-        const decoded = jwtDecode(token);
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        // Check if user's email matches OWNER_EMAIL or role is 'owner'
-        if (user.role === 'owner' || user.email === import.meta.env.VITE_OWNER_EMAIL) {
-          setIsOwner(true);
-          // Add the Ads item to navigation if the user is the owner
-          setNavigation([...regularNavigation, adsNavItem]);
-        }
-      } catch (error) {
-        console.error('Error checking owner status:', error);
-      }
-    };
-    
-    checkIfOwner();
-  }, []);
 
   return (
-    <div className="hidden lg:flex h-full w-64 flex-col bg-gray-900" data-tour="sidebar">
-      <nav className="flex-1 space-y-1 px-2 py-4">
+    <div className="hidden lg:flex h-full w-64 flex-col bg-gray-800">
+      
+      
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href || 
-                          (item.href !== '/' && location.pathname.startsWith(item.href));
+                         (item.href !== '/' && location.pathname.startsWith(item.href));
           return (
             <Link
               key={item.name}
               to={item.href}
               className={clsx(
                 isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white",
-                "group flex items-center rounded-md px-2 py-2 text-sm font-medium"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200"
               )}
             >
               <item.icon
                 className={clsx(
-                  isActive
-                    ? "text-white"
-                    : "text-gray-400 group-hover:text-white",
-                  "mr-3 h-6 w-6 flex-shrink-0"
+                  isActive ? "text-blue-400" : "text-gray-400 group-hover:text-gray-300",
+                  "mr-3 flex-shrink-0 h-5 w-5"
                 )}
                 aria-hidden="true"
               />
               {item.name}
+              {isActive && (
+                <span className="ml-auto inline-block w-1.5 h-1.5 rounded-full bg-blue-500" />
+              )}
             </Link>
           );
         })}
       </nav>
       
       {/* SidebarAd at the bottom */}
-      <div className="mt-auto p-3">
-        {!loading && ads.length > 0 && (
+      <div className="p-3 border-t border-gray-700">
+        {!loading && ads.length > 0 ? (
           <SidebarAd ad={ads[0]} />
+        ) : (
+          <div className="text-center text-xs text-gray-400 mt-2">
+            No active ads
+          </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default Sidebar;

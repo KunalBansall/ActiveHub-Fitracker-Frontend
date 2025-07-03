@@ -43,9 +43,13 @@ const DeveloperMessages: React.FC = () => {
         ).length;
         
         setUnreadCount(newUnreadCount);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error fetching announcements:', error);
-        toast.error('Failed to load developer announcements');
+        // Only show error toast if there was an actual error, not for empty responses
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status !== 404) {
+          toast.error('Failed to load developer announcements');
+        }
       } finally {
         setLoading(false);
       }
